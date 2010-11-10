@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>FileManager</title>
+<title>FileTrader</title>
 <meta name="viewport" content="width = 320" />
 <style type="text/css">
 	@import url("s/style.css");
@@ -20,7 +20,7 @@
         </div>
 	{/if}
 
-	<h1>FileManager</h1>
+	<h1>FileTrader</h1>
 
 	<div id="navigation">
 	<ul>
