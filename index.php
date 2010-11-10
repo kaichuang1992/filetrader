@@ -262,10 +262,9 @@ switch($action) {
 	        // usleep(5000);
 
 	        // Get parameters
-		// FIXME: use our helper function
-	        $chunk = isset($_REQUEST["chunk"]) ? $_REQUEST["chunk"] : 0;
-	        $chunks = isset($_REQUEST["chunks"]) ? $_REQUEST["chunks"] : 0;
-	        $fileName = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
+		$chunk = getRequest('chunk', FALSE, 0);
+		$chunks = getRequest('chunks', FALSE, 0);
+		$fileName = getRequest('name', FALSE, '');
 
 	        // Clean the fileName for security reasons
 		// FIXME: make this better, don't remove so much!!!		
