@@ -1,0 +1,48 @@
+-- File Manager --
+
+The following PHP/JS libraries are required:
+
+- PHP Pear:Download (for segmented downloading)
+	- (pear install as root)
+- Smarty (template engine)
+	- (from Fedora package (php-Smarty)
+- OAuth (OAuth authentication)
+	- ext/oauth/  (from http://oauth.googlecode.com/svn/code/php/)
+- Sag (CouchDB PHP library)
+	- ext/sag/ (from http://www.saggingcouch.com/)
+- LightOpenID (OpenID SP library)
+	- ext/lightopenid/   (from ...)
+
+The following JS libraries are required:
+
+- Plupload (Various methods HTTP upload)
+	- ext/plupload/	(from http://www.plupload.com)
+- jQuery (General Purpose JS library)
+	- ext/jquery.js (from http://www.jquery.com)
+
+The following components are required:
+
+- PHP 5.3.x
+- CouchDB
+- 64 bit system for >2G file uploads
+
+--- Configure ---
+
+Copy config.php.defaults to config.php and modify if needed.
+
+Make sure the database exists in CouchDB. It doesn't need to contain
+any documents though.
+
+Create directories and set file permissions:
+
+	# create directories
+	mkdir -p data
+	mkdir -p data/files
+	mkdir -p tpl_c
+
+	# set unix permissions
+	chmod o+w -R data tpl_c
+
+	# set the correct SELinux labels (only for Fedora/Red Hat systems?)
+	chcon -R -t httpd_sys_rw_content_t data tpl_c
+
