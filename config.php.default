@@ -1,0 +1,26 @@
+<?php
+$config = array();
+
+$config['time_zone'] = 'Europe/Amsterdam';
+
+// PlainAuth, OpenIDAuth
+$config['auth_type'] = 'PlainAuth';
+
+$config['openid_whitelist'] = 
+	array('https://@ID@.wordpress.com'
+			=> 'Wordpress', 
+	      'https://www.google.com/accounts/o8/id'
+			=> 'Google',
+	      '@ID@'
+			=> 'Other...',
+	);
+
+// Allow users to share files through email invites containing a token
+$config['email_share'] = TRUE;
+
+// Allow users to share files through groups
+$config['group_share'] = TRUE;
+
+// Name of database in CouchDB
+$config['db_name'] = 'files';
+?>

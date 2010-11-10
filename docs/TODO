@@ -1,0 +1,25 @@
+Things still to do:
+
+== 1.0 ==
+Big Tasks:
+- implement 2-legged OAuth
+- implement OpenSocial auth, allow iGoogle access
+- custom css/js for plupload instead of default one
+- implement automatic class loader
+
+Small Tasks:
+- do something better with file name filter on upload, too restrictive now
+- add licensing text to source files
+- figure out license of all libraries used
+- update the list of dependencies with version numbers and URLs
+- figure out how to take care of Pear Download library in a nice way (now 
+  as root pear install of the module, ieeuw)
+- figure out how to take care of Smarty (now Fedora package)
+- add better logging
+
+== 2.0 ==
+- add SAML SP module support
+- split out group/team stuff to separate classes?
+- implement 3-legged OAuth
+- implement something like "file collections" to keep files "together"?
+- implement tagging / file collections?
