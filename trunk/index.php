@@ -73,6 +73,9 @@ switch($action) {
 
 			if(!file_exists($filePath))
 				throw new Exception("file does not exist on file system");
+
+			logHandler("User '" . $auth->getUserID() . "' is downloading file '" . $file . "'");
+
 			$dl = new HTTP_Download();
 			$dl->setFile($filePath);
 			$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $file);
@@ -113,6 +116,8 @@ switch($action) {
 
                 if($info['fileOwner'] !== $auth->getUserId())
                         die("access denied");
+
+                logHandler("User '" . $auth->getUserID() . "' is deleting file '" . $info['fileName'] . "'");
 
 		$storage->deleteEntry($dbName, $id, $info['_rev']);
 
@@ -161,7 +166,7 @@ switch($action) {
                         die("access denied");
 
                 $address = getRequest('address', TRUE);
-		/* validate address */
+		/* FIXME: validate address */
 
 		/* add token */
 		$token = generateToken();
@@ -178,6 +183,8 @@ switch($action) {
 
 		if($status !== TRUE)
 			logHandler("Sending mail to $address failed!");
+		else
+	                logHandler("User '" . $auth->getUserID() . "' is sharing file '" . $info['fileName'] . "' with '" . $address . "'");
 
 		/* add token to data store */
 		$info['downloadTokens'][$token] = $address;
@@ -351,6 +358,7 @@ switch($action) {
         	        $metaData = analyzeFile($targetDir . DIRECTORY_SEPARATOR . $fileName);
 	                $metaData['fileOwner'] = $auth->getUserId();
 	                $storage->createEntry($dbName, $metaData);
+	                logHandler("User '" . $auth->getUserID() . "' uploaded file '" . $metaData['fileName'] . "'");
 	        }
 
 	        // Return JSON-RPC response
