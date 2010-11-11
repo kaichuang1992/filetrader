@@ -37,7 +37,7 @@
 			$caller = $_SERVER['REMOTE_ADDR'];
 		else
 			$caller = 'php-cli';
-		file_put_contents('data/app.log', "---[".$caller." @ ".date("c",time())."]---\n".$message."\n", FILE_APPEND);
+		file_put_contents('data/app.log', date("c",time())." ".$caller. ": " . $message, FILE_APPEND);
 		return $message;
 	}
 
