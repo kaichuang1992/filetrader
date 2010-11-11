@@ -1,4 +1,4 @@
-<script type="text/javascript" src="j/openid.js"></script>
+<script type="text/javascript" src="j/auth.js"></script>
 <style type="text/css">
         @import url("s/login.css");
 </style>
