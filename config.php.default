@@ -18,8 +18,8 @@ $config['openid_whitelist'] =
 // Allow users to share files through email invites
 $config['email_share'] = TRUE;
 
-// Allow users to share files through groups (requires support in 
-// authentication backend!)
+// Allow users to share files through groups
+// (This requires support in authentication backend!)
 $config['group_share'] = FALSE;
 
 // Name of database in CouchDB
