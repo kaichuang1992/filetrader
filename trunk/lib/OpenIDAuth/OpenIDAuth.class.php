@@ -55,7 +55,7 @@
 					if(!empty($domains))
 						$domains = array_merge(array('---' => 'Select an Identity Provider'), $domains);
 					$smarty->assign('domains', $domains);
-	                                $smarty->assign('content', $smarty->fetch('openidauth.tpl'));
+	                                $smarty->assign('content', $smarty->fetch('openid.tpl'));
 	                                $smarty->display('index.tpl');
 	                                die();
 
