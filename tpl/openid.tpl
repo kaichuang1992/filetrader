@@ -1,6 +1,6 @@
 <script type="text/javascript" src="j/auth.js"></script>
 <style type="text/css">
-        @import url("s/login.css");
+        @import url("s/auth.css");
 </style>
 <div class="login">
 	<h2>Login</h2>
