@@ -1,6 +1,6 @@
 <script type="text/javascript" src="j/openid.js"></script>
 <style type="text/css">
-        @import url("s/openid.css");
+        @import url("s/login.css");
 </style>
 <div class="login">
 	<h2>Login</h2>
