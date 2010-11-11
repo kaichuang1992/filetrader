@@ -1,0 +1,17 @@
+The following external PHP libraries are required:
+
+Library         Version         License         URL
+                Tested
+-------------------------------------------------------------------------------
+Smarty		2.6.26		LGPL		http://www.smarty.net
+Sag PHP		0.3.0 (dev)	ASL2.0		http://www.saggingcouch.com/
+LightOpenID	0.3		MIT		http://code.google.com/p/lightopenid/
+
+The following external JS libraries are required:
+
+Library		Version		License		URL
+		Tested
+-------------------------------------------------------------------------------
+Plupload	1.2.4		GPLv2		http://www.plupload.com/
+jQuery		1.4.3		MIT, GPLv2	http://jquery.com/
+
