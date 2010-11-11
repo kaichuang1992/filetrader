@@ -1,37 +1,20 @@
--- File Manager --
+-- File Trader --
 
-The following PHP/JS libraries are required:
-
-- PHP Pear:Download (for segmented downloading)
-	- (pear install as root)
-- Smarty (template engine)
-	- (from Fedora package (php-Smarty)
-- OAuth (OAuth authentication)
-	- ext/oauth/  (from http://oauth.googlecode.com/svn/code/php/)
-- Sag (CouchDB PHP library)
-	- ext/sag/ (from http://www.saggingcouch.com/)
-- LightOpenID (OpenID SP library)
-	- ext/lightopenid/   (from ...)
-
-The following JS libraries are required:
-
-- Plupload (Various methods HTTP upload)
-	- ext/plupload/	(from http://www.plupload.com)
-- jQuery (General Purpose JS library)
-	- ext/jquery.js (from http://www.jquery.com)
-
-The following components are required:
+The following base components are required. See REQUIREMENTS for a list of 
+external PHP and JavaScript libraries required for FileTrader.
 
 - PHP 5.3.x
 - CouchDB
+- PHP With PEAR (HTTP_Download 1.1.4)
 - 64 bit system for >2G file uploads
 
 --- Configure ---
-
 Copy config.php.defaults to config.php and modify if needed.
 
 Make sure the database exists in CouchDB. It doesn't need to contain
-any documents though.
+any documents though. See the script in the docs/ directory to populate 
+CouchDB with some entries. You can also use the web based CouchDB 
+interface at "http://localhost:<PORT>/_utils".
 
 Create directories and set file permissions:
 
