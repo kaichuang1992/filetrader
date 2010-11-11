@@ -9,8 +9,6 @@
 <script type="text/javascript" src="ext/jquery.js"></script>
 {if $authenticated}
 <script type="text/javascript" src="j/index.js"></script> 
-{else}
-<script type="text/javascript" src="j/login.js"></script> 
 {/if}
 </head>
 <body>
