@@ -1,4 +1,5 @@
 <?php
+
 /*  
  *  FileTrader - Web based file sharing platform
  *  Copyright (C) 2010 François Kooman <fkooman@tuxed.net>
@@ -18,14 +19,14 @@
  */
 
 class NullAuth extends Auth {
-	
+
 	function login() {
-		if($this->isLoggedIn())
+		if ($this->isLoggedIn())
 			return;
-                $_SESSION['userId'] = 'anonymous';
-                $_SESSION['userAttr'] = array();
-                $_SESSION['userDisplayName'] = 'Anonymous Coward';
-                return;
+		$_SESSION['userId'] = 'anonymous';
+		$_SESSION['userAttr'] = array ();
+		$_SESSION['userDisplayName'] = 'Anonymous Coward';
+		return;
 	}
 }
 ?>

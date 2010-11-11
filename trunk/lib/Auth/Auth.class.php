@@ -1,4 +1,5 @@
 <?php
+
 /*  
  *  FileTrader - Web based file sharing platform
  *  Copyright (C) 2010 François Kooman <fkooman@tuxed.net>
@@ -21,47 +22,45 @@ abstract class Auth {
 	var $config;
 
 	function __construct($config) {
-		if(!is_array($config))
+		if (!is_array($config))
 			throw new Exception("config parameter should be array");
 		$this->config = $config;
 		session_start();
 	}
 
-        function isLoggedIn() {
-		return (isset($_SESSION['userId']) && 
-		       	isset($_SESSION['userAttr']) && 
-			isset($_SESSION['userDisplayName']));
-        }
+	function isLoggedIn() {
+		return (isset ($_SESSION['userId']) && isset ($_SESSION['userAttr']) && isset ($_SESSION['userDisplayName']));
+	}
 
-        function getUserInfo() {
-		if($this->isLoggedIn())
-	        	return $_SESSION['userAttr'];
+	function getUserInfo() {
+		if ($this->isLoggedIn())
+			return $_SESSION['userAttr'];
 		else
 			throw new Exception("not logged in");
-        }
+	}
 
-        function getUserId() {
-		if($this->isLoggedIn())
-                        return $_SESSION['userId'];
+	function getUserId() {
+		if ($this->isLoggedIn())
+			return $_SESSION['userId'];
 		else
 			throw new Exception("not logged in");
-        }
+	}
 
 	function getUserDisplayName() {
-        	if($this->isLoggedIn())
-	                return $_SESSION['userDisplayName'];
-        	else
-                        throw new Exception("not logged in");
+		if ($this->isLoggedIn())
+			return $_SESSION['userDisplayName'];
+		else
+			throw new Exception("not logged in");
 	}
 
 	/**
 	 * Function must set session variables userId, userAttr, userDisplayName
 	 */
 	abstract function login();
-	
+
 	function getUserGroups() {
-		if($this->isLoggedIn())
-			return array();
+		if ($this->isLoggedIn())
+			return array ();
 		else
 			throw new Exception("not logged in");
 	}
@@ -71,16 +70,16 @@ abstract class Auth {
 	 * groups.
 	 */
 	function memberOfGroups($groups) {
-        	if($this->isLoggedIn()) {
-			if(!is_array($groups)) {
+		if ($this->isLoggedIn()) {
+			if (!is_array($groups)) {
 				throw new Exception("groups should be specified as array");
 			}
-			if(empty($groups)) {
-					return FALSE;
+			if (empty ($groups)) {
+				return FALSE;
 			}
 			$userGroups = $this->getUserGroups();
 			$intersect = array_intersect(array_keys($userGroups), $groups);
-			return !empty($intersect);
+			return !empty ($intersect);
 		} else {
 			throw new Exception("not logged in");
 		}
