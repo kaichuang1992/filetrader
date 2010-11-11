@@ -20,7 +20,7 @@
 			</form>
 	
 			{if !empty($tokens)}	
-				Shared with:		
+				Already shared with:		
 
 				<ul>
         	                {foreach key=k item=v from=$tokens}
