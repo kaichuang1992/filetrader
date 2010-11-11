@@ -172,7 +172,6 @@ switch($action) {
 		$token = generateToken();
 
 		$url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=download&id=$id&token=$token";
-		logHandler($address . "   LINK: " . $url);
 
 		$message = "Hello,\n\n".$auth->getUserDisplayName() . " invites you to download the file '" . $info['fileName'] . "'. You can click on the link below to start the download. You may be asked to login to the service first.\n\nLink: $url";
 
