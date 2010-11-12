@@ -21,59 +21,79 @@
 require_once ('ext/lightopenid/openid.php');
 
 class OpenIDAuth extends Auth {
+
 	function login() {
 		if ($this->isLoggedIn()) {
 			return;
 		}
-			if (!isset ($_GET['openid_mode'])) {
-				if (isset ($_POST['openid_identifier'])) {
-					$id = $_POST['openid_identifier'];
 
-					if (isset ($this->config['openid_whitelist']) && !empty ($this->config['openid_whitelist'])) {
-						if (!isset ($_POST['domain']))
-							throw new Exception('domain expected');
-						$domain = $_POST['domain'];
-						if (array_key_exists($domain, $this->config['openid_whitelist'])) {
-							$id = str_replace('@ID@', $id, $domain);
-						} else {
-							throw new Exception("domain not whitelisted");
-						}
+		/* 
+		 * record returnUrl in session variable as the OpenID authentication
+		 * seems to mangle the returnUrl. This is a bit ugly, have to dive in
+		 * OpenID specs to see if this can be fixed in a nice way. SAML
+		 * has no problem with this...
+		 */
+		if (isset ($_REQUEST['PARAM']) && !empty ($_REQUEST['PARAM']) && !isset ($_SESSION['returnUrl'])) {
+			$_SESSION['returnUrl'] = $_REQUEST['PARAM'];
+		}
+
+		if (!isset ($_GET['openid_mode'])) {
+			if (isset ($_POST['openid_identifier'])) {
+				$id = $_POST['openid_identifier'];
+
+				if (isset ($this->config['openid_whitelist']) && !empty ($this->config['openid_whitelist'])) {
+					if (!isset ($_POST['domain']))
+						throw new Exception('domain expected');
+					$domain = $_POST['domain'];
+					if (array_key_exists($domain, $this->config['openid_whitelist'])) {
+						$id = str_replace('@ID@', $id, $domain);
 					} else {
-						// all is allowed...
+						throw new Exception("domain not whitelisted");
 					}
-					$openid = new LightOpenID();
-					$openid->identity = $id;
-
-					$openid->optional = array (
-						'namePerson'
-					);
-					header('Location: ' . $openid->authUrl());
+				} else {
+					// all is allowed...
 				}
-
-				$smarty = new Smarty();
-				$smarty->template_dir = 'tpl';
-				$smarty->compile_dir = 'tpl_c';
-				$domains = $this->config['openid_whitelist'];
-				$smarty->assign('domains', $domains);
-				$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
-				$smarty->display('index.tpl');
-				exit(0);
-
-			} elseif ($_GET['openid_mode'] == 'cancel') {
-				die('User has canceled authentication!');
-			} else {
 				$openid = new LightOpenID();
-				if ($openid->validate()) {
-					$_SESSION['userId'] = $openid->identity;
-					$attributes = $openid->getAttributes();
-					$_SESSION['userAttr'] = $attributes;
+				$openid->identity = $id;
 
-					if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson'])) 
-						$_SESSION['userDisplayName'] = $attributes['namePerson'];
-					else
-						throw new Exception("not provided nick name");
+				$openid->optional = array (
+					'namePerson'
+				);
+				header('Location: ' . $openid->authUrl());
+			}
+
+			$smarty = new Smarty();
+			$smarty->template_dir = 'tpl';
+			$smarty->compile_dir = 'tpl_c';
+			$domains = $this->config['openid_whitelist'];
+			$smarty->assign('domains', $domains);
+			$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
+			$smarty->display('index.tpl');
+			exit (0);
+
+		}
+		elseif ($_GET['openid_mode'] == 'cancel') {
+			die('User has canceled authentication!');
+		} else {
+			$openid = new LightOpenID();
+			if ($openid->validate()) {
+				$_SESSION['userId'] = $openid->identity;
+				$attributes = $openid->getAttributes();
+				$_SESSION['userAttr'] = $attributes;
+
+				if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson']))
+					$_SESSION['userDisplayName'] = $attributes['namePerson'];
+				else
+					throw new Exception("not provided nick name");
+
+				/* jump to returnUrl if it was set */
+				if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
+					$returnUrl = $_SESSION['returnUrl'];
+					unset ($_SESSION['returnUrl']);
+					header("Location: " . $returnUrl);
 				}
 			}
+		}
 	}
 }
 ?>
