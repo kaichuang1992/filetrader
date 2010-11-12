@@ -33,8 +33,8 @@ class OpenIDAuth extends Auth {
 		 * OpenID specs to see if this can be fixed in a nice way. SAML
 		 * has no problem with this...
 		 */
-		if (isset ($_REQUEST['PARAM']) && !empty ($_REQUEST['PARAM']) && !isset ($_SESSION['returnUrl'])) {
-			$_SESSION['returnUrl'] = $_REQUEST['PARAM'];
+		if (isset ($_SERVER['REQUEST_URI']) && !empty ($_SERVER['REQUEST_URI']) && !isset ($_SESSION['returnUrl'])) {
+			$_SESSION['returnUrl'] = $_SERVER['REQUEST_URI'];
 		}
 
 		if (!isset ($_GET['openid_mode'])) {
@@ -50,12 +50,9 @@ class OpenIDAuth extends Auth {
 					} else {
 						throw new Exception("domain not whitelisted");
 					}
-				} else {
-					// all is allowed...
 				}
 				$openid = new LightOpenID();
 				$openid->identity = $id;
-
 				$openid->optional = array (
 					'namePerson'
 				);
@@ -79,14 +76,15 @@ class OpenIDAuth extends Auth {
 			if ($openid->validate()) {
 				$_SESSION['userId'] = $openid->identity;
 				$attributes = $openid->getAttributes();
+
 				$_SESSION['userAttr'] = $attributes;
 
 				if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson']))
 					$_SESSION['userDisplayName'] = $attributes['namePerson'];
 				else
-					throw new Exception("not provided nick name");
+					$_SESSION['userDisplayName'] = $openid->identity;
 
-				/* jump to returnUrl if it was set */
+				/* Jump to returnUrl if it was set, but not before unsetting it */
 				if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
 					$returnUrl = $_SESSION['returnUrl'];
 					unset ($_SESSION['returnUrl']);

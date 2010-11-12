@@ -4,12 +4,13 @@
 </style>
 <div class="login">
 	<h2>Login</h2>
+        <p>You can login using your OpenID account.</p>
 
 	<form method="post">
 		{if !empty($domains)}
 			{html_options class=provider name=domain options=$domains}
 		{/if}	
-	        <label class="identifier">Username <input type="text" name="openid_identifier" /></label>
-		<input type="submit" value="Login" />
+	        <label class="identifier">Account <input type="text" name="openid_identifier" /></label>
+		<input type="submit" value="Proceed" />
 	</form>
 </div>

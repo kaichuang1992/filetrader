@@ -241,6 +241,11 @@ switch ($action) {
 		$smarty->display('index.tpl');
 		break;
 
+	case "logout" :
+		$auth->logout();
+		header("Location: " . $_SERVER['SCRIPT_NAME']);
+		break;
+
 	case "upload" :
 		// FIXME: this seems to be WAY too crazy
 		// Remove HTML4 support completely, only support HTML5 file upload (and maybe Flash/Silverlight?!)
