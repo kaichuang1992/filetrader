@@ -29,8 +29,6 @@ class GoogleAuth extends Auth {
 		try {
 		    if(!isset($_GET['openid_mode'])) {
 		        $openid = new LightOpenID;
-#			$openid->realm     = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-#			$openid->returnUrl = $openid->realm . $_SERVER['REQUEST_URI'];
                         $openid->identity = 'https://www.google.com/accounts/o8/id';
 		        header('Location: ' . $openid->authUrl());
 		    } elseif($_GET['openid_mode'] == 'cancel') {

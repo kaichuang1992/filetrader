@@ -22,8 +22,9 @@ require_once ('ext/lightopenid/openid.php');
 
 class OpenIDAuth extends Auth {
 	function login() {
-		if ($this->isLoggedIn())
+		if ($this->isLoggedIn()) {
 			return;
+		}
 			if (!isset ($_GET['openid_mode'])) {
 				if (isset ($_POST['openid_identifier'])) {
 					$id = $_POST['openid_identifier'];
@@ -45,7 +46,7 @@ class OpenIDAuth extends Auth {
 
 					$openid->optional = array (
 						'namePerson'
-					); 
+					);
 					header('Location: ' . $openid->authUrl());
 				}
 
@@ -56,26 +57,22 @@ class OpenIDAuth extends Auth {
 				$smarty->assign('domains', $domains);
 				$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
 				$smarty->display('index.tpl');
-				die();
+				exit(0);
 
-			}
-			elseif ($_GET['openid_mode'] == 'cancel') {
+			} elseif ($_GET['openid_mode'] == 'cancel') {
 				die('User has canceled authentication!');
 			} else {
-				/* FIXME: check whitelist */
-
+				var_dump($_REQUEST);
 				$openid = new LightOpenID();
 				if ($openid->validate()) {
 					$_SESSION['userId'] = $openid->identity;
 					$attributes = $openid->getAttributes();
 					$_SESSION['userAttr'] = $attributes;
 
-					if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson'])) {
-						$dn = $attributes['namePerson'];
-					} else {
+					if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson'])) 
+						$_SESSION['userDisplayName'] = $attributes['namePerson'];
+					else
 						throw new Exception("not provided nick name");
-					}
-					$_SESSION['userDisplayName'] = $dn;
 				}
 			}
 	}
