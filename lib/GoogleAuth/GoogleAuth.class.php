@@ -28,24 +28,21 @@ class GoogleAuth extends Auth {
 		}
 
 		if (!isset ($_GET['openid_mode'])) {
-			if (isset ($_POST['openid_identifier'])) {
-				$id = $_POST['openid_identifier'];
+			$endpoint = 'https://www.google.com/accounts/o8/id';
+			$openid = new LightOpenID();
+			$openid->identity = $endpoint;
 
-				$openid = new LightOpenID();
-				$openid->identity = $id;
+			$openid->required = array (
+				'namePerson/first',
+				'namePerson/last'
+			);
+			header('Location: ' . $openid->authUrl());
 
-				$openid->required = array (
-					'namePerson/first',
-					'namePerson/last'
-				);
-				header('Location: ' . $openid->authUrl());
-			}
-
-			$smarty = new Smarty();
+			/*$smarty = new Smarty();
 			$smarty->template_dir = 'tpl';
 			$smarty->compile_dir = 'tpl_c';
 			$smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
-			$smarty->display('index.tpl');
+			$smarty->display('index.tpl');*/
 			exit (0);
 		}
 		elseif ($_GET['openid_mode'] == 'cancel') {
