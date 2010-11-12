@@ -27,24 +27,25 @@ class GoogleAuth extends Auth {
 		}
 
 		try {
-		    if(!isset($_GET['openid_mode'])) {
-		        $openid = new LightOpenID;
-                        $openid->identity = 'https://www.google.com/accounts/o8/id';
-		        header('Location: ' . $openid->authUrl());
-		    } elseif($_GET['openid_mode'] == 'cancel') {
-		        echo 'User has canceled authentication!';
-		    } else {
-		        $openid = new LightOpenID;
-			if($openid->validate()) {
-				$_SESSION['userId'] = $openid->identity;
-				$_SESSION['userAttr'] = array();
-				$_SESSION['userDisplayName'] = 'Google User';
-			}else {
-				throw new Exception("login failed");
+			if (!isset ($_GET['openid_mode'])) {
+				$openid = new LightOpenID;
+				$openid->identity = 'https://www.google.com/accounts/o8/id';
+				header('Location: ' . $openid->authUrl());
 			}
-		    }
-		} catch(ErrorException $e) {
-		    echo $e->getMessage();
+			elseif ($_GET['openid_mode'] == 'cancel') {
+				echo 'User has canceled authentication!';
+			} else {
+				$openid = new LightOpenID;
+				if ($openid->validate()) {
+					$_SESSION['userId'] = $openid->identity;
+					$_SESSION['userAttr'] = array ();
+					$_SESSION['userDisplayName'] = 'Google User';
+				} else {
+					throw new Exception("login failed");
+				}
+			}
+		} catch (ErrorException $e) {
+			echo $e->getMessage();
 		}
 	}
 }
