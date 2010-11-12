@@ -13,12 +13,10 @@ Small Tasks:
 - do something better with file name filter on upload, too restrictive now
 - figure out how to take care of Pear Download library in a nice way (now 
   as root pear install of the module, ieeuw, and doesn't work with STRICT mode)
-- add better logging
 
 == 2.0 ==
 - separate "FileTrader" from the actual file uploading/downloading processes
 - don't assume we run on Unix-like systems
-- add SAML SP module support
 - split out group/team stuff to separate classes?
 - implement 3-legged OAuth
 - implement something like "file collections" to keep files "together"?
