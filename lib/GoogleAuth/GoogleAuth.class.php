@@ -21,31 +21,61 @@
 require_once ('ext/lightopenid/openid.php');
 
 class GoogleAuth extends Auth {
+
 	function login() {
 		if ($this->isLoggedIn()) {
 			return;
 		}
 
-		try {
-			if (!isset ($_GET['openid_mode'])) {
-				$openid = new LightOpenID;
-				$openid->identity = 'https://www.google.com/accounts/o8/id';
+		/* 
+		 * record returnUrl in session variable as the OpenID authentication
+		 * seems to mangle the returnUrl. This is a bit ugly, have to dive in
+		 * OpenID specs to see if this can be fixed in a nice way. SAML
+		 * has no problem with this...
+		 */
+		if (isset ($_SERVER['REQUEST_URI']) && !empty ($_SERVER['REQUEST_URI']) && !isset ($_SESSION['returnUrl'])) {
+			$_SESSION['returnUrl'] = $_SERVER['REQUEST_URI'];
+		}
+
+		if (!isset ($_GET['openid_mode'])) {
+			if (isset ($_POST['openid_identifier'])) {
+				$id = $_POST['openid_identifier'];
+				$openid = new LightOpenID();
+				$openid->identity = $id;
+				$openid->required = array (
+					'namePerson/first',
+					'namePerson/last'
+				);
 				header('Location: ' . $openid->authUrl());
 			}
-			elseif ($_GET['openid_mode'] == 'cancel') {
-				echo 'User has canceled authentication!';
-			} else {
-				$openid = new LightOpenID;
-				if ($openid->validate()) {
-					$_SESSION['userId'] = $openid->identity;
-					$_SESSION['userAttr'] = array ();
-					$_SESSION['userDisplayName'] = 'Google User';
-				} else {
-					throw new Exception("login failed");
+
+			$smarty = new Smarty();
+			$smarty->template_dir = 'tpl';
+			$smarty->compile_dir = 'tpl_c';
+			$smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
+			$smarty->display('index.tpl');
+			exit (0);
+
+		}
+		elseif ($_GET['openid_mode'] == 'cancel') {
+			die('User has canceled authentication!');
+		} else {
+			$openid = new LightOpenID();
+			if ($openid->validate()) {
+				$_SESSION['userId'] = $openid->identity;
+				$attributes = $openid->getAttributes();
+
+				$_SESSION['userAttr'] = $attributes;
+
+				$_SESSION['userDisplayName'] = $attributes['namePerson/first'] . " " . $attributes['namePerson/last'];
+
+				/* Jump to returnUrl if it was set, but not before unsetting it */
+				if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
+					$returnUrl = $_SESSION['returnUrl'];
+					unset ($_SESSION['returnUrl']);
+					header("Location: " . $returnUrl);
 				}
 			}
-		} catch (ErrorException $e) {
-			echo $e->getMessage();
 		}
 	}
 }

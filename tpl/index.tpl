@@ -16,7 +16,7 @@
         <div id="userinfo">
                 <strong title="{$userId}">{$userDisplayName}</strong>
                 <br>
-                <a href="#">Logout</a>
+                <a href="?action=logout">Logout</a>
         </div>
 	{/if}
 

@@ -32,17 +32,26 @@ class SAMLAuth extends Auth {
 		if($this->isLoggedIn())
 			return;
 
+		if(!isset($_POST['samlProceed'])) {
+                        $smarty = new Smarty();
+                        $smarty->template_dir = 'tpl';
+                        $smarty->compile_dir = 'tpl_c';
+                        $smarty->assign('content', $smarty->fetch('SAMLAuth.tpl'));
+                        $smarty->display('index.tpl');
+                        exit (0);
+		}
 		$this->saml->requireAuth();
 		$attr = $this->saml->getAttributes();
 
-                $_SESSION['userId'] = $attr[$this->config['saml_uid']][0];
+       	        $_SESSION['userId'] = $attr[$this->config['saml_uid']][0];
 		$_SESSION['userAttr'] = $attr;
 		$_SESSION['userDisplayName'] = $attr[$this->config['saml_display_name']][0];
+
 	}
 
 	function logout() {
 		parent::logout();
-		$this->saml->logout();
+		$this->saml->logout($_SERVER['SCRIPT_NAME']);
 	}		
 }
 ?>
