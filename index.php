@@ -70,7 +70,7 @@ switch ($action) {
 		if ($info['fileOwner'] === $auth->getUserId() || $auth->memberOfGroups($info['shareGroups']) || array_key_exists($token, $info['downloadTokens'])) {
 			/* Access */
 			$ownerDir = base64_encode($info['fileOwner']);
-			$filePath = "data/files/$ownerDir/$file";
+			$filePath = $config['fileStorageDir'] . "/$ownerDir/$file";
 
 			if (!file_exists($filePath))
 				throw new Exception("file does not exist on file system");
@@ -124,7 +124,7 @@ switch ($action) {
 
 		$file = $info['fileName'];
 		$ownerDir = base64_encode($info['fileOwner']);
-		$filePath = "data/files/$ownerDir/$file";
+		$filePath = $config['fileStorageDir'] . "/$ownerDir/$file";
 
 		/* delete from file system */
 		unlink($filePath);
@@ -260,7 +260,7 @@ switch ($action) {
 
 		// Settings
 		$ownerDir = base64_encode($auth->getUserId());
-		$targetDir = "data/files/$ownerDir";
+		$targetDir = $config['fileStorageDir'] . "/$ownerDir";
 
 		// FIXME: are these variables really needed?
 		$cleanupTargetDir = false; // Remove old files
