@@ -84,5 +84,14 @@ abstract class Auth {
 			throw new Exception("not logged in");
 		}
 	}
+
+	function logout() {
+		if($this->isLoggedIn()) {
+			unset($_SESSION['userId']);
+                        unset($_SESSION['userAttr']);
+                        unset($_SESSION['userDisplayName']);
+		} else {
+			throw new Exception("not logged in");
+		}
 }
 ?>
