@@ -62,7 +62,6 @@ class OpenIDAuth extends Auth {
 			} elseif ($_GET['openid_mode'] == 'cancel') {
 				die('User has canceled authentication!');
 			} else {
-				var_dump($_REQUEST);
 				$openid = new LightOpenID();
 				if ($openid->validate()) {
 					$_SESSION['userId'] = $openid->identity;
