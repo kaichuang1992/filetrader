@@ -1,6 +1,5 @@
 <?php
 
-
 /*  
  *  FileTrader - Web based file sharing platform
  *  Copyright (C) 2010 François Kooman <fkooman@tuxed.net>
@@ -27,39 +26,27 @@ class GoogleAuth extends Auth {
 			return;
 		}
 
-		if (!isset ($_GET['openid_mode'])) {
-			$endpoint = 'https://www.google.com/accounts/o8/id';
-			$openid = new LightOpenID();
-			$openid->identity = $endpoint;
-
-			$openid->required = array (
-				'namePerson/first',
-				'namePerson/last'
-			);
-			header('Location: ' . $openid->authUrl());
-
-			/*$smarty = new Smarty();
-			$smarty->template_dir = 'tpl';
-			$smarty->compile_dir = 'tpl_c';
-			$smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
-			$smarty->display('index.tpl');*/
-			exit (0);
-		}
-		elseif ($_GET['openid_mode'] == 'cancel') {
-			throw new Exception('User has canceled authentication!');
-		} else {
-			$openid = new LightOpenID();
-			if ($openid->validate()) {
+		try {
+		    if(!isset($_GET['openid_mode'])) {
+		        $openid = new LightOpenID;
+#			$openid->realm     = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+#			$openid->returnUrl = $openid->realm . $_SERVER['REQUEST_URI'];
+                        $openid->identity = 'https://www.google.com/accounts/o8/id';
+		        header('Location: ' . $openid->authUrl());
+		    } elseif($_GET['openid_mode'] == 'cancel') {
+		        echo 'User has canceled authentication!';
+		    } else {
+		        $openid = new LightOpenID;
+			if($openid->validate()) {
 				$_SESSION['userId'] = $openid->identity;
-				$attributes = $openid->getAttributes();
-				$_SESSION['userAttr'] = $attributes;
-
-				if (isset ($attributes['namePerson/first']) && isset ($attributes['namePerson/last']) && !empty ($attributes['namePerson/first']) && !empty ($attributes['namePerson/last'])) {
-					$_SESSION['userDisplayName'] = $attributes['namePerson/first'] . ' ' . $attributes['namePerson/last'];
-				} else {
-					throw new Exception("no first and last name available from IDP");
-				}
+				$_SESSION['userAttr'] = array();
+				$_SESSION['userDisplayName'] = 'Google User';
+			}else {
+				throw new Exception("login failed");
 			}
+		    }
+		} catch(ErrorException $e) {
+		    echo $e->getMessage();
 		}
 	}
 }
