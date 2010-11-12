@@ -1,18 +1,17 @@
 Things still to do:
 
 == 1.0 ==
-Big Tasks:
 - implement 2-legged OAuth
 - implement OpenSocial auth, allow iGoogle access
 - custom css/js for plupload instead of default one
 - implement automatic class loader
   - add library.config.php file or something to point to (external) PHP/JS 
     libraries
-
-Small Tasks:
 - do something better with file name filter on upload, too restrictive now
-- figure out how to take care of Pear Download library in a nice way (now 
+- figure out how to take care of PEAR Download library in a nice way (now 
   as root pear install of the module, ieeuw, and doesn't work with STRICT mode)
+- verify specified email addresses
+- make it possible to cancel email invite
 
 == 2.0 ==
 - separate "FileTrader" from the actual file uploading/downloading processes
