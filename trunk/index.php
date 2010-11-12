@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  *  FileTrader - Web based file sharing platform
  *  Copyright (C) 2010 François Kooman <fkooman@tuxed.net>
