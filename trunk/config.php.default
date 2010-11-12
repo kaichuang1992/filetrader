@@ -1,19 +1,15 @@
 <?php
-$config = array();
+$config = array ();
 
 $config['time_zone'] = 'Europe/Amsterdam';
 
-// NullAuth, OpenIDAuth
+// NullAuth, OpenIDAuth, GoogleAuth
 $config['auth_type'] = 'NullAuth';
 
-$config['openid_whitelist'] = 
-	array('https://@ID@.wordpress.com'
-			=> 'Wordpress', 
-	      'https://www.google.com/accounts/o8/id'
-			=> 'Google',
-	      '@ID@'
-			=> 'Other...',
-	);
+$config['openid_whitelist'] = array (
+	'https://@ID@.wordpress.com' => 'Wordpress',
+	'@ID@' => 'Other...'
+);
 
 // Allow users to share files through email invites
 $config['email_share'] = TRUE;
@@ -27,5 +23,4 @@ $config['db_name'] = 'files';
 
 // Location to directory where to store uploaded files
 $config['fileStorageDir'] = 'data/files';
-
 ?>
