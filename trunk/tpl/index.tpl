@@ -15,6 +15,8 @@
 	{if $authenticated}
         <div id="userinfo">
                 <strong title="{$userId}">{$userDisplayName}</strong>
+                <br>
+                <a href="#">Logout</a>
         </div>
 	{/if}
 
