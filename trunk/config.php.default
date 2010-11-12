@@ -11,6 +11,12 @@ $config['openid_whitelist'] = array (
 	'@ID@' => 'Other...'
 );
 
+# simpleSAMLphp configuration (SAMLAuth)
+$config['saml_path'] = '/var/www/ssp/sp';
+$config['saml_sp'] = 'default-sp';
+$config['saml_uid'] = 'uid';
+$config['saml_display_name'] = 'cn';
+
 // Allow users to share files through email invites
 $config['email_share'] = TRUE;
 
