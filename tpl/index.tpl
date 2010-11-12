@@ -14,7 +14,7 @@
 <body>
 	{if $authenticated}
         <div id="userinfo">
-                <strong>{$userDisplayName}</strong><br><small>({$userId})</small>
+                <strong title="{$userId}">{$userDisplayName}</strong>
         </div>
 	{/if}
 
