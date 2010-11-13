@@ -4,7 +4,7 @@
 		{if empty($files)}
 			<p>	
 			{if $type == "myfiles"}
-				You did not upload any files yet. Click on the <strong>Upload Files</strong> tab to upload some.
+				You did not upload any files yet. Click on the <strong>Upload</strong> tab to upload some.
 			{else}
 				No files were shared with the group(s) you are a member of.
 			{/if}	

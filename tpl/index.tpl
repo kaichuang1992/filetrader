@@ -29,7 +29,7 @@
 			{if !empty($userGroups) }
 			<li class="groupfiles"><a href="#">Group Files</a></li>
 			{/if}
-			<li class="uploadfiles"><a href="#">Upload Files</a></li>
+			<li class="uploadfiles"><a href="#">Upload</a></li>
 		{else}
 			<li class="login"><a href="#">Login</a></li>
 		{/if}
