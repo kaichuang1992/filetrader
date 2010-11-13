@@ -16,18 +16,25 @@
 			<legend>Email</legend>
 			<label>Address <input title="The adressee(s) will receive an URL through email containing a special token to download this file after logging in" type="text" name="address" /></label>
 			<input type="button" class="{$id}" value="Share" />
+			<br>
+                        {if !empty($tokens)}
+                                Already shared with:
+
+                                <ul>
+                                {foreach key=k item=v from=$tokens}
+                                        <li>{$v}
+
+<a id="delete_{$id}_{$k}" class="delete" href="#">
+                                                        <img src="i/delete.png" width="16" height="16" alt="Delete Token" title="Delete Token" />
+                                                </a>
+					</li>
+                                {/foreach}
+                                </ul>
+                        {/if}
+
 			</fieldset>
 			</form>
 	
-			{if !empty($tokens)}	
-				Already shared with:		
-
-				<ul>
-        	                {foreach key=k item=v from=$tokens}
-					<li>{$v}</li>
-				{/foreach}
-				</ul>
-			{/if}
 		</li>
 		{/if}
 
