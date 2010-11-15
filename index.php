@@ -21,7 +21,7 @@
 include_once ('config.php');
 include_once ('utils.php');
 
-if(isset($config['ssl_only'] && $config['ssl_only']) {
+if(isset($config['ssl_only']) && $config['ssl_only']) {
 	// only allow SSL connections
 	if(!isset($_SERVER['HTTPS']) || empty($_SERVER['HTTPS']))
 		die("service only available through SSL connection");
@@ -157,7 +157,7 @@ switch ($action) {
 		break;
 
 	case "updategroups" :
-		if(!$config['group_share']))
+		if(!$config['group_share'])
 			die("group share is not enabled");
 
 		$id = getRequest("id", TRUE);
