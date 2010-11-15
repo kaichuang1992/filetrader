@@ -37,6 +37,8 @@ class GoogleAuth extends Auth {
 			$_SESSION['returnUrl'] = $_SERVER['REQUEST_URI'];
 		}
 
+		try {
+
 		if (!isset ($_GET['openid_mode'])) {
 			if (isset ($_POST['openid_identifier'])) {
 				$id = $_POST['openid_identifier'];
@@ -48,17 +50,8 @@ class GoogleAuth extends Auth {
 				);
 				header('Location: ' . $openid->authUrl());
 			}
-
-			$smarty = new Smarty();
-			$smarty->template_dir = 'tpl';
-			$smarty->compile_dir = 'tpl_c';
-			$smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
-			$smarty->display('index.tpl');
-			exit (0);
-
-		}
-		elseif ($_GET['openid_mode'] == 'cancel') {
-			die('User has canceled authentication!');
+		} elseif ($_GET['openid_mode'] == 'cancel') {
+			throw new Exception('User has canceled authentication.');
 		} else {
 			$openid = new LightOpenID();
 			if ($openid->validate()) {
@@ -77,6 +70,20 @@ class GoogleAuth extends Auth {
 				}
 			}
 		}
+
+                } catch(Exception $e) {
+                        $this->error = TRUE;
+                        $this->errorMessage = $e->getMessage();
+                }
+
+                        $smarty = new Smarty();
+                        $smarty->template_dir = 'tpl';
+                        $smarty->compile_dir = 'tpl_c';
+	                $smarty->assign('error', $this->error);
+        	        $smarty->assign('errorMessage', $this->errorMessage);
+                        $smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
+                        $smarty->display('index.tpl');
+			exit(0);
 	}
 }
 ?>

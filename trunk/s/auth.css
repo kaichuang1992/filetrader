@@ -1,8 +1,12 @@
-.login input, .login label {
+.login input, .login label, .login select {
 	display: block;
 	margin: 10px;
 }
 
 .login label {
 	font-size: 85%;
+}
+
+.login .proceed {
+	margin-left: 20px;
 }
