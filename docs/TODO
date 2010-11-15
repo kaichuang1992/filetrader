@@ -9,7 +9,6 @@ Things still to do:
 - write installation manual
 - better global template/error handling in index.php
 - fix all the FIXMEs
-- use getConfig function instead of fiddling all the time
 
 == 2.0 ==
 - implement automatic class loader

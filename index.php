@@ -21,13 +21,16 @@
 include_once ('config.php');
 include_once ('utils.php');
 
-if(isset($config['ssl_only']) && $config['ssl_only']) {
+if(!isset($config) || !is_array($config))
+	throw new Exception("broken or missing configuration file?");
+
+if(getConfig($config,'ssl_only', FALSE, FALSE)) {
 	// only allow SSL connections
 	if(!isset($_SERVER['HTTPS']) || empty($_SERVER['HTTPS']))
 		die("service only available through SSL connection");
 }
 
-date_default_timezone_set($config['time_zone']);
+date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
 # FIXME: 
 # system libraries required:
@@ -41,12 +44,12 @@ include_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 include_once ("lib/Auth/Auth.class.php");
 include_once ("/usr/share/php/Smarty/Smarty.class.php");
 
-$authType = $config['auth_type'];
-$dbName = $config['db_name'];
+$authType = getConfig($config,'auth_type', TRUE);
+$dbName = getConfig($config,'db_name', TRUE);
 
 include_once ("lib/$authType/$authType.class.php");
 
-if ($config['allow_opensocial']) {
+if (getConfig($config,'allow_opensocial', FALSE, FALSE)) {
 	/* do something with OpenSocial signature verification */
 	$userId = 'OpenSocial';
 } else {
@@ -77,7 +80,7 @@ switch ($action) {
 		if ($info['fileOwner'] === $auth->getUserId() || $auth->memberOfGroups($info['shareGroups']) || array_key_exists($token, $info['downloadTokens'])) {
 			/* Access */
 			$ownerDir = base64_encode($info['fileOwner']);
-			$filePath = $config['fileStorageDir'] . "/$ownerDir/$file";
+			$filePath = getConfig($config,'fileStorageDir', TRUE) . "/$ownerDir/$file";
 
 			if (!file_exists($filePath))
 				die("file does not exist on file system");
@@ -110,8 +113,8 @@ switch ($action) {
 		$smarty->assign('tokens', $info['downloadTokens']);
 		$smarty->assign('groups', $auth->getUserGroups());
 		$smarty->assign('id', $id);
-		$smarty->assign('group_share', $config['group_share']);
-		$smarty->assign('email_share', $config['email_share']);
+		$smarty->assign('group_share', getConfig($config,'group_share', FALSE, FALSE));
+		$smarty->assign('email_share', getConfig($config,'email_share', FALSE, FALSE));
 		$smarty->display('share.tpl');
 		break;
 
@@ -132,13 +135,16 @@ switch ($action) {
 
 		$file = $info['fileName'];
 		$ownerDir = base64_encode($info['fileOwner']);
-		$filePath = $config['fileStorageDir'] . "/$ownerDir/$file";
+		$filePath = getConfig($config,'fileStorageDir', TRUE) . "/$ownerDir/$file";
 
 		/* delete from file system */
 		unlink($filePath);
 		break;
 
 	case "deletetoken" :
+                if(!getConfig($config,'email_share', FALSE, FALSE))
+                        die("email share is not enabled");
+
 		$id = getRequest("id", TRUE);
 
 		/* FIXME: ugly way of passing the id! */
@@ -157,7 +163,7 @@ switch ($action) {
 		break;
 
 	case "updategroups" :
-		if(!$config['group_share'])
+		if(!getConfig($config,'group_share', FALSE, FALSE))
 			die("group share is not enabled");
 
 		$id = getRequest("id", TRUE);
@@ -185,7 +191,7 @@ switch ($action) {
 		break;
 
 	case "emailshare" :
-		if (!$config['email_share'])
+                if(!getConfig($config,'email_share', FALSE, FALSE))
 			die("sharing through email not enabled");
 
 		$id = getRequest("id", TRUE);
@@ -294,7 +300,7 @@ switch ($action) {
 
 		// Settings
 		$ownerDir = base64_encode($auth->getUserId());
-		$targetDir = $config['fileStorageDir'] . "/$ownerDir";
+		$targetDir = getConfig($config,'fileStorageDir', TRUE) . "/$ownerDir";
 
 		// FIXME: are these variables really needed?
 		$cleanupTargetDir = false; // Remove old files

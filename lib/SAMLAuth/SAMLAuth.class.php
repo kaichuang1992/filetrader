@@ -18,14 +18,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once($config['saml_path'] . '/lib/_autoload.php');
+require_once(getConfig($config, 'saml_path', TRUE) . '/lib/_autoload.php');
 
 class SAMLAuth extends Auth {
 	var $saml;
 
 	function __construct($config) {
 		parent::__construct($config);
-		$this->saml = new SimpleSAML_Auth_Simple($this->config['saml_sp']);
+		$this->saml = new SimpleSAML_Auth_Simple(getConfig($this->config, 'saml_sp', TRUE));
 	}
 
 	function login() {
@@ -38,9 +38,9 @@ class SAMLAuth extends Auth {
 				$this->saml->requireAuth();
 				$attr = $this->saml->getAttributes();
 
-       			        $_SESSION['userId'] = $attr[$this->config['saml_uid']][0];
+       			        $_SESSION['userId'] = $attr[getConfig($this->config, 'saml_uid', TRUE)][0];
 				$_SESSION['userAttr'] = $attr;
-				$_SESSION['userDisplayName'] = $attr[$this->config['saml_display_name']][0];
+				$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'saml_display_name', TRUE)][0];
 				return;
 			}
 

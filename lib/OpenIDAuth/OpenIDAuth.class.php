@@ -42,11 +42,13 @@ class OpenIDAuth extends Auth {
 				if (isset ($_POST['openid_identifier'])) {
 					$id = $_POST['openid_identifier'];
 
-					if (isset ($this->config['openid_whitelist']) && !empty ($this->config['openid_whitelist'])) {
+					$whitelist = getConfig($this->config, 'openid_whitelist', FALSE, array());
+
+					if (!empty($whitelist)) {
 						if (!isset ($_POST['domain']))
 							throw new Exception('A domain was expected as part of the request.');
 						$domain = $_POST['domain'];
-						if (array_key_exists($domain, $this->config['openid_whitelist'])) {
+						if (array_key_exists($domain, $whitelist)) {
 							$id = str_replace('@ID@', $id, $domain);
 						} else {
 							throw new Exception("The domain you used is not whitelisted.");
@@ -93,7 +95,7 @@ class OpenIDAuth extends Auth {
 		$smarty->compile_dir = 'tpl_c';
 		$smarty->assign('error', $this->error);
 		$smarty->assign('errorMessage', $this->errorMessage);
-		$domains = $this->config['openid_whitelist'];
+		$domains = getConfig($this->config, 'openid_whitelist', FALSE, array());
 		$smarty->assign('domains', $domains);
 		$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
 		$smarty->display('index.tpl');
