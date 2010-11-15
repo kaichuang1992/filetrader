@@ -130,22 +130,22 @@ switch ($action) {
 		unlink($filePath);
 		break;
 
-	case "deletetoken":
+	case "deletetoken" :
 		$id = getRequest("id", TRUE);
 
-                /* FIXME: ugly way of passing the id! */
-                list ($type, $fileId, $tokenId) = explode("_", $id);
+		/* FIXME: ugly way of passing the id! */
+		list ($type, $fileId, $tokenId) = explode("_", $id);
 
-                $info = $storage->readEntry($dbName, $fileId);
+		$info = $storage->readEntry($dbName, $fileId);
 
-                if ($info['fileOwner'] !== $auth->getUserId()) {
+		if ($info['fileOwner'] !== $auth->getUserId()) {
 			logHandler("[SECURITY] Not '" . $auth->getUserId() . "' is the owner of '" . $info['fileName'] . "', but '" . $info['fileOwner'] . "'");
-                        die("access denied");
+			die("access denied");
 		}
 
-                logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
-		unset($info['downloadTokens'][$tokenId]);
-                $storage->updateEntry($dbName, $fileId, $info);
+		logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
+		unset ($info['downloadTokens'][$tokenId]);
+		$storage->updateEntry($dbName, $fileId, $info);
 		break;
 
 	case "updategroups" :
