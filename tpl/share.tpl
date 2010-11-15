@@ -1,5 +1,5 @@
 	        <script type="text/javascript" src="j/share.js"></script>
-		{if !empty($groups)}
+		{if $group_share && !empty($groups)}
                 <li>
 			<form>
 			<fieldset>
@@ -19,7 +19,6 @@
 			<br>
                         {if !empty($tokens)}
                                 Already shared with:
-
                                 <ul>
                                 {foreach key=k item=v from=$tokens}
                                         <li>{$v}
@@ -31,10 +30,8 @@
                                 {/foreach}
                                 </ul>
                         {/if}
-
 			</fieldset>
 			</form>
-	
 		</li>
 		{/if}
 

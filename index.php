@@ -21,6 +21,12 @@
 include_once ('config.php');
 include_once ('utils.php');
 
+if(isset($config['ssl_only'] && $config['ssl_only']) {
+	// only allow SSL connections
+	if(!isset($_SERVER['HTTPS']) || empty($_SERVER['HTTPS']))
+		die("service only available through SSL connection");
+}
+
 date_default_timezone_set($config['time_zone']);
 
 # FIXME: 
@@ -29,6 +35,7 @@ date_default_timezone_set($config['time_zone']);
 # - Smarty
 
 include_once ("ext/sag/src/Sag.php");
+include_once ("ext/EmailAddressValidator.php");
 include_once ("lib/CRUDStorage/CRUDStorage.class.php");
 include_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 include_once ("lib/Auth/Auth.class.php");
@@ -73,7 +80,7 @@ switch ($action) {
 			$filePath = $config['fileStorageDir'] . "/$ownerDir/$file";
 
 			if (!file_exists($filePath))
-				throw new Exception("file does not exist on file system");
+				die("file does not exist on file system");
 
 			logHandler("User '" . $auth->getUserID() . "' is downloading file '" . $file . "'");
 
@@ -84,7 +91,7 @@ switch ($action) {
 			$dl->send();
 			exit (0);
 		} else {
-			throw new Exception("access denied");
+			die("access denied");
 		}
 		break;
 
@@ -103,6 +110,7 @@ switch ($action) {
 		$smarty->assign('tokens', $info['downloadTokens']);
 		$smarty->assign('groups', $auth->getUserGroups());
 		$smarty->assign('id', $id);
+		$smarty->assign('group_share', $config['group_share']);
 		$smarty->assign('email_share', $config['email_share']);
 		$smarty->display('share.tpl');
 		break;
@@ -149,6 +157,9 @@ switch ($action) {
 		break;
 
 	case "updategroups" :
+		if(!$config['group_share']))
+			die("group share is not enabled");
+
 		$id = getRequest("id", TRUE);
 
 		$info = $storage->readEntry($dbName, $id);
@@ -185,6 +196,11 @@ switch ($action) {
 
 		$address = getRequest('address', TRUE);
 		/* FIXME: validate address */
+
+        	$validator = new EmailAddressValidator;
+        	if (!$validator->check_email_address($address)) {
+            		die("invalid address specified");
+        	}
 
 		/* add token */
 		$token = generateToken();
@@ -387,6 +403,6 @@ switch ($action) {
 		break;
 
 	default :
-		throw new Exception("unknown action");
+		die("unknown action");
 }
 ?>
