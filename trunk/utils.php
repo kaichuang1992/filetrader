@@ -33,6 +33,21 @@ function getRequest($variable = NULL, $required = FALSE, $default = NULL) {
 	return $default;
 }
 
+function getConfig($variable = NULL, $required = FALSE, $default = NULL) {
+	if(!isset($config) || !is_array($config))
+		throw new Exception("no usable configuration array, broken or missing config file?");
+        if ($variable === NULL || empty ($variable))
+                throw new Exception("no variable specified or empty");
+        if ($required) {
+                if (!isset ($config[$variable]))
+                        throw new Exception("$variable not available while required");
+                return $config[$variable];
+        }
+        if (isset ($config[$variable]))
+                return $config[$variable];
+        return $default;
+}
+
 function logHandler($message) {
 	if (isset ($_SERVER['REMOTE_ADDR']))
 		$caller = $_SERVER['REMOTE_ADDR'];
