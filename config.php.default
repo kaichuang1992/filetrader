@@ -28,8 +28,22 @@ $config['group_share'] = FALSE;
 $config['db_name'] = 'files';
 
 // Wheter or not to allow only SSL connections
-$config['ssl_only'] = TRUE;
+$config['ssl_only'] = FALSE;
 
 // Location to directory where to store uploaded files
 $config['fileStorageDir'] = 'data/files';
+
+// Static list of allowed OAuth consumers
+$config['oauth_consumers'] = array (
+	array(
+		'key' => '12345',
+		'secret' => '54321',
+	),
+
+	array(
+		'key' => 'abcde',
+		'secret' => 'edcba',
+	),
+);
+
 ?>

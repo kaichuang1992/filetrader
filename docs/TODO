@@ -5,9 +5,10 @@ Things still to do:
 - do something better with file name filter on upload, too restrictive now
 - figure out how to take care of PEAR Download library in a nice way (now 
   as root pear install of the module, ieeuw, and doesn't work with STRICT mode)
-- verify specified email addresses
 - better handling of "enter" button on sharing to email address
 - write installation manual
+- better global template/error handling in index.php
+- fix all the FIXMEs
 
 == 2.0 ==
 - implement automatic class loader
