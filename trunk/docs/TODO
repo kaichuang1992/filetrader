@@ -7,8 +7,6 @@ Things still to do:
   as root pear install of the module, ieeuw, and doesn't work with STRICT mode)
 - verify specified email addresses
 - better handling of "enter" button on sharing to email address
-- make enable/disable email/group share toggles in config actually work
-- make it possible to only connect using SSL/HTTPS
 - write installation manual
 
 == 2.0 ==

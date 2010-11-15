@@ -27,6 +27,9 @@ $config['group_share'] = FALSE;
 // Name of database in CouchDB
 $config['db_name'] = 'files';
 
+// Wheter or not to allow only SSL connections
+$config['ssl_only'] = TRUE;
+
 // Location to directory where to store uploaded files
 $config['fileStorageDir'] = 'data/files';
 ?>
