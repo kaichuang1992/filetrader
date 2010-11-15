@@ -38,52 +38,51 @@ class GoogleAuth extends Auth {
 		}
 
 		try {
-
-		if (!isset ($_GET['openid_mode'])) {
-			if (isset ($_POST['openid_identifier'])) {
-				$id = $_POST['openid_identifier'];
-				$openid = new LightOpenID();
-				$openid->identity = $id;
-				$openid->required = array (
-					'namePerson/first',
-					'namePerson/last'
-				);
-				header('Location: ' . $openid->authUrl());
-			}
-		} elseif ($_GET['openid_mode'] == 'cancel') {
-			throw new Exception('User has canceled authentication.');
-		} else {
-			$openid = new LightOpenID();
-			if ($openid->validate()) {
-				$_SESSION['userId'] = $openid->identity;
-				$attributes = $openid->getAttributes();
-
-				$_SESSION['userAttr'] = $attributes;
-
-				$_SESSION['userDisplayName'] = $attributes['namePerson/first'] . " " . $attributes['namePerson/last'];
-
-				/* Jump to returnUrl if it was set, but not before unsetting it */
-				if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
-					$returnUrl = $_SESSION['returnUrl'];
-					unset ($_SESSION['returnUrl']);
-					header("Location: " . $returnUrl);
+			if (!isset ($_GET['openid_mode'])) {
+				if (isset ($_POST['openid_identifier'])) {
+					$id = $_POST['openid_identifier'];
+					$openid = new LightOpenID();
+					$openid->identity = $id;
+					$openid->required = array (
+						'namePerson/first',
+						'namePerson/last'
+					);
+					header('Location: ' . $openid->authUrl());
 				}
 			}
+			elseif ($_GET['openid_mode'] == 'cancel') {
+				throw new Exception('User has canceled authentication.');
+			} else {
+				$openid = new LightOpenID();
+				if ($openid->validate()) {
+					$_SESSION['userId'] = $openid->identity;
+					$attributes = $openid->getAttributes();
+
+					$_SESSION['userAttr'] = $attributes;
+
+					$_SESSION['userDisplayName'] = $attributes['namePerson/first'] . " " . $attributes['namePerson/last'];
+
+					/* Jump to returnUrl if it was set, but not before unsetting it */
+					if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
+						$returnUrl = $_SESSION['returnUrl'];
+						unset ($_SESSION['returnUrl']);
+						header("Location: " . $returnUrl);
+					}
+				}
+			}
+		} catch (Exception $e) {
+			$this->error = TRUE;
+			$this->errorMessage = $e->getMessage();
 		}
 
-                } catch(Exception $e) {
-                        $this->error = TRUE;
-                        $this->errorMessage = $e->getMessage();
-                }
-
-                        $smarty = new Smarty();
-                        $smarty->template_dir = 'tpl';
-                        $smarty->compile_dir = 'tpl_c';
-	                $smarty->assign('error', $this->error);
-        	        $smarty->assign('errorMessage', $this->errorMessage);
-                        $smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
-                        $smarty->display('index.tpl');
-			exit(0);
+		$smarty = new Smarty();
+		$smarty->template_dir = 'tpl';
+		$smarty->compile_dir = 'tpl_c';
+		$smarty->assign('error', $this->error);
+		$smarty->assign('errorMessage', $this->errorMessage);
+		$smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
+		$smarty->display('index.tpl');
+		exit (0);
 	}
 }
 ?>

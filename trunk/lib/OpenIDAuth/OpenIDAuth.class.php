@@ -37,68 +37,67 @@ class OpenIDAuth extends Auth {
 			$_SESSION['returnUrl'] = $_SERVER['REQUEST_URI'];
 		}
 
-		try { 
+		try {
+			if (!isset ($_GET['openid_mode'])) {
+				if (isset ($_POST['openid_identifier'])) {
+					$id = $_POST['openid_identifier'];
 
-		if (!isset ($_GET['openid_mode'])) {
-			if (isset ($_POST['openid_identifier'])) {
-				$id = $_POST['openid_identifier'];
+					if (isset ($this->config['openid_whitelist']) && !empty ($this->config['openid_whitelist'])) {
+						if (!isset ($_POST['domain']))
+							throw new Exception('A domain was expected as part of the request.');
+						$domain = $_POST['domain'];
+						if (array_key_exists($domain, $this->config['openid_whitelist'])) {
+							$id = str_replace('@ID@', $id, $domain);
+						} else {
+							throw new Exception("The domain you used is not whitelisted.");
+						}
+					}
+					$openid = new LightOpenID();
+					$openid->identity = $id;
+					$openid->optional = array (
+						'namePerson'
+					);
+					header('Location: ' . $openid->authUrl());
+				}
+			}
+			elseif ($_GET['openid_mode'] == 'cancel') {
+				throw new Exception('User has canceled authentication.');
+			} else {
+				$openid = new LightOpenID();
+				if ($openid->validate()) {
+					$_SESSION['userId'] = $openid->identity;
+					$attributes = $openid->getAttributes();
 
-				if (isset ($this->config['openid_whitelist']) && !empty ($this->config['openid_whitelist'])) {
-					if (!isset ($_POST['domain']))
-						throw new Exception('A domain was expected as part of the request.');
-					$domain = $_POST['domain'];
-					if (array_key_exists($domain, $this->config['openid_whitelist'])) {
-						$id = str_replace('@ID@', $id, $domain);
-					} else {
-						throw new Exception("The domain you used is not whitelisted.");
+					$_SESSION['userAttr'] = $attributes;
+
+					if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson']))
+						$_SESSION['userDisplayName'] = $attributes['namePerson'];
+					else
+						$_SESSION['userDisplayName'] = $openid->identity;
+
+					/* Jump to returnUrl if it was set, but not before unsetting it */
+					if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
+						$returnUrl = $_SESSION['returnUrl'];
+						unset ($_SESSION['returnUrl']);
+						header("Location: " . $returnUrl);
 					}
 				}
-				$openid = new LightOpenID();
-				$openid->identity = $id;
-				$openid->optional = array (
-					'namePerson'
-				);
-				header('Location: ' . $openid->authUrl());
 			}
-		} elseif ($_GET['openid_mode'] == 'cancel') {
-			throw new Exception('User has canceled authentication.');
-		} else {
-			$openid = new LightOpenID();
-			if ($openid->validate()) {
-				$_SESSION['userId'] = $openid->identity;
-				$attributes = $openid->getAttributes();
-
-				$_SESSION['userAttr'] = $attributes;
-
-				if (isset ($attributes['namePerson']) && !empty ($attributes['namePerson']))
-					$_SESSION['userDisplayName'] = $attributes['namePerson'];
-				else
-					$_SESSION['userDisplayName'] = $openid->identity;
-
-				/* Jump to returnUrl if it was set, but not before unsetting it */
-				if (isset ($_SESSION['returnUrl']) && !empty ($_SESSION['returnUrl'])) {
-					$returnUrl = $_SESSION['returnUrl'];
-					unset ($_SESSION['returnUrl']);
-					header("Location: " . $returnUrl);
-				}
-			}
-		}	
-
-		} catch(Exception $e) {
+		} catch (Exception $e) {
 			$this->error = TRUE;
 			$this->errorMessage = $e->getMessage();
 		}
 
-                $smarty = new Smarty();
-                $smarty->template_dir = 'tpl';
-                $smarty->compile_dir = 'tpl_c';
-                $smarty->assign('error', $this->error);
-                $smarty->assign('errorMessage', $this->errorMessage);
-                $domains = $this->config['openid_whitelist'];
-                $smarty->assign('domains', $domains);
-                $smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
-                $smarty->display('index.tpl');
-		exit(0);
+		$smarty = new Smarty();
+		$smarty->template_dir = 'tpl';
+		$smarty->compile_dir = 'tpl_c';
+		$smarty->assign('error', $this->error);
+		$smarty->assign('errorMessage', $this->errorMessage);
+		$domains = $this->config['openid_whitelist'];
+		$smarty->assign('domains', $domains);
+		$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
+		$smarty->display('index.tpl');
+		exit (0);
 	}
 }
 ?>
