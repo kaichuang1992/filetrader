@@ -33,8 +33,8 @@ function getRequest($variable = NULL, $required = FALSE, $default = NULL) {
 	return $default;
 }
 
-function getConfig($variable = NULL, $required = FALSE, $default = NULL) {
-	if(!isset($config) || !is_array($config))
+function getConfig($config = array(), $variable = NULL, $required = FALSE, $default = NULL) {
+	if(!is_array($config))
 		throw new Exception("no usable configuration array, broken or missing config file?");
         if ($variable === NULL || empty ($variable))
                 throw new Exception("no variable specified or empty");
