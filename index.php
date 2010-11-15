@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-include_once ('config.php');
-include_once ('utils.php');
+require_once ('config.php');
+require_once ('utils.php');
 
 if(!isset($config) || !is_array($config))
 	throw new Exception("broken or missing configuration file?");
@@ -37,17 +37,17 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 # - Pear HTTP Download
 # - Smarty
 
-include_once ("ext/sag/src/Sag.php");
-include_once ("ext/EmailAddressValidator.php");
-include_once ("lib/CRUDStorage/CRUDStorage.class.php");
-include_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
-include_once ("lib/Auth/Auth.class.php");
-include_once ("/usr/share/php/Smarty/Smarty.class.php");
+require_once ("ext/sag/src/Sag.php");
+require_once ("ext/EmailAddressValidator.php");
+require_once ("lib/CRUDStorage/CRUDStorage.class.php");
+require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
+require_once ("lib/Auth/Auth.class.php");
+require_once ("/usr/share/php/Smarty/Smarty.class.php");
 
 $authType = getConfig($config,'auth_type', TRUE);
 $dbName = getConfig($config,'db_name', TRUE);
 
-include_once ("lib/$authType/$authType.class.php");
+require_once ("lib/$authType/$authType.class.php");
 
 if (getConfig($config,'allow_opensocial', FALSE, FALSE)) {
 	/* do something with OpenSocial signature verification */
@@ -70,7 +70,7 @@ $action = getRequest('action', FALSE, 'index');
 
 switch ($action) {
 	case "download" :
-		include_once ('/usr/share/pear/HTTP/Download.php');
+		require_once ('/usr/share/pear/HTTP/Download.php');
 		$id = getRequest("id", TRUE);
 		$token = getRequest("token", FALSE, 0);
 
