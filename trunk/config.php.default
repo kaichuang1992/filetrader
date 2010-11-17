@@ -33,6 +33,9 @@ $config['ssl_only'] = FALSE;
 // Location to directory where to store uploaded files
 $config['fileStorageDir'] = 'data/files';
 
+// Allow OAuth consumers
+$config['allow_oauth'] = FALSE;
+
 // Static list of allowed OAuth consumers (format: key => secret)
 $config['oauth_consumers'] = array (
 	'12345' => '54321',
