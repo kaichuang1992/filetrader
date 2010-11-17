@@ -201,7 +201,6 @@ switch ($action) {
 			die("access denied");
 
 		$address = getRequest('address', TRUE);
-		/* FIXME: validate address */
 
         	$validator = new EmailAddressValidator;
         	if (!$validator->check_email_address($address)) {
