@@ -31,23 +31,23 @@ class OAuthAuth extends Auth {
 		 */
 		$sig_method = new OAuthSignatureMethod_HMAC_SHA1;
 
-		$method = $_SERVER['REQUEST_METHOD'];   // POST or GET
+		$method = $_SERVER['REQUEST_METHOD']; // POST or GET
 		/* we show determine whether http or https should be used, depends party on
 		   configuration setting and current request mode */
-		$uri = 'https://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+		$uri = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		$sig = $_GET['oauth_signature'];
 		$key = $_GET['oauth_consumer_key'];
 
 		/* check if key exists */
 		$consumers = getConfig($this->config, 'oauth_consumers', TRUE);
-		if(!array_key_exists($key, $consumers))
+		if (!array_key_exists($key, $consumers))
 			throw new Exception("OAuth consumer not registered");
 		$consumer = new OAuthConsumer($key, $consumers[$key]);
 
 		$req = new OAuthRequest($method, $uri);
 		//token is null because we're doing 2-leg
-		$valid = $sig_method->check_signature( $req, $consumer, NULL, $sig );
-		if(!$valid)
+		$valid = $sig_method->check_signature($req, $consumer, NULL, $sig);
+		if (!$valid)
 			throw new Exception('invalid OAuth signature');
 
 		/* userId should be actual user the oAuth client is acting on behalf of, 
