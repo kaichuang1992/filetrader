@@ -65,7 +65,6 @@ require_once ("lib/CRUDStorage/CRUDStorage.class.php");
 require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 
 $storage = new CouchCRUDStorage();
-$files = $storage->listEntries($dbName);
 
 $smarty = new Smarty();
 $smarty->template_dir = 'tpl';
@@ -237,6 +236,7 @@ switch ($action) {
 		break;
 
 	case "myfiles" :
+		$files = $storage->listEntries($dbName);
 		foreach ($files as $k => $v) {
 			if ($v['fileOwner'] !== $auth->getUserId()) {
 				unset ($files[$k]);
@@ -255,6 +255,7 @@ switch ($action) {
 		break;
 
 	case "groupfiles" :
+		$files = $storage->listEntries($dbName);
 		foreach ($files as $k => $v) {
 			if ($v['fileOwner'] === $auth->getUserId()) {
 				unset ($files[$k]);
