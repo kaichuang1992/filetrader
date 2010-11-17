@@ -26,6 +26,10 @@ class OAuthAuth extends Auth {
 		if ($this->isLoggedIn())
 			return;
 
+		/* if no attempt to use OAuth stop */
+		if (!isset ($_GET['oauth_signature']))
+			return;
+
 		/* Idea taken from: 
 		 * http://developer.yahoo.com/blogs/ydn/posts/2010/04/a_twolegged_oauth_serverclient_example/
 		 */
