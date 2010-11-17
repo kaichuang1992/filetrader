@@ -48,8 +48,8 @@ if (getConfig($config, 'allow_opensocial', FALSE, FALSE)) {
 
 if (getConfig($config, 'allow_oauth', FALSE, FALSE)) {
 	/* try OAuth authentication */
-	require_once ("lib/OAuthAuth/OAuthAuth.class.php");
-	$auth = new OAuthAuth($config);
+	require_once ("lib/OAuth/OAuth.class.php");
+	$auth = new OAuth($config);
 	$auth->login();
 }
 

@@ -20,15 +20,44 @@
 
 require_once ('ext/oauth/OAuth.php');
 
-class OAuthAuth extends Auth {
+class OAuth {
 
-	function login() {
-		if ($this->isLoggedIn())
-			return;
+        var $config;
+	var $consumer_key;
+	var $isValidRequest;
+
+        function __construct($config) {
+                if (!is_array($config))
+                        throw new Exception("config parameter should be array");
+                $this->config = $config;
+		$this->isValidRequest = FALSE;
+        }
+
+	function isLoggedIn() {
+		return $this->isValidRequest;
+	}
+
+	function getUserId() {
+		return "oauth_" . $this->consumer_key;
+	}
+
+	function getUserDisplayName() {
+		return "OAuth Consumer";
+	}
+
+	function getUserInfo() {
+		return array();
+	}
+	
+	function memberOfGroups($groups) {
+		return $this->isValidRequest;
+	}
+
+	function login() { 
 
 		/* if no attempt to use OAuth stop */
 		if (!isset ($_GET['oauth_signature']))
-			return;
+			return FALSE;
 
 		/* Idea taken from: 
 		 * http://developer.yahoo.com/blogs/ydn/posts/2010/04/a_twolegged_oauth_serverclient_example/
@@ -54,11 +83,11 @@ class OAuthAuth extends Auth {
 		if (!$valid)
 			throw new Exception('invalid OAuth signature');
 
-		/* userId should be actual user the oAuth client is acting on behalf of, 
+		/* FIXME: userId should be actual user the oAuth client is acting on behalf of, 
 		   or do we want a special "super account"? */
-		$_SESSION['userId'] = "OAuth_$key";
-		$_SESSION['userAttr'] = array ();
-		$_SESSION['userDisplayName'] = 'OAuth Consumer';
+
+		$this->consumer_key = $key;
+		$this->isValidRequest = TRUE;
 		return;
 	}
 }
