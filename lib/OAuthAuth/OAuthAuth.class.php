@@ -26,9 +26,14 @@ class OAuthAuth extends Auth {
 		if ($this->isLoggedIn())
 			return;
 
+		/* Idea taken from: 
+		 * http://developer.yahoo.com/blogs/ydn/posts/2010/04/a_twolegged_oauth_serverclient_example/
+		 */
 		$sig_method = new OAuthSignatureMethod_HMAC_SHA1;
 
 		$method = $_SERVER['REQUEST_METHOD'];   // POST or GET
+		/* we show determine whether http or https should be used, depends party on
+		   configuration setting and current request mode */
 		$uri = 'https://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 		$sig = $_GET['oauth_signature'];
 		$key = $_GET['oauth_consumer_key'];
@@ -45,6 +50,8 @@ class OAuthAuth extends Auth {
 		if(!$valid)
 			throw new Exception('invalid OAuth signature');
 
+		/* userId should be actual user the oAuth client is acting on behalf of, 
+		   or do we want a special "super account"? */
 		$_SESSION['userId'] = "OAuth_$key";
 		$_SESSION['userAttr'] = array ();
 		$_SESSION['userDisplayName'] = 'OAuth Consumer';
