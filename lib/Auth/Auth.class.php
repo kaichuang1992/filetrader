@@ -29,7 +29,8 @@ abstract class Auth {
 		$this->config = $config;
 		$this->error = FALSE;
 		$this->errorMessage = '';
-		session_start();
+		if(!isset($_SESSION))
+			session_start();
 	}
 
 	function isLoggedIn() {
