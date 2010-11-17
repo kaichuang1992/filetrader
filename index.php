@@ -83,6 +83,7 @@ switch ($action) {
 		$info = $storage->readEntry($dbName, $id);
 		$file = $info['fileName'];
 
+		/* FIXME: memberOfGroups and token only if said support is enabled! */
 		if ($info['fileOwner'] === $auth->getUserId() || $auth->memberOfGroups($info['shareGroups']) || array_key_exists($token, $info['downloadTokens'])) {
 			/* Access */
 			$ownerDir = base64_encode($info['fileOwner']);
@@ -255,6 +256,9 @@ switch ($action) {
 		break;
 
 	case "groupfiles" :
+		if (!getConfig($config, 'group_share', FALSE, FALSE))
+			die("group share is not enabled");
+
 		$files = $storage->listEntries($dbName);
 		foreach ($files as $k => $v) {
 			if ($v['fileOwner'] === $auth->getUserId()) {
@@ -273,18 +277,16 @@ switch ($action) {
 		break;
 
 	case "index" :
-		if ($auth->isLoggedIn()) {
-			$userId = $auth->getUserId();
-			$userDisplayName = $auth->getUserDisplayName();
-			$userGroups = $auth->getUserGroups();
-		} else {
-			$userId = NULL;
-			$userDisplayName = NULL;
-			$userGroups = NULL;
-		}
-		$smarty->assign('userId', $userId);
-		$smarty->assign('userDisplayName', $userDisplayName);
-		$smarty->assign('userGroups', $userGroups);
+		if(!$auth->isLoggedIn())
+			throw new Exception("not logged in");
+
+		$smarty->assign('userId', $auth->getUserId());
+		$smarty->assign('userDisplayName', $auth->getUserDisplayName());
+
+		if (getConfig($config, 'group_share', FALSE, FALSE))
+			$smarty->assign('userGroups', $auth->getUserGroups());
+		else
+			$smarty->assign('userGroups', array());
 		$smarty->display('index.tpl');
 		break;
 
