@@ -38,15 +38,24 @@ class OAuth {
 	}
 
 	function getUserId() {
-		return "oauth_" . $this->consumer_key;
+                if ($this->isLoggedIn())
+                        return "oauth_" . $this->consumer_key;
+                else
+                        throw new Exception("not logged in");
 	}
 
 	function getUserDisplayName() {
-		return "OAuth Consumer";
+                if ($this->isLoggedIn())
+                        return "OAuth Consumer";
+                else
+                        throw new Exception("not logged in");
 	}
 
 	function getUserInfo() {
-		return array();
+                if ($this->isLoggedIn())
+                        return array();
+                else
+                        throw new Exception("not logged in");
 	}
 	
 	function memberOfGroups($groups) {
@@ -54,7 +63,6 @@ class OAuth {
 	}
 
 	function login() { 
-
 		/* if no attempt to use OAuth stop */
 		if (!isset ($_GET['oauth_signature']))
 			return FALSE;
@@ -83,8 +91,9 @@ class OAuth {
 		if (!$valid)
 			throw new Exception('invalid OAuth signature');
 
-		/* FIXME: userId should be actual user the oAuth client is acting on behalf of, 
-		   or do we want a special "super account"? */
+		/* FIXME: userId should be actual user the oAuth client is acting on behalf of. 
+		   We now have a hack that OAuth is a member of all groups. This is another bug
+		   if groups support is disabled! */
 
 		$this->consumer_key = $key;
 		$this->isValidRequest = TRUE;
