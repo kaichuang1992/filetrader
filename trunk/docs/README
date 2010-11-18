@@ -26,6 +26,16 @@ Create directories and set file permissions:
 	# set unix permissions
 	chmod o+w -R data tpl_c
 
-	# set the correct SELinux labels (only for Fedora/Red Hat systems?)
+
+--- SELinux Configuration ---
+
+Set the correct SELinux labels (only for Fedora/Red Hat systems?)
+
 	chcon -R -t httpd_sys_rw_content_t data tpl_c
+
+Allow HTTP to access the network (to contact CouchDB) and send mail (for the 
+invites)
+
+	sudo setsebool httpd_can_network_connect on
+	sudo setsebool httpd_can_sendmail on
 

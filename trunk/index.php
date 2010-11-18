@@ -35,7 +35,7 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 $authType = getConfig($config, 'auth_type', TRUE);
 $dbName = getConfig($config, 'db_name', TRUE);
 
-require_once ("/usr/share/php/Smarty/Smarty.class.php");
+require_once ("ext/smarty/libs/Smarty.class.php");
 require_once ("lib/Auth/Auth.class.php");
 require_once ("lib/$authType/$authType.class.php");
 
