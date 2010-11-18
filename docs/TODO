@@ -8,6 +8,8 @@ Things still to do:
 - write installation manual
 - better global template/error handling in index.php
 - fix all the FIXMEs
+- fix all http/https in case of sending mail. Maybe server is not even available
+  through https
 
 == 2.0 ==
 - make it possible to see whether or not the invited user actually downloaded the file (share)
