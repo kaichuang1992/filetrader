@@ -1,4 +1,5 @@
-	<script type="text/javascript" src="ext/plupload/js/plupload.full.min.js"></script>
+	<script type="text/javascript" src="ext/plupload/js/plupload.min.js"></script>
+        <script type="text/javascript" src="ext/plupload/js/plupload.html5.min.js"></script>
 	<script type="text/javascript" src="ext/plupload/js/jquery.plupload.queue.min.js"></script>
 	<script type="text/javascript" src="j/upload.js"></script>
 
