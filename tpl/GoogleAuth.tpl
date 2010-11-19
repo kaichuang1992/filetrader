@@ -2,7 +2,7 @@
 <style type="text/css">
         @import url("s/auth.css");
 </style>
-{if $error }
+{if $error}
         <div class="error">
                 {$errorMessage}
         </div>

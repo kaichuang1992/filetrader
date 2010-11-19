@@ -26,7 +26,7 @@
 	<ul>
 		{if $authenticated}
 			<li class="myfiles"><a href="#">My Files</a></li>
-			{if !empty($userGroups) }
+			{if !empty($userGroups)}
 			<li class="groupfiles"><a href="#">Group Files</a></li>
 			{/if}
 			<li class="uploadfiles"><a href="#">Upload</a></li>

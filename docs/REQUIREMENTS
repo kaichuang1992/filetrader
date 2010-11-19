@@ -3,7 +3,7 @@ The following external PHP libraries are required:
 Library         Version         License         URL
                 Tested
 -------------------------------------------------------------------------------
-Smarty		2.6.26		LGPL		http://www.smarty.net
+Smarty		3.0.4		LGPL		http://www.smarty.net
 Sag PHP		0.3.0 (dev)	ASL2.0		http://www.saggingcouch.com/
 php-email-address-validation
 		r10 (20100215)	New BSD		http://code.google.com/p/php-email-address-validation/
