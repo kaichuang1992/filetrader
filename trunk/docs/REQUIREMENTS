@@ -3,13 +3,15 @@ The following external PHP libraries are required:
 Library         Version         License         URL
                 Tested
 -------------------------------------------------------------------------------
-Smarty		3.0.4		LGPL		http://www.smarty.net
-Sag PHP		0.3.0 (dev)	ASL2.0		http://www.saggingcouch.com/
+Smarty		3.0.4		LGPL2 or 3?	http://www.smarty.net
+Sag PHP		0.3.0-dev	ASL2.0		http://www.saggingcouch.com/
+		  (using latest Git)
 php-email-address-validation
 		r10 (20100215)	New BSD		http://code.google.com/p/php-email-address-validation/
 
 # If you want to use OpenID/Google Auth:
-LightOpenID	0.3		MIT		http://code.google.com/p/lightopenid/
+LightOpenID	0.3+		MIT		http://code.google.com/p/lightopenid/
+		  (using latest Git)
 
 # If you want to use SAML Auth:
 simpleSAMLphp	1.6.1		LGPL 2.1	http://simplesamlphp.org/
@@ -19,6 +21,7 @@ The following external JS libraries are required:
 Library		Version		License		URL
 		Tested
 -------------------------------------------------------------------------------
-Plupload	1.2.4		GPLv2		http://www.plupload.com/
+Plupload	1.2.4+		GPLv2		http://www.plupload.com/
+		  (using latest Git)
 jQuery		1.4.4		MIT, GPLv2	http://jquery.com/
 
