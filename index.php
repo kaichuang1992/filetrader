@@ -106,40 +106,31 @@ switch ($action) {
 
 	case "groupShare" :
                 $id = getRequest("id", TRUE);
-
                 $info = $storage->readEntry($dbName, $id);
-
                 if ($info['fileOwner'] !== $auth->getUserId())
                         throw new Exception("access denied");
 
                 $smarty->assign('sharegroups', $info['shareGroups']);
                 $smarty->assign('groups', $auth->getUserGroups());
                 $smarty->assign('id', $id);
-                $smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
                 $content = $smarty->fetch('GroupShare.tpl');
 		break;
 
 	case "emailShare" :
                 $id = getRequest("id", TRUE);
-
                 $info = $storage->readEntry($dbName, $id);
-
                 if ($info['fileOwner'] !== $auth->getUserId())
                         throw new Exception("access denied");
 
                 $smarty->assign('tokens', $info['downloadTokens']);
                 $smarty->assign('id', $id);
 		$smarty->assign('fileName', $info['fileName']);
-
-//                $smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
                 $content = $smarty->fetch('EmailShare.tpl');
 		break;
 
 	case "deleteFile" :
 		$id = getRequest("id", TRUE);
-
 		$info = $storage->readEntry($dbName, $id);
-
 		if ($info['fileOwner'] !== $auth->getUserId())
 			throw new Exception("access denied");
 
@@ -153,6 +144,7 @@ switch ($action) {
 
 		/* delete from file system */
 		unlink($filePath);
+                header("Location: index.php?action=myFiles");
 		break;
 
 	case "deleteToken" :
@@ -164,15 +156,12 @@ switch ($action) {
 
 		$info = $storage->readEntry($dbName, $id);
 
-		if ($info['fileOwner'] !== $auth->getUserId()) {
-			logHandler("[SECURITY] Not '" . $auth->getUserId() . "' is the owner of '" . $info['fileName'] . "', but '" . $info['fileOwner'] . "'");
+		if ($info['fileOwner'] !== $auth->getUserId())
 			throw new Exception("access denied");
-		}
 
 		logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
 		unset ($info['downloadTokens'][$tokenId]);
 		$storage->updateEntry($dbName, $id, $info);
-
                 header("Location: index.php?action=emailShare&id=$id");
 		break;
 
@@ -202,6 +191,7 @@ switch ($action) {
 			}
 		}
 		$storage->updateEntry($dbName, $id, $info);
+                header("Location: index.php?action=groupShare&id=$id");
 		break;
 
 	case "updateEmailShare" :
@@ -210,18 +200,14 @@ switch ($action) {
 
 		$id = getRequest("id", TRUE);
 		$info = $storage->readEntry($dbName, $id);
-
 		if ($info['fileOwner'] !== $auth->getUserId())
 			throw new Exception("access denied");
-
 		$address = getRequest('address', TRUE);
 
 		$validator = new EmailAddressValidator;
 		if (!$validator->check_email_address($address)) {
 			throw new Exception("invalid address specified");
 		}
-		echo "Hello!";
-
 		/* add token */
 		$token = generateToken();
 
@@ -412,10 +398,6 @@ switch ($action) {
 
 		// Return JSON-RPC response
 		throw new Exception('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
-		break;
-
-	case "doLogin" : 
-                $content = $smarty->fetch("$authType.tpl");
 		break;
 
 	default :
