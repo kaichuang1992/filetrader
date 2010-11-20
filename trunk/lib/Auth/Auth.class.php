@@ -20,15 +20,11 @@
 
 abstract class Auth {
 	var $config;
-	var $error;
-	var $errorMessage;
 
 	function __construct($config) {
 		if (!is_array($config))
 			throw new Exception("config parameter should be array");
 		$this->config = $config;
-		$this->error = FALSE;
-		$this->errorMessage = '';
 		if(!isset($_SESSION))
 			session_start();
 	}
