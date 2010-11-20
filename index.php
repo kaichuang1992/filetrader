@@ -22,22 +22,33 @@ require_once ('config.php');
 require_once ('utils.php');
 
 if (!isset ($config) || !is_array($config))
-	throw new Exception("broken or missing configuration file?");
-
-if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
-	// only allow SSL connections
-	if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS']))
-		die("service only available through SSL connection");
-}
+	die("broken or missing configuration file?");
 
 date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
+
+require_once ("ext/smarty/libs/Smarty.class.php");
+
+$smarty = new Smarty();
+$smarty->template_dir = 'tpl';
+$smarty->compile_dir = 'tpl_c';
+
+try { 
+
+if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
+        // only allow SSL connections
+        if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS']))
+                throw new Exception("This service only available through SSL connection");
+}
 
 $authType = getConfig($config, 'auth_type', TRUE);
 $dbName = getConfig($config, 'db_name', TRUE);
 
-require_once ("ext/smarty/libs/Smarty.class.php");
 require_once ("lib/Auth/Auth.class.php");
 require_once ("lib/$authType/$authType.class.php");
+require_once ("ext/sag/src/Sag.php");
+require_once ("ext/EmailAddressValidator.php");
+require_once ("lib/CRUDStorage/CRUDStorage.class.php");
+require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 
 if (getConfig($config, 'allow_opensocial', FALSE, FALSE)) {
 	/* try OpenSocial authentication */
@@ -54,28 +65,16 @@ if (getConfig($config, 'allow_oauth', FALSE, FALSE)) {
 }
 
 if (!isset ($auth) || empty ($auth) || !$auth->isLoggedIn()) {
-	/* we need interactive authentication */
 	$auth = new $authType ($config);
 	$auth->login();
 }
 
-require_once ("ext/sag/src/Sag.php");
-require_once ("ext/EmailAddressValidator.php");
-require_once ("lib/CRUDStorage/CRUDStorage.class.php");
-require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
+$action = getRequest('action', FALSE, 'myFiles');
 
 $storage = new CouchCRUDStorage();
 
-$smarty = new Smarty();
-$smarty->template_dir = 'tpl';
-$smarty->compile_dir = 'tpl_c';
-
-$smarty->assign('authenticated', $auth->isLoggedIn());
-
-$action = getRequest('action', FALSE, 'index');
-
 switch ($action) {
-	case "download" :
+	case "downloadFile" :
 		require_once ('/usr/share/pear/HTTP/Download.php');
 		$id = getRequest("id", TRUE);
 		$token = getRequest("token", FALSE, 0);
@@ -90,7 +89,7 @@ switch ($action) {
 			$filePath = getConfig($config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
 
 			if (!file_exists($filePath))
-				die("file does not exist on file system");
+				throw new Exception("file does not exist on file system");
 
 			logHandler("User '" . $auth->getUserID() . "' is downloading file '" . $file . "'");
 
@@ -101,40 +100,48 @@ switch ($action) {
 			$dl->send();
 			exit (0);
 		} else {
-			die("access denied");
+			throw new Exception("Access denied");
 		}
 		break;
 
-	case "share" :
-		$id = getRequest("id", TRUE);
+	case "groupShare" :
+                $id = getRequest("id", TRUE);
 
-		/* FIXME: ugly way of passing the id! */
-		list ($type, $id) = explode("_", $id);
+                $info = $storage->readEntry($dbName, $id);
 
-		$info = $storage->readEntry($dbName, $id);
+                if ($info['fileOwner'] !== $auth->getUserId())
+                        throw new Exception("access denied");
 
-		if ($info['fileOwner'] !== $auth->getUserId())
-			die("access denied");
-
-		$smarty->assign('sharegroups', $info['shareGroups']);
-		$smarty->assign('tokens', $info['downloadTokens']);
-		$smarty->assign('groups', $auth->getUserGroups());
-		$smarty->assign('id', $id);
-		$smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
-		$smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
-		$smarty->display('share.tpl');
+                $smarty->assign('sharegroups', $info['shareGroups']);
+                $smarty->assign('groups', $auth->getUserGroups());
+                $smarty->assign('id', $id);
+                $smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
+                $content = $smarty->fetch('GroupShare.tpl');
 		break;
 
-	case "delete" :
-		$id = getRequest("id", TRUE);
+	case "emailShare" :
+                $id = getRequest("id", TRUE);
 
-		/* FIXME: ugly way of passing the id! */
-		list ($type, $id) = explode("_", $id);
+                $info = $storage->readEntry($dbName, $id);
+
+                if ($info['fileOwner'] !== $auth->getUserId())
+                        throw new Exception("access denied");
+
+                $smarty->assign('tokens', $info['downloadTokens']);
+                $smarty->assign('id', $id);
+		$smarty->assign('fileName', $info['fileName']);
+
+//                $smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
+                $content = $smarty->fetch('EmailShare.tpl');
+		break;
+
+	case "deleteFile" :
+		$id = getRequest("id", TRUE);
 
 		$info = $storage->readEntry($dbName, $id);
 
 		if ($info['fileOwner'] !== $auth->getUserId())
-			die("access denied");
+			throw new Exception("access denied");
 
 		logHandler("User '" . $auth->getUserID() . "' is deleting file '" . $info['fileName'] . "'");
 
@@ -148,37 +155,37 @@ switch ($action) {
 		unlink($filePath);
 		break;
 
-	case "deletetoken" :
+	case "deleteToken" :
 		if (!getConfig($config, 'email_share', FALSE, FALSE))
-			die("email share is not enabled");
+			throw new Exception("email share is not enabled");
 
 		$id = getRequest("id", TRUE);
+                $tokenId = getRequest("token", TRUE);
 
-		/* FIXME: ugly way of passing the id! */
-		list ($type, $fileId, $tokenId) = explode("_", $id);
-
-		$info = $storage->readEntry($dbName, $fileId);
+		$info = $storage->readEntry($dbName, $id);
 
 		if ($info['fileOwner'] !== $auth->getUserId()) {
 			logHandler("[SECURITY] Not '" . $auth->getUserId() . "' is the owner of '" . $info['fileName'] . "', but '" . $info['fileOwner'] . "'");
-			die("access denied");
+			throw new Exception("access denied");
 		}
 
 		logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
 		unset ($info['downloadTokens'][$tokenId]);
-		$storage->updateEntry($dbName, $fileId, $info);
+		$storage->updateEntry($dbName, $id, $info);
+
+                header("Location: index.php?action=emailShare&id=$id");
 		break;
 
-	case "updategroups" :
+	case "updateGroupShare" :
 		if (!getConfig($config, 'group_share', FALSE, FALSE))
-			die("group share is not enabled");
+			throw new Exception("group share is not enabled");
 
 		$id = getRequest("id", TRUE);
 
 		$info = $storage->readEntry($dbName, $id);
 
 		if ($info['fileOwner'] !== $auth->getUserId())
-			die("access denied");
+			throw new Exception("access denied");
 
 		$groupId = getRequest('groupid', TRUE);
 		$checked = getRequest('checked', TRUE);
@@ -197,22 +204,23 @@ switch ($action) {
 		$storage->updateEntry($dbName, $id, $info);
 		break;
 
-	case "emailshare" :
+	case "updateEmailShare" :
 		if (!getConfig($config, 'email_share', FALSE, FALSE))
-			die("sharing through email not enabled");
+			throw new Exception("sharing through email not enabled");
 
 		$id = getRequest("id", TRUE);
 		$info = $storage->readEntry($dbName, $id);
 
 		if ($info['fileOwner'] !== $auth->getUserId())
-			die("access denied");
+			throw new Exception("access denied");
 
 		$address = getRequest('address', TRUE);
 
 		$validator = new EmailAddressValidator;
 		if (!$validator->check_email_address($address)) {
-			die("invalid address specified");
+			throw new Exception("invalid address specified");
 		}
+		echo "Hello!";
 
 		/* add token */
 		$token = generateToken();
@@ -234,9 +242,11 @@ switch ($action) {
 		/* add token to data store */
 		$info['downloadTokens'][$token] = $address;
 		$storage->updateEntry($dbName, $id, $info);
+
+		header("Location: index.php?action=emailShare&id=$id");
 		break;
 
-	case "myfiles" :
+	case "myFiles" :
 		$files = $storage->listEntries($dbName);
 		foreach ($files as $k => $v) {
 			if ($v['fileOwner'] !== $auth->getUserId()) {
@@ -247,17 +257,18 @@ switch ($action) {
 		}
 		$smarty->assign('files', $files);
 		$smarty->assign('type', $action);
-		$smarty->assign('groups', $auth->getUserGroups());
-		$smarty->display('files.tpl');
+                $smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
+                $smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
+		$content = $smarty->fetch('files.tpl');
 		break;
 
-	case "uploadfiles" :
-		$smarty->display('upload.tpl');
+	case "uploadFiles" :
+		$content = $smarty->fetch('uploadFiles.tpl');
 		break;
 
-	case "groupfiles" :
+	case "groupFiles" :
 		if (!getConfig($config, 'group_share', FALSE, FALSE))
-			die("group share is not enabled");
+			throw new Exception("group share is not enabled");
 
 		$files = $storage->listEntries($dbName);
 		foreach ($files as $k => $v) {
@@ -273,21 +284,7 @@ switch ($action) {
 		}
 		$smarty->assign('files', $files);
 		$smarty->assign('type', $action);
-		$smarty->display('files.tpl');
-		break;
-
-	case "index" :
-		if(!$auth->isLoggedIn())
-			throw new Exception("not logged in");
-
-		$smarty->assign('userId', $auth->getUserId());
-		$smarty->assign('userDisplayName', $auth->getUserDisplayName());
-
-		if (getConfig($config, 'group_share', FALSE, FALSE))
-			$smarty->assign('userGroups', $auth->getUserGroups());
-		else
-			$smarty->assign('userGroups', array());
-		$smarty->display('index.tpl');
+		$content = $smarty->fetch('files.tpl');
 		break;
 
 	case "logout" :
@@ -295,7 +292,7 @@ switch ($action) {
 		header("Location: " . $_SERVER['SCRIPT_NAME']);
 		break;
 
-	case "upload" :
+	case "handleUpload" :
 		// FIXME: this seems to be WAY too crazy
 		// Remove HTML4 support completely, only support HTML5 file upload (and maybe Flash/Silverlight?!)
 
@@ -357,7 +354,7 @@ switch ($action) {
 			}
 			closedir($dir);
 		} else
-			die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
+			throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
 
 		// Look for the content type header
 		if (isset ($_SERVER["HTTP_CONTENT_TYPE"]))
@@ -379,14 +376,14 @@ switch ($action) {
 						while ($buff = fread($in, 4096))
 							fwrite($out, $buff);
 					} else
-						die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+						throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 
 					fclose($out);
 					@ unlink($_FILES['file']['tmp_name']);
 				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+					throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+				throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
 		} else {
 			// Open temp file
 			$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
@@ -398,11 +395,11 @@ switch ($action) {
 					while ($buff = fread($in, 4096))
 						fwrite($out, $buff);
 				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 
 				fclose($out);
 			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+				throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 		}
 
 		/* only add entry to the database after receiving the last block */
@@ -414,10 +411,33 @@ switch ($action) {
 		}
 
 		// Return JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		throw new Exception('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		break;
+
+	case "doLogin" : 
+                $content = $smarty->fetch("$authType.tpl");
 		break;
 
 	default :
-		die("unknown action");
+		throw new Exception("unknown action");
 }
+
+                } catch (Exception $e) {
+
+
+	                $smarty->assign('error', TRUE);
+	                $smarty->assign('errorMessage', $e->getMessage());
+	                $smarty->display('index.tpl');
+			exit(1);
+                }
+
+		$smarty->assign('authenticated', $auth->isLoggedIn());
+                $smarty->assign('userId', $auth->getUserId());
+                $smarty->assign('userDisplayName', $auth->getUserDisplayName());
+
+                $smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
+                $smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
+
+		$smarty->assign('content', $content);
+                $smarty->display('index.tpl');
 ?>

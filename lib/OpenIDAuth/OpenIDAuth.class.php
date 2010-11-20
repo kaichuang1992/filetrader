@@ -37,7 +37,6 @@ class OpenIDAuth extends Auth {
 			$_SESSION['returnUrl'] = $_SERVER['REQUEST_URI'];
 		}
 
-		try {
 			if (!isset ($_GET['openid_mode'])) {
 				if (isset ($_POST['openid_identifier'])) {
 					$id = $_POST['openid_identifier'];
@@ -85,16 +84,10 @@ class OpenIDAuth extends Auth {
 					}
 				}
 			}
-		} catch (Exception $e) {
-			$this->error = TRUE;
-			$this->errorMessage = $e->getMessage();
-		}
 
 		$smarty = new Smarty();
 		$smarty->template_dir = 'tpl';
 		$smarty->compile_dir = 'tpl_c';
-		$smarty->assign('error', $this->error);
-		$smarty->assign('errorMessage', $this->errorMessage);
 		$domains = getConfig($this->config, 'openid_whitelist', FALSE, array());
 		$smarty->assign('domains', $domains);
 		$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));

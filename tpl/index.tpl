@@ -1,15 +1,9 @@
 <html>
 <head>
 <title>FileTrader</title>
-<meta name="viewport" content="width = 320" />
 <style type="text/css">
 	@import url("s/style.css");
-        @import url("ext/plupload/examples/css/plupload.queue.css"); 
 </style>
-<script type="text/javascript" src="ext/jquery.js"></script>
-{if $authenticated}
-<script type="text/javascript" src="j/index.js"></script> 
-{/if}
 </head>
 <body>
 	{if $authenticated}
@@ -25,18 +19,23 @@
 	<div id="navigation">
 	<ul>
 		{if $authenticated}
-			<li class="myfiles"><a href="#">My Files</a></li>
-			{if !empty($userGroups)}
-			<li class="groupfiles"><a href="#">Group Files</a></li>
+			<li><a href="?action=myFiles">My Files</a></li>
+
+			{if $share_groups} 
+				<li><a href="?action=groupFiles">Group Files</a></li>
 			{/if}
-			<li class="uploadfiles"><a href="#">Upload</a></li>
-		{else}
-			<li class="login"><a href="#">Login</a></li>
+			<li><a href="?action=uploadFiles">Upload</a></li>
 		{/if}
 	</ul>
 	</div>
 
 	<div id="content">
+	        {if $error}
+	                <div class="error">
+	                        {$errorMessage}
+	                </div>
+		{/if}
+
 		{$content}
 	</div>
 </body>

@@ -1,12 +1,3 @@
-<script type="text/javascript" src="j/auth.js"></script>
-<style type="text/css">
-        @import url("s/auth.css");
-</style>
-{if $error}
-        <div class="error">
-                {$errorMessage}
-        </div>
-{/if}
 <div class="login">
 	<h2>Login</h2>
 	<p>You can login using your Google account.</p>
