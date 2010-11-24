@@ -22,24 +22,29 @@ body {
 
 #content a {
 	color: #000;
-/*	text-decoration: none;*/
 }
 
-#content a.share img, a.delete img {
-	border: 0;
-	/*margin-left: 5px;*/
-	float: right;
-	margin: 0 3px;
+#content table {
+	border: 1px solid #000;
+	margin: 0;
+	padding: 0;
+	width: 100%;
 }
 
-#content ul {
-	list-style: none;
+#content td, #content th {
+	border: 1px dotted #000;
+        text-align: left;
+        vertical-align: middle; 
 	padding: 5px;
-	margin: 0 0 0 15px;
 }
 
-a img {
-	border: 0;
+#content form {
+	margin: 0;
+	padding: 0;
+}
+
+#content input {
+	font-size: 85%;
 }
 
 /*

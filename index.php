@@ -245,7 +245,7 @@ try {
 			$smarty->assign('type', $action);
 			$smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
 			$smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
-			$content = $smarty->fetch('files.tpl');
+			$content = $smarty->fetch('FileList.tpl');
 			break;
 
 		case "uploadFiles" :
@@ -270,7 +270,7 @@ try {
 			}
 			$smarty->assign('files', $files);
 			$smarty->assign('type', $action);
-			$content = $smarty->fetch('files.tpl');
+			$content = $smarty->fetch('FileList.tpl');
 			break;
 
 		case "logout" :
@@ -406,7 +406,8 @@ try {
 
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);
-	$smarty->assign('errorMessage', $e->getMessage());
+//	$smarty->assign('errorMessage', $e->getMessage());
+	$smarty->assign('errorMessage', $e->getTraceAsString());
 	$smarty->display('index.tpl');
 	exit (1);
 }
