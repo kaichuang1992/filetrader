@@ -1,5 +1,7 @@
+<!DOCTYPE HTML>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>FileTrader</title>
 <style type="text/css">
 	@import url("s/style.css");
