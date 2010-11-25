@@ -46,7 +46,7 @@ class SAMLAuth extends Auth {
                 $smarty = new Smarty();
                 $smarty->template_dir = 'tpl';
                 $smarty->compile_dir = 'tpl_c';
-                $smarty->assign('content', $smarty->fetch('SAMLAuth.tpl'));
+                $smarty->assign('container', $smarty->fetch('SAMLAuth.tpl'));
                 $smarty->display('index.tpl');
                 exit (0);
 	}
