@@ -33,7 +33,6 @@ $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
 
 try {
-
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
 		// only allow SSL connections
 		if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS']))
@@ -248,10 +247,6 @@ try {
 			$content = $smarty->fetch('FileList.tpl');
 			break;
 
-		case "uploadFiles" :
-			$content = $smarty->fetch('uploadFiles.tpl');
-			break;
-
 		case "groupFiles" :
 			if (!getConfig($config, 'group_share', FALSE, FALSE))
 				throw new Exception("group share is not enabled");
@@ -419,6 +414,6 @@ $smarty->assign('userDisplayName', $auth->getUserDisplayName());
 $smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
 $smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
 
-$smarty->assign('content', $content);
+$smarty->assign('container', $content);
 $smarty->display('index.tpl');
 ?>
