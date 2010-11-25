@@ -406,8 +406,8 @@ try {
 
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);
-//	$smarty->assign('errorMessage', $e->getMessage());
-	$smarty->assign('errorMessage', $e->getTraceAsString());
+	$smarty->assign('errorMessage', $e->getMessage());
+//	$smarty->assign('errorMessage', $e->getTraceAsString());
 	$smarty->display('index.tpl');
 	exit (1);
 }
