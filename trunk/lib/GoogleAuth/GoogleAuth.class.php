@@ -73,7 +73,7 @@ class GoogleAuth extends Auth {
 		$smarty = new Smarty();
 		$smarty->template_dir = 'tpl';
 		$smarty->compile_dir = 'tpl_c';
-                $smarty->assign('content', $smarty->fetch('GoogleAuth.tpl'));
+                $smarty->assign('container', $smarty->fetch('GoogleAuth.tpl'));
                 $smarty->display('index.tpl');
                 exit (0);
 	}

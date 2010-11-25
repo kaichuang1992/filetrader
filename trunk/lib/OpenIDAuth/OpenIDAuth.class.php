@@ -90,7 +90,7 @@ class OpenIDAuth extends Auth {
 		$smarty->compile_dir = 'tpl_c';
 		$domains = getConfig($this->config, 'openid_whitelist', FALSE, array());
 		$smarty->assign('domains', $domains);
-		$smarty->assign('content', $smarty->fetch('OpenIDAuth.tpl'));
+		$smarty->assign('container', $smarty->fetch('OpenIDAuth.tpl'));
 		$smarty->display('index.tpl');
 		exit (0);
 	}
