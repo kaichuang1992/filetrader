@@ -23,8 +23,15 @@
 
 	<h1>FileTrader</h1>
 
-	<div id="container">
-		{$container}
-	</div>
+	{if $error} 
+		<div class="error">
+			<p>{$errorMessage}</p>
+		</div>
+	{else}
+		<div id="container">
+			{$container}
+		</div>
+	{/if}
+
 </body>
 </html>
