@@ -40,7 +40,7 @@ body {
 	padding: 0;
 }
 
-#container input {
+#container input, #container select {
 	font-size: 85%;
 }
 
@@ -48,9 +48,6 @@ body {
  * Error Messages
  */
 .error {
-	margin: 0 auto;
-	padding: 5px;
-	width: 75%;
 	background-color: #c00;
 	color: #fff;
 	text-align: center;
