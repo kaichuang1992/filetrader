@@ -103,7 +103,10 @@ function bytesToHuman($bytes) {
 }
 
 function getProtocol() {
-	return (isset($_SERVER['HTTPS') && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+	return (   isset($_SERVER['HTTPS']) && 
+		   !empty($_SERVER['HTTPS']) && 
+		   $_SERVER['HTTPS'] !== 'off'
+		) ? "https://" : "http://";
 }
 
 function generateToken() {
