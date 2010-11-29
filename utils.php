@@ -102,6 +102,10 @@ function bytesToHuman($bytes) {
 	return $bytes . " bytes";
 }
 
+function getProtocol() {
+	return (isset($_SERVER['HTTPS') && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+}
+
 function generateToken() {
 	return bin2hex(openssl_random_pseudo_bytes(16));
 }
