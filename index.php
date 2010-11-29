@@ -224,7 +224,7 @@ try {
 
 			/* send email */
 			$subject = '[FileTrader] A file has been shared with you!';
-			$from = getConfig('email_share_sender', FALSE, 'FileTrader <filetrader@example.com>');
+			$from = getConfig($config, 'email_share_sender', FALSE, 'FileTrader <filetrader@example.com>');
 			$headers = "From: $from\r\n" .
 			    "Reply-To: $from\r\n" .
 			    "X-Mailer: PHP/" . phpversion();
