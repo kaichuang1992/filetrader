@@ -214,7 +214,7 @@ try {
                         $info['downloadTokens'][$token] = $address;
                         $storage->updateEntry($dbName, $id, $info);
 
-			$url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$id&token=$token";
+			$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$id&token=$token";
 
                         $smarty->assign('sender', $auth->getUserDisplayName());
 			$smarty->assign('fileName', $info['fileName']);
