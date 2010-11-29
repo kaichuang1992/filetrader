@@ -210,23 +210,30 @@ try {
 			/* add token */
 			$token = generateToken();
 
-			$url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=download&id=$id&token=$token";
+                        /* add token to data store */
+                        $info['downloadTokens'][$token] = $address;
+                        $storage->updateEntry($dbName, $id, $info);
 
-			$message = "Hello,\n\n" . $auth->getUserDisplayName() . " invites you to download the file '" . $info['fileName'] . "'. You can click on the link below to start the download. You may be asked to login to the service first.\n\nLink: $url";
+			$url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$id&token=$token";
 
-			$message = wordwrap($message, 70);
+                        $smarty->assign('sender', $auth->getUserDisplayName());
+			$smarty->assign('fileName', $info['fileName']);
+                        $smarty->assign('url', $url);
+                        $content = $smarty->fetch('EmailInvite.tpl');
+			$message = wordwrap($content, 70);
 
 			/* send email */
-			$status = mail($address, 'A file has been shared with you!', $message);
+			$subject = '[FileTrader] A file has been shared with you!';
+			$from = $config['email_share_sender'];
+			$headers = "From: $from\r\n" .
+			    "Reply-To: $from\r\n" .
+			    "X-Mailer: PHP/" . phpversion();
+			$status = mail($address, $subject, $message, $headers);
 
 			if ($status !== TRUE)
 				logHandler("Sending mail to $address failed!");
 			else
 				logHandler("User '" . $auth->getUserID() . "' is sharing file '" . $info['fileName'] . "' with '" . $address . "'");
-
-			/* add token to data store */
-			$info['downloadTokens'][$token] = $address;
-			$storage->updateEntry($dbName, $id, $info);
 
 			header("Location: index.php?action=emailShare&id=$id");
 			break;

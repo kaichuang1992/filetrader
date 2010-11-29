@@ -1,9 +1,9 @@
-			<h2>Share</h2>
+			<h2>Email Share</h2>
 
-			<p>Here you can enter email addresses of people you want to share the file "<strong>{$fileName}</strong>" with.</p>
+			<p>Here you can share the file "<strong>{$fileName}</strong>" by sending email invites.</p>
 
 			<form method="post">
-			<label>Email Address <input title="The addressee(s) will receive an URL through email containing a special token to download this file after logging in" type="text" name="address" /></label>
+			<label>Email Address <input title="Address to send an invite to" type="text" name="address" /></label>
 			<input type="hidden" name="id" value="{$id}" />
                         <input type="hidden" name="action" value="updateEmailShare">
 			<input type="submit" value="Share" />
@@ -11,7 +11,7 @@
 
                         {if !empty($tokens)}
 				<h2>Shared With</h2>
-				<p>Currently this file is shared with the following people.</p>
+				<p>You sent an invite the the following email addresses:</p>
 				<table>
         	                        <tr><th>Email Address</th><th>Action</th></tr>
 		                        {foreach key=k item=v from=$tokens}
