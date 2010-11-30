@@ -20,8 +20,8 @@ $config['saml_display_name'] = 'cn';
 // Allow users to share files through email invites
 $config['email_share'] = TRUE;
 
-// Specify the address of the sender of the email invites
-$config['email_share_sender'] = 'FileTrader <filetrader@example.com>';
+// Override the default sender of the email invites
+// $config['email_share_sender'] = 'FileTrader <filetrader@example.com>';
 
 // Allow users to share files through groups
 // (This requires support in authentication backend!)
