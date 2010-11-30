@@ -14,7 +14,7 @@
 
 			
 			<table>
-			<tr><th>Delete</th><th>Name</th><th>Action</th></tr>
+			<tr><th>Delete</th><th>Name</th><th>&nbsp;</th></tr>
 	                {foreach key=k item=v from=$files}
 			<tr><td>
                                                 <input type="checkbox" name="id[]" title="Mark this file for deletion" value="{$k}">
@@ -26,11 +26,11 @@
 			</td><td>	
 	                                {if $type == "myFiles"}
 						{if $group_share}
-							<a href="?action=groupShare&id={$k}">Group Share</a>
+							<a href="?action=groupShare&id={$k}"><img src="i/group_add.png" alt="Group Share" title="Group Share"></a>
 						{/if}
 
 						{if $email_share}
-							<a href="?action=emailShare&id={$k}">Email Share</a>
+							<a href="?action=emailShare&id={$k}"><img src="i/email_add.png" alt="Email Share" title="Email Share"></a>
 						{/if}
 	                                {/if}
 	                </td></tr>
