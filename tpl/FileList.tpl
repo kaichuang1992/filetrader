@@ -14,7 +14,6 @@
 
 			
 			<table>
-			<tr><th>Delete</th><th>Name</th><th>&nbsp;</th></tr>
 	                {foreach key=k item=v from=$files}
 			<tr><td>
                                                 <input type="checkbox" name="id[]" title="Mark this file for deletion" value="{$k}">
