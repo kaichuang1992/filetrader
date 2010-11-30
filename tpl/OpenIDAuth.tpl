@@ -3,7 +3,7 @@
         <p>You can login using your OpenID account. If you select a domain you only need to provide your user account for that domain.</p>
 
 	<form method="post">
-		<label class="domain">Domain 
+		<label class="domain">Provider 
 		{if !empty($domains)}
 			{html_options class=provider name=domain options=$domains}
 		{/if}	
