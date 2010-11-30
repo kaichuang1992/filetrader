@@ -44,7 +44,7 @@
         <div id="upload">
         	<div id="uploadFileList">Your browser doesn't have HTML5 support.</div>
                 <br />
-                <a id="uploadPickFiles" href="#">[Select files]</a>
-                <a id="uploadFiles" href="#">[Upload files]</a>
+                <button id="uploadPickFiles">Select files...</button>
+                <button id="uploadFiles">Upload</button>
         </div>
 
