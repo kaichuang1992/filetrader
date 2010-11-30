@@ -24,12 +24,36 @@ img {
 	border: 0;
 }
 
-p.header {
-	width: 100%;
+#header {
 	background-color: #000;
+	margin: 0;
+	padding: 0;
+}
+
+#header p {
+	margin: 0;
+	padding: 5px;
 	text-align: right;
 	color: #fff;
-	margin: 0;
-	padding: 5px 0;
-	
+}
+
+#content {
+	border: 1px solid #000;
+	margin: 5px;
+	padding: 10px;
+}
+
+label {
+	display: block;
+	margin: 10px;
+}
+
+form {
+	border: 1px solid #000;
+	background-color: #eee;
+	padding: 5px;
+}
+
+input.button {
+	text-align: center;
 }
