@@ -12,20 +12,19 @@
                         {if !empty($tokens)}
 				<h2>Shared With</h2>
 				<p>You sent an invite the the following email addresses:</p>
+				<form method="post">
+				<input type="hidden" name="action" value="deleteToken">
+				<input type="hidden" name="id" value="{$id}">
 				<table>
-        	                        <tr><th>Email Address</th><th>Action</th></tr>
+        	                        <tr><th>Delete</th><th>Email Address</th></tr>
 		                        {foreach key=k item=v from=$tokens}
 					<tr>
-	                                       <td>{$v}</td>
 						<td>
-			                                <form method="post" action="index.php">
-								<input type="hidden" name="action" value="deleteToken">
-								<input type="hidden" name="id" value="{$id}">
-								<input type="hidden" name="token" value="{$k}">
-								<input type="submit" value="Delete">
-							</form>
+							<input type="checkbox" title="Mark this token for deletion" name="token[]" value="{$k}">
 						</td>
+                                        	<td>{$v}</td>
 					</tr>
 		                        {/foreach}
-				</table>		
+				</table>
+				<input type="submit" title="Delete the selected tokens" value="Delete Tokens">
                         {/if}

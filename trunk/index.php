@@ -129,21 +129,26 @@ try {
 			break;
 
 		case "deleteFile" :
-			$id = getRequest("id", TRUE);
-			$info = $storage->readEntry($dbName, $id);
-			if ($info['fileOwner'] !== $auth->getUserId())
-				throw new Exception("access denied");
+			$ids = getRequest("id", TRUE);
+			if(!is_array($ids))
+				throw new Exception("deleteFile should receive array of files to delete");
 
-			logHandler("User '" . $auth->getUserID() . "' is deleting file '" . $info['fileName'] . "'");
+			foreach($ids as $id) {
+				$info = $storage->readEntry($dbName, $id);
+				if ($info['fileOwner'] !== $auth->getUserId())
+					throw new Exception("access denied");
 
-			$storage->deleteEntry($dbName, $id, $info['_rev']);
+				logHandler("User '" . $auth->getUserID() . "' is deleting file '" . $info['fileName'] . "'");
 
-			$file = $info['fileName'];
-			$ownerDir = base64_encode($info['fileOwner']);
-			$filePath = getConfig($config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
+				$storage->deleteEntry($dbName, $id, $info['_rev']);
 
-			/* delete from file system */
-			unlink($filePath);
+				$file = $info['fileName'];
+				$ownerDir = base64_encode($info['fileOwner']);
+				$filePath = getConfig($config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
+
+				/* delete from file system */
+				unlink($filePath);
+			}
 			header("Location: index.php?action=myFiles");
 			break;
 
@@ -152,15 +157,19 @@ try {
 				throw new Exception("email share is not enabled");
 
 			$id = getRequest("id", TRUE);
-			$tokenId = getRequest("token", TRUE);
+			$tokenIds = getRequest("token", TRUE);
+                        if(!is_array($tokenIds))
+                                throw new Exception("deleteToken should receive array of tokens to delete");
 
 			$info = $storage->readEntry($dbName, $id);
 
 			if ($info['fileOwner'] !== $auth->getUserId())
 				throw new Exception("access denied");
 
-			logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
-			unset ($info['downloadTokens'][$tokenId]);
+                        foreach($tokenIds as $tokenId) {
+				logHandler("User '" . $auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
+				unset ($info['downloadTokens'][$tokenId]);
+			}
 			$storage->updateEntry($dbName, $id, $info);
 			header("Location: index.php?action=emailShare&id=$id");
 			break;

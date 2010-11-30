@@ -13,25 +13,18 @@
 <script type="text/javascript" src="j/upload.js"></script>
 </head>
 <body>
-	{if $authenticated}
-        <div id="userinfo">
-                <strong title="{$userId}">{$userDisplayName}</strong>
-                <br>
-                <a href="?action=logout">Logout</a>
-        </div>
+	<p class="header"><a href="?action=myFiles">Home</a> 
+	{if $authenticated} 
+		| Logged in as: <span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a>
 	{/if}
-
-	<h1>FileTrader</h1>
+	</p>
 
 	{if $error} 
 		<div class="error">
-			<p>{$errorMessage}</p>
+			<p>Error: {$errorMessage}</p>
 		</div>
 	{else}
-		<div id="container">
-			{$container}
-		</div>
+		{$container}
 	{/if}
-
 </body>
 </html>
