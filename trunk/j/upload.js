@@ -5,11 +5,12 @@ $(document).ready(function() {
 		container : 'upload',
 		max_file_size : '4096mb',
 		url : 'index.php?action=handleUpload',
+		drop_element :'uploadFileList',
 	});
 
 	uploader.bind('Init', function(up, params) {
 		// $('#uploadFileList').html("<div>Current runtime: " + params.runtime + "</div>");
-		$('#uploadFileList').html("");
+		$('#uploadFileList').html("<div>Drag files here...</div>");
 	});
 
 	$('#uploadFiles').click(function(e) {
@@ -23,7 +24,7 @@ $(document).ready(function() {
 		$.each(files, function(i, file) {
 			$('#uploadFileList').append(
 				'<div id="' + file.id + '">' +
-				file.name + ' (' + plupload.formatSize(file.size) + ') <b></b>' +
+				file.name + ' (' + plupload.formatSize(file.size) + ')' +
 			'</div>');
 		});
 
