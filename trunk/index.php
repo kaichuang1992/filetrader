@@ -31,6 +31,7 @@ require_once ("ext/smarty/libs/Smarty.class.php");
 $smarty = new Smarty();
 $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
+$smarty->assign('error', FALSE);
 
 try {
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
@@ -224,7 +225,7 @@ try {
 
 			/* send email */
 			$subject = '[FileTrader] A file has been shared with you!';
-			$from = getConfig($config, 'email_share_sender', FALSE, 'FileTrader <filetrader@example.com>');
+			$from = getConfig($config, 'email_share_sender', FALSE, 'FileTrader <filetrader@' . $_SERVER['HTTP_HOST'] . '>');
 			$headers = "From: $from\r\n" .
 			    "Reply-To: $from\r\n" .
 			    "X-Mailer: PHP/" . phpversion();
@@ -410,6 +411,7 @@ try {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
 //	$smarty->assign('errorMessage', $e->getTraceAsString());
+	$smarty->assign('authenticated', FALSE);
 	$smarty->display('index.tpl');
 	exit (1);
 }
