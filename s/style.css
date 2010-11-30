@@ -3,13 +3,16 @@ body {
 	font-size: 85%;
 	margin: 0;
 	padding: 0;
-	background-color: #eee;
+}
+
+a {
+	color: #888;
 }
 
 table {
 	border: 1px solid #000;
 	margin: 5px 0;
-	background-color: #ddd;
+	background-color: #eee;
 }
 
 th, td {
@@ -17,9 +20,14 @@ th, td {
 	padding: 5px 10px;
 }
 
+img {
+	border: 0;
+}
+
 p.header {
 	width: 100%;
-	background-color: #ddd;
+	background-color: #000;
+	color: #fff;
 	margin: 0;
 	padding: 5px 0;
 	
