@@ -128,7 +128,7 @@ try {
 			break;
 
 		case "deleteFile" :
-			$ids = getRequest("id", TRUE);
+			$ids = getRequest("id", FALSE, array());
 			if(!is_array($ids))
 				throw new Exception("deleteFile should receive array of files to delete");
 
@@ -156,7 +156,7 @@ try {
 				throw new Exception("email share is not enabled");
 
 			$id = getRequest("id", TRUE);
-			$tokenIds = getRequest("token", TRUE);
+			$tokenIds = getRequest("token", FALSE, array());
                         if(!is_array($tokenIds))
                                 throw new Exception("deleteToken should receive array of tokens to delete");
 
