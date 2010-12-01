@@ -34,7 +34,7 @@ $config['email_share'] = TRUE;
 $config['group_share'] = FALSE;
 
 // Name of database in CouchDB
-$config['db_name'] = 'files';
+$config['db_name'] = 'filetrader';
 
 // Wheter or not to allow only SSL connections
 $config['ssl_only'] = FALSE;
