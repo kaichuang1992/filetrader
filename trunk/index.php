@@ -320,8 +320,7 @@ try {
 			$fileName = getRequest('name', FALSE, '');
 
 			// Clean the fileName for security reasons
-			// FIXME: make this better, don't remove so much!!!		
-			$fileName = preg_replace('/[^\w\._]+/', '', $fileName);
+			$fileName = filter_var($fileName, FILTER_SANITIZE_SPECIAL_CHARS);
 
 			// Make sure the fileName is unique but only if chunking is disabled
 			if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {

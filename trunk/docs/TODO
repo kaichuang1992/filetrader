@@ -1,7 +1,6 @@
 Things still to do:
 
 == 1.0 ==
-- do something better with file name filter on upload, too restrictive now
 - figure out how to take care of PEAR Download library in a nice way (now 
   as root pear install of the module, ieeuw, and doesn't work with STRICT mode)
 - write installation manual
