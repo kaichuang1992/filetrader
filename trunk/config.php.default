@@ -3,6 +3,12 @@ $config = array ();
 
 $config['time_zone'] = 'Europe/Amsterdam';
 
+// use system wide PEAR installation
+// $config['pear_path'] = '/usr/share/pear';
+
+// use local PEAR 
+$config['pear_path'] = __DIR__."/ext/pear/php";
+
 // NullAuth, OpenIDAuth, GoogleAuth, SAMLAuth
 $config['auth_type'] = 'NullAuth';
 
@@ -11,7 +17,7 @@ $config['openid_whitelist'] = array (
 	'@ID@' => 'Other...'
 );
 
-# simpleSAMLphp configuration (SAMLAuth)
+// simpleSAMLphp configuration (SAMLAuth)
 $config['saml_path'] = '/var/simplesamlphp';
 $config['saml_sp'] = 'default-sp';
 $config['saml_uid'] = 'uid';

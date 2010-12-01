@@ -5,7 +5,8 @@ external PHP and JavaScript libraries required for FileTrader.
 
 - PHP 5.3.x
 - CouchDB
-- PHP With PEAR (HTTP_Download 1.1.4)
+- PHP With PEAR	(see below)
+	HTTP_Download 1.1.4
 - 64 bit system for >2G file uploads
 
 --- Configure ---
@@ -38,4 +39,17 @@ invites)
 
 	sudo setsebool httpd_can_network_connect on
 	sudo setsebool httpd_can_sendmail on
+
+--- Setup PEAR ---
+See http://pear.php.net/manual/en/installation.shared.php
+
+(You need SSH access to do this)
+
+$ pear config-create /var/www/html/filetrader/ext ~/.pearrc
+$ pear install -o PEAR
+$ pear install HTTP_Download
+
+This will make PEAR available in the "ext" directory. If you have 
+a complete PEAR installation (including HTTP_Download) on your 
+system you can set the config flag 'pear_path' in config.php.
 
