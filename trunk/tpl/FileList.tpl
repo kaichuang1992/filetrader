@@ -41,10 +41,11 @@
 		{/if}
 
 	<h2>Upload</h2>
-        <div id="upload">
-        	<div id="uploadFileList">Your browser doesn't have HTML5 support.</div>
-                <br />
+
+        <form id="upload">
+		<div id="fileList"><p>Drop files here...</p></div>
                 <button id="uploadPickFiles">Select files...</button>
-                <button id="uploadFiles">Upload</button>
+                <button id="uploadFiles">Start Upload</button>
+		<button id="stopUpload" disabled="disabled">Cancel Upload</button>
         </div>
 

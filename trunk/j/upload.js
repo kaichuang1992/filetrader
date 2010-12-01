@@ -5,7 +5,7 @@ $(document).ready(function() {
 		container : 'upload',
 		max_file_size : '4096mb',
 		url : 'index.php?action=handleUpload',
-		drop_element :'uploadFileList',
+		drop_element :'upload',
 	});
 
 	uploader.bind('Init', function(up, params) {
@@ -18,21 +18,26 @@ $(document).ready(function() {
 		e.preventDefault();
 	});
 
+	$('#stopUpload').click(function(e) {
+		uploader.stop();
+		e.preventDefault();
+	});
+
 	uploader.init();
 
 	uploader.bind('FilesAdded', function(up, files) {
 		$.each(files, function(i, file) {
-			$('#uploadFileList').append(
-				'<div id="' + file.id + '">' +
+			$('#fileList').append(
+				'<label id="' + file.id + '"><input type="checkbox" name="id[]" value=' + file.id + '">' +
 				file.name + ' (' + plupload.formatSize(file.size) + ')' +
-			'</div>');
+			'</label>');
 		});
 
 		up.refresh(); // Reposition Flash/Silverlight
 	});
 
 	uploader.bind('UploadProgress', function(up, file) {
-		$('#' + file.id + " b").html(file.percent + "%");
+		$('#' + file.id).html(file.name + ' ' + file.percent + "%");
 	});
 
 	uploader.bind('Error', function(up, err) {
@@ -46,8 +51,17 @@ $(document).ready(function() {
 	});
 
 	uploader.bind('FileUploaded', function(up, file) {
-		$('#' + file.id + " b").html("100%");
+		$('#' + file.id).addClass('finished');
 	});
 
+	uploader.bind('StateChanged', function(up) {
+		if(up.state == plupload.STARTED) {
+			$('#stopUpload').removeAttr('disabled');
+		}
+
+		if(up.state == plupload.STOPPED) {
+			$('#stopUpload').attr('disabled', 'disabled');
+		}
+	});
 });
 

@@ -50,15 +50,21 @@ input.button {
 	text-align: center;
 }
 
-#uploadFileList {
-	width: 100%;
+#fileList {
+	width: 400px;
 	height: 200px;
 	border: 1px dashed #000;
+	margin: 10px;
+	overflow-y: scroll;
 }
 
-#uploadFileList div {
-	width: 25%;
-	margin: 0 auto;
-	border: 1px solid;
+#fileList p {
 	text-align: center;
+	font-weight: bold;
+	font-variant: small-caps;
 }
+
+.finished {
+	color: #888;
+}
+
