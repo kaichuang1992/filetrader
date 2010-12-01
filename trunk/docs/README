@@ -1,5 +1,4 @@
 -- File Trader --
-
 The following base components are required. See REQUIREMENTS for a list of 
 external PHP and JavaScript libraries required for FileTrader.
 
@@ -13,32 +12,34 @@ external PHP and JavaScript libraries required for FileTrader.
 Copy config.php.defaults to config.php and modify if needed.
 
 Make sure the database exists in CouchDB. It doesn't need to contain
-any documents though. See the script in the docs/ directory to populate 
-CouchDB with some entries. You can also use the web based CouchDB 
-interface at "http://localhost:<PORT>/_utils".
+any documents though. You can use the web based CouchDB 
+interface at "http://localhost:<PORT>/_utils" or use CURL:
+
+$ curl -X PUT http://127.0.0.1:5984/filetrader
+
+See the script in the docs/ directory to populate CouchDB with some entries.
 
 Create directories and set file permissions:
 
-	# create directories
-	mkdir -p data
-	mkdir -p data/files
-	mkdir -p tpl_c
+# create directories
+$ mkdir -p data
+$ mkdir -p data/files
+$ mkdir -p tpl_c
 
-	# set unix permissions
-	chmod o+w -R data tpl_c
+# set unix permissions
+$ chmod o+w -R data tpl_c
 
 
 --- SELinux Configuration ---
-
 Set the correct SELinux labels (only for Fedora/Red Hat systems?)
 
-	chcon -R -t httpd_sys_rw_content_t data tpl_c
+$ chcon -R -t httpd_sys_rw_content_t data tpl_c
 
 Allow HTTP to access the network (to contact CouchDB) and send mail (for the 
 invites)
 
-	sudo setsebool httpd_can_network_connect on
-	sudo setsebool httpd_can_sendmail on
+$ su -c 'setsebool httpd_can_network_connect on'
+$ su -c 'setsebool httpd_can_sendmail on'
 
 --- Setup PEAR ---
 See http://pear.php.net/manual/en/installation.shared.php
