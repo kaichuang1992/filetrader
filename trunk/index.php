@@ -46,7 +46,6 @@ try {
 	require_once ("lib/Auth/Auth.class.php");
 	require_once ("lib/$authType/$authType.class.php");
 	require_once ("ext/sag/src/Sag.php");
-	require_once ("ext/EmailAddressValidator.php");
 	require_once ("lib/CRUDStorage/CRUDStorage.class.php");
 	require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 
@@ -212,11 +211,10 @@ try {
 			if ($info['fileOwner'] !== $auth->getUserId())
 				throw new Exception("access denied");
 			$address = getRequest('address', TRUE);
+			$address = filter_var($address, FILTER_VALIDATE_EMAIL);
+			if($address === FALSE)
+				throw new Exception("invalid email address specified");
 
-			$validator = new EmailAddressValidator;
-			if (!$validator->check_email_address($address)) {
-				throw new Exception("invalid address specified");
-			}
 			/* add token */
 			$token = generateToken();
 
