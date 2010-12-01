@@ -74,7 +74,8 @@ try {
 
 	switch ($action) {
 		case "downloadFile" :
-			require_once ('/usr/share/pear/HTTP/Download.php');
++			set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($config, 'pear_path', TRUE));
+			require_once ('HTTP/Download.php');
 			$id = getRequest("id", TRUE);
 			$token = getRequest("token", FALSE, 0);
 
