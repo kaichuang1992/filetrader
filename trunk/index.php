@@ -422,7 +422,7 @@ try {
 //	$smarty->assign('errorMessage', $e->getTraceAsString());
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('index.tpl');
-	logHander("ERROR: " . $e->getMessage());
+	logHandler("ERROR: " . $e->getMessage());
 	exit (1);
 }
 
