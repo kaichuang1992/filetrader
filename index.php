@@ -318,10 +318,12 @@ try {
 			// Get parameters
 			$chunk = getRequest('chunk', FALSE, 0);
 			$chunks = getRequest('chunks', FALSE, 0);
-			$fileName = getRequest('name', FALSE, '');
+			$fN = getRequest('name', FALSE, '');
 
 			// Clean the fileName for security reasons
-			$fileName = filter_var($fileName, FILTER_SANITIZE_SPECIAL_CHARS);
+			$fileName = filter_var($fN, FILTER_SANITIZE_SPECIAL_CHARS);
+			if($fileName === FALSE)
+				throw new Exception("Unable to sanitize filename '" . $fN . "' uploaded by user '" . $auth->getUserId() . "'");
 
 			// Make sure the fileName is unique but only if chunking is disabled
 			if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
@@ -420,6 +422,7 @@ try {
 //	$smarty->assign('errorMessage', $e->getTraceAsString());
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('index.tpl');
+	logHander("ERROR: " . $e->getMessage());
 	exit (1);
 }
 
