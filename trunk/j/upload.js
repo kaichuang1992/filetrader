@@ -5,6 +5,7 @@ $(document).ready(function() {
 		container : 'upload',
 		max_file_size : '4096mb',
 		url : 'index.php?action=handleUpload',
+		chunk_size : '1mb',
 		drop_element :'upload',
 	});
 
