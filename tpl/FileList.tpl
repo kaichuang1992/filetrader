@@ -1,4 +1,4 @@
-	<h2>File List</h2>
+	
 		{if empty($files)}
 			<p>	
 				You did not upload any files yet. Please upload some files :)
@@ -43,9 +43,4 @@
 	<h2>Upload</h2>
 
         <form id="upload">
-		<div id="fileList"><p>Drop files here...</p></div>
-                <button id="uploadPickFiles">Select files...</button>
-                <button id="uploadFiles">Start Upload</button>
-		<button id="stopUpload" disabled="disabled">Cancel Upload</button>
-        </div>
-
+        </form>

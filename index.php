@@ -352,7 +352,7 @@ try {
 				}
 				closedir($dir);
 			} else
-				throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
+				die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
 
 			// Look for the content type header
 			if (isset ($_SERVER["HTTP_CONTENT_TYPE"]))
@@ -374,14 +374,14 @@ try {
 							while ($buff = fread($in, 4096))
 								fwrite($out, $buff);
 						} else
-							throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+							die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 
 						fclose($out);
 						@ unlink($_FILES['file']['tmp_name']);
 					} else
-						throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+						die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 				} else
-					throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
 			} else {
 				// Open temp file
 				$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
@@ -393,11 +393,11 @@ try {
 						while ($buff = fread($in, 4096))
 							fwrite($out, $buff);
 					} else
-						throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+						die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 
 					fclose($out);
 				} else
-					throw new Exception('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 			}
 
 			/* only add entry to the database after receiving the last block */
@@ -409,7 +409,7 @@ try {
 			}
 
 			// Return JSON-RPC response
-			throw new Exception('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+			die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 			break;
 
 		default :
@@ -419,7 +419,6 @@ try {
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
-//	$smarty->assign('errorMessage', $e->getTraceAsString());
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('index.tpl');
 	logHandler("ERROR: " . $e->getMessage());
