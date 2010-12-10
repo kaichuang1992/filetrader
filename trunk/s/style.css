@@ -27,8 +27,6 @@ img {
 }
 
 #content {
-	border: 1px solid #000;
-	margin: 5px;
 	padding: 10px;
 }
 
@@ -48,20 +46,6 @@ form {
 
 input.button {
 	text-align: center;
-}
-
-#fileList {
-	width: 400px;
-	height: 200px;
-	border: 1px dashed #000;
-	margin: 10px;
-	overflow-y: scroll;
-}
-
-#fileList p {
-	text-align: center;
-	font-weight: bold;
-	font-variant: small-caps;
 }
 
 .finished {
