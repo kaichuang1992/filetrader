@@ -42,5 +42,7 @@
 
 	<h2>Upload</h2>
 
+	<p>Only confirmed to work in Google Chrome and Firefox!</p>
+
         <form id="upload">
         </form>
