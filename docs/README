@@ -41,6 +41,8 @@ invites)
 $ su -c 'setsebool -P httpd_can_network_connect on'
 $ su -c 'setsebool -P httpd_can_sendmail on'
 
+(The -P flag makes the setting persistent across reboots)
+
 --- Setup PEAR ---
 See http://pear.php.net/manual/en/installation.shared.php
 

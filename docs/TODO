@@ -3,6 +3,8 @@ Things still to do:
 == 1.0 ==
 - write installation manual
 - fix all the FIXMEs
+- refresh after uploads complete
+- deal with upload of files with the same name
 
 == 2.0 ==
 - make it possible to see whether or not the invited user actually downloaded the file (share)
