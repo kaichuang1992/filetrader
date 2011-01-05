@@ -11,7 +11,7 @@ LightOpenID	0.3+		MIT		http://code.google.com/p/lightopenid/
 		  (using latest Git)
 
 # If you want to use SAML Auth:
-simpleSAMLphp	1.6.1		LGPL 2.1	http://simplesamlphp.org/
+simpleSAMLphp	1.6.3		LGPL 2.1	http://simplesamlphp.org/
 
 The following external JS libraries are required:
 
