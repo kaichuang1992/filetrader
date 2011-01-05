@@ -3,9 +3,8 @@ The following external PHP libraries are required:
 Library         Version         License         URL
                 Tested
 -------------------------------------------------------------------------------
-Smarty		3.0.5		LGPL2 or 3?	http://www.smarty.net
-Sag PHP		0.3.0-dev	ASL2.0		http://www.saggingcouch.com/
-		  (using latest Git)
+Smarty		3.0.6		LGPL2 or 3?	http://www.smarty.net
+Sag PHP		0.3.0		ASL2.0		http://www.saggingcouch.com/
 
 # If you want to use OpenID/Google Auth:
 LightOpenID	0.3+		MIT		http://code.google.com/p/lightopenid/
