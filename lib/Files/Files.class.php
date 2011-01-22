@@ -220,6 +220,7 @@ class Files {
 			}
 		}
 		$this->smarty->assign('files', $files);
+		$this->smarty->assign('type', 'myFiles');
 		$this->smarty->assign('email_share', getConfig($this->config, 'email_share', FALSE, FALSE));
 		$this->smarty->assign('group_share', getConfig($this->config, 'group_share', FALSE, FALSE));
 		$content = $this->smarty->fetch('FileList.tpl');
@@ -243,6 +244,7 @@ class Files {
 			}
 		}
 		$this->smarty->assign('files', $files);
+		$this->smarty->assign('type', 'groupFiles');
 		$content = $this->smarty->fetch('FileList.tpl');
 		return $content;
 	}
