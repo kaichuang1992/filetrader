@@ -20,7 +20,6 @@
 
 require_once ('config.php');
 require_once ('utils.php');
-require_once ('Files.php');
 
 if (!isset ($config) || !is_array($config))
 	die("broken or missing configuration file?");
@@ -49,7 +48,7 @@ try {
 	require_once ("ext/sag/src/Sag.php");
 	require_once ("lib/CRUDStorage/CRUDStorage.class.php");
 	require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
-	require_once ("Files.class.php");
+	require_once ("lib/Files/Files.class.php");
 
 	if (getConfig($config, 'allow_opensocial', FALSE, FALSE)) {
 		/* try OpenSocial authentication */
