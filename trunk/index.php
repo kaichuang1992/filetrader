@@ -73,7 +73,19 @@ try {
 
 	$storage = new CouchCRUDStorage();
 
-		if (!in_array($action, array (), TRUE))
+	if (!in_array($action, array (
+			'deleteFile',
+			'deleteToken',
+			'downloadFile',
+			'emailShare',
+			'groupFiles',
+			'groupShare',
+			'handleUpload',
+			'logout',
+			'myFiles',
+			'updateEmailShare',
+			'updateGroupShare',
+		), TRUE))
 		throw new Exception("unknown action");
 	$f = new Files($config, $storage, $dbName, $auth, $smarty);
 	$f-> $action ();
