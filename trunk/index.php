@@ -88,7 +88,7 @@ try {
 		), TRUE))
 		throw new Exception("unknown action");
 	$f = new Files($config, $storage, $dbName, $auth, $smarty);
-	$f-> $action ();
+	$content = $f-> $action ();
 
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);

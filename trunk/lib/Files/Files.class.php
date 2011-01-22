@@ -75,6 +75,7 @@ class Files {
 		$this->smarty->assign('groups', $this->auth->getUserGroups());
 		$this->smarty->assign('id', $id);
 		$content = $this->smarty->fetch('GroupShare.tpl');
+		return $content;
 	}
 
 	function emailShare() {
@@ -87,6 +88,7 @@ class Files {
 		$this->smarty->assign('id', $id);
 		$this->smarty->assign('fileName', $info['fileName']);
 		$content = $this->smarty->fetch('EmailShare.tpl');
+		return $content;
 	}
 
 	function deleteFile() {
@@ -218,10 +220,10 @@ class Files {
 			}
 		}
 		$this->smarty->assign('files', $files);
-		$this->smarty->assign('type', $action);
 		$this->smarty->assign('email_share', getConfig($this->config, 'email_share', FALSE, FALSE));
 		$this->smarty->assign('group_share', getConfig($this->config, 'group_share', FALSE, FALSE));
 		$content = $this->smarty->fetch('FileList.tpl');
+		return $content;
 	}
 
 	function groupFiles() {
@@ -241,8 +243,8 @@ class Files {
 			}
 		}
 		$this->smarty->assign('files', $files);
-		$this->smarty->assign('type', $action);
 		$content = $this->smarty->fetch('FileList.tpl');
+		return $content;
 	}
 
 	function logout() {
