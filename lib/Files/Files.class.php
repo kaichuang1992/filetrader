@@ -71,36 +71,29 @@ class Files {
 		if ($info['fileOwner'] !== $this->auth->getUserId())
 			throw new Exception("access denied");
 
-		$this->smarty->assign('info', $info['mediaData']);
 		$this->smarty->assign('id', $id);
+                $this->smarty->assign('fileName', $info['fileName']);
+                $this->smarty->assign('fileSize', bytesToHuman($info['fileSize']));
+                $this->smarty->assign('fileDescription', $info['fileDescription']);
+                $this->smarty->assign('fileTags', implode(", ", $info['fileTags']));
+
+		/* fixme: do something with tokens and groups UI */
+                $this->smarty->assign('tokens', $info['downloadTokens']);
+
 		$content = $this->smarty->fetch('FileInfo.tpl');
 		return $content;
 	}
 
-	function groupShare() {
-		$id = getRequest("id", TRUE);
-		$info = $this->storage->readEntry($this->dbName, $id);
-		if ($info['fileOwner'] !== $this->auth->getUserId())
-			throw new Exception("access denied");
+	function rawFileInfo() {
+                $id = getRequest("id", TRUE);
+                $info = $this->storage->readEntry($this->dbName, $id);
+                if ($info['fileOwner'] !== $this->auth->getUserId())
+                        throw new Exception("access denied");
 
-		$this->smarty->assign('sharegroups', $info['shareGroups']);
-		$this->smarty->assign('groups', $this->auth->getUserGroups());
-		$this->smarty->assign('id', $id);
-		$content = $this->smarty->fetch('GroupShare.tpl');
-		return $content;
-	}
+                $this->smarty->assign('fileInfo', var_export($info, TRUE));
+                $content = $this->smarty->fetch('RawFileInfo.tpl');
+                return $content;
 
-	function emailShare() {
-		$id = getRequest("id", TRUE);
-		$info = $this->storage->readEntry($this->dbName, $id);
-		if ($info['fileOwner'] !== $this->auth->getUserId())
-			throw new Exception("access denied");
-
-		$this->smarty->assign('tokens', $info['downloadTokens']);
-		$this->smarty->assign('id', $id);
-		$this->smarty->assign('fileName', $info['fileName']);
-		$content = $this->smarty->fetch('EmailShare.tpl');
-		return $content;
 	}
 
 	function deleteFile() {
@@ -146,7 +139,7 @@ class Files {
 			unset ($info['downloadTokens'][$tokenId]);
 		}
 		$this->storage->updateEntry($this->dbName, $id, $info);
-		header("Location: index.php?action=emailShare&id=$id");
+		header("Location: index.php?action=fileInfo&id=$id");
 	}
 
 	function updateGroupShare() {
@@ -177,6 +170,25 @@ class Files {
 		$this->storage->updateEntry($this->dbName, $id, $info);
 		header("Location: index.php?action=groupShare&id=$id");
 	}
+
+        function updateFileInfo() {
+                $id = getRequest("id", TRUE);
+                $info = $this->storage->readEntry($this->dbName, $id);
+                if ($info['fileOwner'] !== $this->auth->getUserId())
+                        throw new Exception("access denied");
+                $description = getRequest('fileDescription', FALSE, '');
+                $tags = getRequest('fileTags', FALSE, '');
+
+		/* FIXME: use HTMLpurifier! */
+                $info['fileDescription'] = $description;
+		$ft = explode(",", $tags);
+		array_walk($ft, 'trim_value');
+		$info['fileTags'] = $ft;
+
+                $this->storage->updateEntry($this->dbName, $id, $info);
+		return $this->fileInfo();
+        }
+
 
 	function updateEmailShare() {
 		if (!getConfig($this->config, 'email_share', FALSE, FALSE))
@@ -219,23 +231,29 @@ class Files {
 		else
 			logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info['fileName'] . "' with '" . $address . "'");
 
-		header("Location: index.php?action=emailShare&id=$id");
+		header("Location: index.php?action=fileInfo&id=$id");
 	}
 
 	function myFiles() {
 		$files = $this->storage->listEntries($this->dbName);
+		$totalSize = 0;
 		foreach ($files as $k => $v) {
 			if ($v['fileOwner'] !== $this->auth->getUserId()) {
 				unset ($files[$k]);
 			} else {
 				$files[$k]['fileSize'] = bytesToHuman($v['fileSize']);
+				$totalSize += $v['fileSize'];
 			}
 		}
 		$this->smarty->assign('files', $files);
 		$this->smarty->assign('type', 'myFiles');
-		$this->smarty->assign('email_share', getConfig($this->config, 'email_share', FALSE, FALSE));
-		$this->smarty->assign('group_share', getConfig($this->config, 'group_share', FALSE, FALSE));
+		$this->smarty->assign('totalSize', bytesToHuman($totalSize));
 		$content = $this->smarty->fetch('FileList.tpl');
+		return $content;
+	}
+	
+	function fileUpload() {
+                $content = $this->smarty->fetch('FileUpload.tpl');
 		return $content;
 	}
 

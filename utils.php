@@ -57,21 +57,6 @@ function logHandler($message) {
 	return $message;
 }
 
-function analyzeFile($fileName) {
-	if (empty ($fileName) || !is_string($fileName) || !file_exists($fileName))
-		throw new Exception("file does not exist");
-	$metaData = array ();
-	$metaData['fileName'] = basename($fileName);
-	$metaData['fileSize'] = filesize($fileName);
-	$metaData['fileDate'] = filemtime($fileName);
-	$metaData['downloadTokens'] = array ();
-	$metaData['shareGroups'] = array ();
-
-	/* MIME-Type */
-	$finfo = finfo_open(FILEINFO_MIME_TYPE);
-	$metaData['fileType'] = finfo_file($finfo, $fileName);
-	return $metaData;
-}
 
 function return_bytes($val) {
 	$val = trim($val);
@@ -112,4 +97,178 @@ function getProtocol() {
 function generateToken() {
 	return bin2hex(openssl_random_pseudo_bytes(16));
 }
+
+
+	/**
+	 * Returns the required scaling depending on the input width/height ratio.
+	 */
+        function scaleVideo($size) {
+		if(!is_array($size) && !(sizeof($size) == 2))
+			throw new Exception("size should be array containing width,height");
+
+		/* we only support the following resolutions */
+                $supported = array( array(384,288),	// 288p
+				    array(512,288),	
+				    array(480,360),	// 360p
+		                    array(640,360),
+				    array(640,480),	// 480p
+                		    array(854,480),
+				    array(960,720),	// 720p
+				    array(1280,720),
+				    array(1440,1080),	// 1080p
+				    array(1920,1080),
+				    array(720,576), 	// Other formats we like
+
+				);
+		if(!in_array($size, $supported))
+			throw new Exception(implode("x", $size) . " is not a supported resolution");
+
+		/* Everything bigger than 360p we scale to 360p */
+		$width = $size[0];
+		$height = $size[1];
+
+		if($height > 360) { 
+			$newHeight = 360;
+			$factor = $height / $newHeight;
+			$newWidth = (int) ($width / $factor);
+			return array('width' => $newWidth, 'height' => $newHeight);
+		}else {
+			return array('width' => $width, 'height' => $height);
+		}
+        }
+
+        /**
+         * @param command       The command to run
+         * @param logFile       The file to write to
+         * @param subject       Some extra subject information for in the
+         *                      log entry
+         */
+        function execCommand($command, $logFile = NULL, $subject = '') {
+                /* executes a command and returns the output when
+                   done executing */
+                if($logFile == NULL)
+                        $logFile = tempnam(sys_get_temp_dir(), "php");
+
+                $logData  = "**************\n";
+                $logData .= "*** $subject\n";
+                $logData .= "**************\n";
+                $logData .= "--- COMMAND: $command\n";
+                $logData .= "--- OUTPUT:\n";
+                file_put_contents($logFile, $logData, FILE_APPEND);
+
+                /* redirect all output to tmp file */
+                $command .= " >>$logFile 2>>$logFile";
+                $op = array();
+                $rv = -1;
+                exec($command, $op, $rv);
+
+                $logData = "--- RETURN VALUE: $rv\n";
+                $logData .= "\n\n";
+                file_put_contents($logFile, $logData, FILE_APPEND);
+        }
+
+        function isMediaFile($file) {
+                if(!file_exists($file) || !is_readable($file))
+                        throw new Exception("unable to open file '$file'");
+                $mediaFile = @new ffmpeg_movie($file);
+                return !($mediaFile === FALSE);
+        }
+
+
+        function analyzeMediaFile($fileName, $still = NULL, $thumbnail = NULL) {
+                if(empty($fileName) || !is_string($fileName) || !file_exists($fileName))
+                        throw new Exception("file does not exist, cannot be analyzed");
+
+                $mediaData = array();
+
+                /* MIME-Type */
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $fileType = finfo_file($finfo, $fileName);
+
+                /* perform some special actions depending on the file type */
+                $mediaData = array();
+
+                switch($fileType) {
+
+                        case "video/quicktime":
+                        case "application/ogg":
+                        case "video/mp4":
+                        case "video/ogg":
+                        case "video/webm":
+                        case "video/x-ms-asf":
+			case "application/octet-stream":
+                                /* determine width, height, codecs */
+                                if(isMediaFile($fileName)) {
+                                        $media = new ffmpeg_movie($fileName, FALSE);
+                                        if($media->hasVideo()) {
+                                                $mediaData['video']['codec'] = $media->getVideoCodec();
+                                                $mediaData['video']['width'] = $media->getFrameWidth();
+                                                $mediaData['video']['height'] = $media->getFrameHeight();
+                                                $mediaData['video']['bitrate'] = $media->getVideoBitRate();
+                                                $mediaData['video']['framerate'] = $media->getFrameRate();
+						$mediaData['video']['duration'] = $media->getDuration();
+                                        }
+                                        if($media->hasAudio()) {
+                                                $mediaData['audio']['codec'] = $media->getAudioCodec();
+                                                $mediaData['audio']['bitrate'] = $media->getAudioBitRate();
+                                                $mediaData['audio']['samplerate'] = $media->getAudioSampleRate();
+                                                $mediaData['audio']['duration'] = $media->getDuration();
+                                        }
+
+					// Create Still
+					if($still != NULL) {
+						$fc = $media->getFrameCount();
+						$f = $media->getFrame($fc/8);
+						$f->resize($media->getFrameWidth(), $media->getFrameHeight());
+						imagepng($f->toGDImage(), $still);
+					}
+					// Create Thumbnail
+					if($thumbnail != NULL) { 
+	                                        $fc = $media->getFrameCount();
+	                                        $f = $media->getFrame($fc/8);
+	                                        $f->resize(100, $media->getFrameHeight() / ($media->getFrameWidth()/100));
+	                                        imagepng($f->toGDImage(), $thumbnail);
+					}
+                                }else {
+                                        // not a media file?!
+                                }
+				break;
+
+                        default:
+                                /* no idea about this file, let it go... */
+                }
+
+                return $mediaData;
+
+	}
+
+function analyzeFile($fileName) {
+        if (empty ($fileName) || !is_string($fileName) || !file_exists($fileName))
+                throw new Exception("file does not exist");
+        $metaData = array ();
+        $mediaData = array ();
+
+        $metaData['fileName'] = basename($fileName);
+        $metaData['fileSize'] = filesize($fileName);
+        $metaData['fileDate'] = filemtime($fileName);
+        $metaData['downloadTokens'] = array ();
+        $metaData['shareGroups'] = array ();
+	$metaData['fileDescription'] = '';
+	$metaData['fileTags'] = array();
+
+        /* MIME-Type */
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $metaData['fileType'] = finfo_file($finfo, $fileName);
+
+        if(isMediaFile($fileName)) {
+                // $mediaData = analyzeMediaFile($fileName, $fileName.".still.png", $fileName.".thumb.png");
+		$mediaData = analyzeMediaFile($fileName, NULL, NULL);
+	}
+        return array_merge($metaData, $mediaData);
+}
+
+function trim_value(&$value) { 
+	$value = trim($value); 
+}
+
 ?>

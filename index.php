@@ -77,13 +77,15 @@ try {
 			'deleteFile',
 			'deleteToken',
 			'downloadFile',
-			'emailShare',
+			'fileInfo',
+			'fileUpload',
 			'groupFiles',
-			'groupShare',
 			'handleUpload',
 			'logout',
 			'myFiles',
+			'rawFileInfo',
 			'updateEmailShare',
+			'updateFileInfo',
 			'updateGroupShare',
 		), TRUE))
 		throw new Exception("unregistered action called");
