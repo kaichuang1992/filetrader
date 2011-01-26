@@ -65,6 +65,18 @@ class Files {
 		}
 	}
 
+	function fileInfo() {
+		$id = getRequest("id", TRUE);
+		$info = $this->storage->readEntry($this->dbName, $id);
+		if ($info['fileOwner'] !== $this->auth->getUserId())
+			throw new Exception("access denied");
+
+		$this->smarty->assign('info', $info['mediaData']);
+		$this->smarty->assign('id', $id);
+		$content = $this->smarty->fetch('FileInfo.tpl');
+		return $content;
+	}
+
 	function groupShare() {
 		$id = getRequest("id", TRUE);
 		$info = $this->storage->readEntry($this->dbName, $id);

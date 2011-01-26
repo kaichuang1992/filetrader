@@ -86,7 +86,7 @@ try {
 			'updateEmailShare',
 			'updateGroupShare',
 		), TRUE))
-		throw new Exception("unknown action");
+		throw new Exception("unregistered action called");
 	$f = new Files($config, $storage, $dbName, $auth, $smarty);
 	$content = $f-> $action ();
 

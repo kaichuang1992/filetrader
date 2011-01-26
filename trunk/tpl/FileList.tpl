@@ -23,6 +23,8 @@
 							{$v.fileName}
 						</a>
 			</td><td>	
+					<a href="?action=fileInfo&id={$k}"><img src="i/file_info.png" alt="File Info" title="File Info"></a>
+
 	                                {if $type == "myFiles"}
 						{if $group_share}
 							<a href="?action=groupShare&id={$k}"><img src="i/group_add.png" alt="Group Share" title="Group Share"></a>
