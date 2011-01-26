@@ -55,10 +55,11 @@
 		$userName = trim(base64_decode(basename($userDir)));
 		echo "**** $userName\n";
 		foreach(glob($userDir."/*") as $userFile) {
+                        echo "[$userName] Analyzing: $userFile\n";
 			$metadata = analyzeFile($userFile);
 			$metadata['fileOwner'] = $userName;
 			$s->post($metadata);
-			echo "[$userName] $userFile\n";
+			echo "[$userName] Imported:  $userFile\n";
 		}
 	}
 ?>

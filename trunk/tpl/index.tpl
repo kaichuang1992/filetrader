@@ -12,16 +12,20 @@
 <script type="text/javascript" src="ext/plupload/js/plupload.html5.min.js"></script>
 <script type="text/javascript" src="ext/plupload/js/jquery.plupload.queue.min.js"></script>
 <script type="text/javascript" src="j/plupload.js"></script>
+<script type="text/javascript" src="j/ft.js"></script>
 </head>
 <body>
 		<div id="header">
-			<p>
-				<a href="?action=myFiles">Home</a> 
-				{if $authenticated} 
-				| Logged in as: <span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a>
-				{/if}
-			</p>
+			<span class="left">FileTrader</span>			
+                        {if $authenticated} 
+			<span class="right">| Logged in as: <span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a> |</span>
+			{/if}
 		</div>
+
+	<ul class="menu">
+		<li><a href="?action=myFiles">Home</a></li>
+		<li><a href="?action=fileUpload">Upload Files</a></li>
+	</ul>
 
 	{if $error} 
 		<div id="error">

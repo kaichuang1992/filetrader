@@ -16,18 +16,36 @@ img {
 #header {
 	background-color: #000;
 	margin: 0;
-	padding: 0;
+	height: 2em;
 }
 
-#header p {
+#header span {
 	margin: 0;
-	padding: 5px;
-	text-align: right;
 	color: #fff;
+	height: 2em;
+	padding: 5px;
 }
+
+#header span.right {
+	float: right;
+}
+
+#header span.left {
+	float: left;
+}
+
 
 #content {
 	padding: 10px;
+	margin: 10px;
+	border: 1px solid #000;
+	background-color: #eee;
+}
+
+td, th { 
+	padding: 5px;
+	vertical-align: top;
+	text-align: left;
 }
 
 label {
@@ -35,20 +53,46 @@ label {
 	margin: 10px;
 }
 
-table, form {
-        background-color: #eee;
-        padding: 5px;
-}
-
-form {
-	border: 1px solid #000;
-}
-
 input.button {
 	text-align: center;
 }
 
-.finished {
-	color: #888;
+p.usage {
+	width: 100%;
+	font-size: small;
+	text-align: center;
+}
+
+ul.menu {
+	list-style: none;
+	padding: 0;
+	margin-left: 5px;
+}
+
+ul.menu li {
+	display: inline;
+	margin: 0;
+	padding: 5px;
+	color: black;
+}
+
+ul.menu li a {
+	color: #000;
+	font-weight: bold;
+	text-decoration: none;
+	border: 1px solid #000;
+	padding: 4px;
+	background-color: #eee;
+}
+
+#debugButton {
+	float: right;
+}
+
+#debugInfo {
+	display: none;
+	position: absolute;
+	background: #000;
+	color: #fff;
 }
 
