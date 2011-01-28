@@ -1,0 +1,1 @@
+<pre>{$fileInfo}</pre>

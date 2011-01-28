@@ -46,8 +46,6 @@ try {
 	require_once ("lib/Auth/Auth.class.php");
 	require_once ("lib/$authType/$authType.class.php");
 	require_once ("ext/sag/src/Sag.php");
-	require_once ("lib/CRUDStorage/CRUDStorage.class.php");
-	require_once ("lib/CouchCRUDStorage/CouchCRUDStorage.class.php");
 	require_once ("lib/Files/Files.class.php");
 
 	if (getConfig($config, 'allow_opensocial', FALSE, FALSE)) {
@@ -71,7 +69,8 @@ try {
 
 	$action = getRequest('action', FALSE, 'myFiles');
 
-	$storage = new CouchCRUDStorage();
+        $storage = new Sag();
+        $storage->setDatabase($dbName);
 
 	if (!in_array($action, array (
 			'deleteFile',
@@ -89,7 +88,7 @@ try {
 			'updateGroupShare',
 		), TRUE))
 		throw new Exception("unregistered action called");
-	$f = new Files($config, $storage, $dbName, $auth, $smarty);
+	$f = new Files($config, $storage, $auth, $smarty);
 	$content = $f-> $action ();
 
 } catch (Exception $e) {

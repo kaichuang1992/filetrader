@@ -6,10 +6,6 @@ Library         Version         License         URL
 Smarty		3.0.6		LGPL2 or 3?	http://www.smarty.net
 Sag PHP		0.3.0		ASL2.0		http://www.saggingcouch.com/
 
-# If you want to use OpenID/Google Auth:
-LightOpenID	0.3+		MIT		http://code.google.com/p/lightopenid/
-		  (using latest Git)
-
 # If you want to use SAML Auth:
 simpleSAMLphp	1.6.3		LGPL 2.1	http://simplesamlphp.org/
 

@@ -22,31 +22,27 @@ class Files {
 
 	var $config;
 	var $storage;
-	var $dbName;
 	var $auth;
 	var $smarty;
 
-	function __construct($config, $storage, $dbName, $auth, $smarty) {
+	function __construct($config, $storage, $auth, $smarty) {
 		$this->config = $config;
 		$this->storage = $storage;
-		$this->dbName = $dbName;
 		$this->auth = $auth;
 		$this->smarty = $smarty;
 	}
 
 	function downloadFile() {
-		set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-		require_once ('HTTP/Download.php');
 		$id = getRequest("id", TRUE);
 		$token = getRequest("token", FALSE, 0);
 
-		$info = $this->storage->readEntry($this->dbName, $id);
-		$file = $info['fileName'];
+		$info = $this->storage->get($id)->body;
+		$file = $info->fileName;
 
 		/* FIXME: memberOfGroups and token only if said support is enabled! */
-		if ($info['fileOwner'] === $this->auth->getUserId() || $this->auth->memberOfGroups($info['shareGroups']) || array_key_exists($token, $info['downloadTokens'])) {
+		if ($info->fileOwner === $this->auth->getUserId() || $this->auth->memberOfGroups($info->shareGroups) || array_key_exists($token, $info->downloadTokens)) {
 			/* Access */
-			$ownerDir = base64_encode($info['fileOwner']);
+			$ownerDir = base64_encode($info->fileOwner);
 			$filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
 
 			if (!file_exists($filePath))
@@ -54,6 +50,8 @@ class Files {
 
 			logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $file . "'");
 
+	                set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
+        	        require_once ('HTTP/Download.php');
 			$dl = new HTTP_Download();
 			$dl->setFile($filePath);
 			$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $file);
@@ -61,63 +59,40 @@ class Files {
 			$dl->send();
 			exit (0);
 		} else {
-			throw new Exception("Access denied");
+			throw new Exception("access denied");
 		}
 	}
 
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
-		$info = $this->storage->readEntry($this->dbName, $id);
-		if ($info['fileOwner'] !== $this->auth->getUserId())
+		$info = $this->storage->get($id)->body;
+		if ($info->fileOwner !== $this->auth->getUserId())
 			throw new Exception("access denied");
-
-		$this->smarty->assign('id', $id);
-                $this->smarty->assign('fileName', $info['fileName']);
-                $this->smarty->assign('fileSize', bytesToHuman($info['fileSize']));
-                $this->smarty->assign('fileDescription', $info['fileDescription']);
-                $this->smarty->assign('fileTags', implode(", ", $info['fileTags']));
-
-		/* fixme: do something with tokens and groups UI */
-                $this->smarty->assign('tokens', $info['downloadTokens']);
-
-		$content = $this->smarty->fetch('FileInfo.tpl');
-		return $content;
+		$this->smarty->assign('fileInfo', $info);
+		$this->smarty->assign('userGroups', $this->auth->getUserGroups());
+		return $this->smarty->fetch('FileInfo.tpl');
 	}
 
 	function rawFileInfo() {
                 $id = getRequest("id", TRUE);
-                $info = $this->storage->readEntry($this->dbName, $id);
-                if ($info['fileOwner'] !== $this->auth->getUserId())
+                $info = $this->storage->get($id)->body;
+                if ($info->fileOwner !== $this->auth->getUserId())
                         throw new Exception("access denied");
-
                 $this->smarty->assign('fileInfo', var_export($info, TRUE));
-                $content = $this->smarty->fetch('RawFileInfo.tpl');
-                return $content;
-
+                return $this->smarty->fetch('RawFileInfo.tpl');
 	}
 
 	function deleteFile() {
-		$ids = getRequest("id", FALSE, array ());
-		if (!is_array($ids))
-			throw new Exception("deleteFile should receive array of files to delete");
+		$id = getRequest("id", TRUE);
+                $info = $this->storage->get($id)->body;
+                if ($info->fileOwner !== $this->auth->getUserId())
+                        throw new Exception("access denied");
 
-		foreach ($ids as $id) {
-			$info = $this->storage->readEntry($this->dbName, $id);
-			if ($info['fileOwner'] !== $this->auth->getUserId())
-				throw new Exception("access denied");
-
-			logHandler("User '" . $this->auth->getUserID() . "' is deleting file '" . $info['fileName'] . "'");
-
-			$this->storage->deleteEntry($this->dbName, $id, $info['_rev']);
-
-			$file = $info['fileName'];
-			$ownerDir = base64_encode($info['fileOwner']);
-			$filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
-
-			/* delete from file system */
-			unlink($filePath);
-		}
-		header("Location: index.php?action=myFiles");
+		logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
+		$this->storage->delete($id, $info->_rev);
+		$filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+		unlink($filePath);	/* delete file from file system */
+		return $this->myFiles();
 	}
 
 	function deleteToken() {
@@ -129,63 +104,55 @@ class Files {
 		if (!is_array($tokenIds))
 			throw new Exception("deleteToken should receive array of tokens to delete");
 
-		$info = $this->storage->readEntry($this->dbName, $id);
+		$info = $this->storage->get($id);
 
-		if ($info['fileOwner'] !== $this->auth->getUserId())
+		if ($info->doc->fileOwner !== $this->auth->getUserId())
 			throw new Exception("access denied");
 
 		foreach ($tokenIds as $tokenId) {
-			logHandler("User '" . $this->auth->getUserID() . "' is deleting token for '" . $info['downloadTokens'][$tokenId] . "' belonging to file '" . $info['fileName'] . "'");
-			unset ($info['downloadTokens'][$tokenId]);
+			logHandler("User '" . $this->auth->getUserID() . "' is deleting token for '" . $info->doc->downloadTokens[$tokenId] . "' belonging to file '" . $info->doc->fileName . "'");
+			unset ($info->doc->downloadTokens[$tokenId]);
 		}
-		$this->storage->updateEntry($this->dbName, $id, $info);
+		$this->storage->update($id, $info);
 		header("Location: index.php?action=fileInfo&id=$id");
-	}
-
-	function updateGroupShare() {
-		if (!getConfig($this->config, 'group_share', FALSE, FALSE))
-			throw new Exception("group share is not enabled");
-
-		$id = getRequest("id", TRUE);
-
-		$info = $this->storage->readEntry($this->dbName, $id);
-
-		if ($info['fileOwner'] !== $this->auth->getUserId())
-			throw new Exception("access denied");
-
-		$groupId = getRequest('groupid', TRUE);
-		$checked = getRequest('checked', TRUE);
-
-		if ($checked === 'true') {
-			/* add to list */
-			if (!in_array($groupId, $info['shareGroups'])) {
-				array_push($info['shareGroups'], $groupId);
-			}
-		} else {
-			if (in_array($groupId, $info['shareGroups'])) {
-				$k = array_search($groupId, $info['shareGroups']);
-				unset ($info['shareGroups'][$k]);
-			}
-		}
-		$this->storage->updateEntry($this->dbName, $id, $info);
-		header("Location: index.php?action=groupShare&id=$id");
 	}
 
         function updateFileInfo() {
                 $id = getRequest("id", TRUE);
-                $info = $this->storage->readEntry($this->dbName, $id);
-                if ($info['fileOwner'] !== $this->auth->getUserId())
+                $info = $this->storage->get($id)->body;
+                if ($info->fileOwner !== $this->auth->getUserId())
                         throw new Exception("access denied");
-                $description = getRequest('fileDescription', FALSE, '');
-                $tags = getRequest('fileTags', FALSE, '');
 
-		/* FIXME: use HTMLpurifier! */
-                $info['fileDescription'] = $description;
-		$ft = explode(",", $tags);
-		array_walk($ft, 'trim_value');
-		$info['fileTags'] = $ft;
+		$fileName = getRequest('fileName', FALSE, $info->fileName); 
+                $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
+                $fileTags = getRequest('fileTags', FALSE, $info->fileTags);
+		$fileShareGroups = getRequest('fileShareGroups', FALSE, array()); /* not set means everything deselected! */
 
-                $this->storage->updateEntry($this->dbName, $id, $info);
+		/* Name */
+		if($fileName != $info->fileName) {
+			/* file name changed, update entry and file system */
+	                $filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+			$newFilePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $fileName;
+			rename($filePath, $newFilePath);
+			$info->fileName = $fileName;
+		}
+
+		/* Tags */
+		$tags = explode(",", $fileTags);
+		$info->fileTags = array();
+		foreach($tags as $t) {
+			$t = trim(htmlspecialchars($t));
+			if(!empty($t))
+				array_push($info->fileTags, $t);
+		}
+
+		/* Description */
+		$info->fileDescription = trim(htmlspecialchars($fileDescription));
+
+		/* ShareGroups */
+		$info->fileShareGroups = $this->auth->memberOfGroups($fileShareGroups);
+
+                $this->storage->put($id, $info);
 		return $this->fileInfo();
         }
 
@@ -195,8 +162,8 @@ class Files {
 			throw new Exception("sharing through email not enabled");
 
 		$id = getRequest("id", TRUE);
-		$info = $this->storage->readEntry($this->dbName, $id);
-		if ($info['fileOwner'] !== $this->auth->getUserId())
+		$info = $this->storage->get($id);
+		if ($info->doc->fileOwner !== $this->auth->getUserId())
 			throw new Exception("access denied");
 		$address = getRequest('address', TRUE);
 		$address = filter_var($address, FILTER_VALIDATE_EMAIL);
@@ -207,13 +174,13 @@ class Files {
 		$token = generateToken();
 
 		/* add token to data store */
-		$info['downloadTokens'][$token] = $address;
-		$this->storage->updateEntry($this->dbName, $id, $info);
+		$info->doc->downloadTokens[$token] = $address;
+		$this->storage->updateEntry($id, $info);
 
 		$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$id&token=$token";
 
 		$this->smarty->assign('sender', $this->auth->getUserDisplayName());
-		$this->smarty->assign('fileName', $info['fileName']);
+		$this->smarty->assign('fileName', $info->doc->fileName);
 		$this->smarty->assign('url', $url);
 		$content = $this->smarty->fetch('EmailInvite.tpl');
 		$message = wordwrap($content, 70);
@@ -229,25 +196,21 @@ class Files {
 		if ($status !== TRUE)
 			logHandler("Sending mail to $address failed!");
 		else
-			logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info['fileName'] . "' with '" . $address . "'");
+			logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info->doc->fileName . "' with '" . $address . "'");
 
 		header("Location: index.php?action=fileInfo&id=$id");
 	}
 
 	function myFiles() {
-		$files = $this->storage->listEntries($this->dbName);
-		$totalSize = 0;
-		foreach ($files as $k => $v) {
-			if ($v['fileOwner'] !== $this->auth->getUserId()) {
-				unset ($files[$k]);
-			} else {
-				$files[$k]['fileSize'] = bytesToHuman($v['fileSize']);
-				$totalSize += $v['fileSize'];
-			}
-		}
+		$files = $this->storage->get("_design/files/_view/by_date")->body->rows;
+		/* fix the view to only display from specified user! */
+		/* fix the view to also return total file size! */
 		$this->smarty->assign('files', $files);
 		$this->smarty->assign('type', 'myFiles');
-		$this->smarty->assign('totalSize', bytesToHuman($totalSize));
+
+		$tagInfo = $this->storage->get("_design/files/_view/tag_count?group=true")->body->rows;
+		$this->smarty->assign('tagInfo', $tagInfo);
+
 		$content = $this->smarty->fetch('FileList.tpl');
 		return $content;
 	}
@@ -257,32 +220,10 @@ class Files {
 		return $content;
 	}
 
-	function groupFiles() {
-		if (!getConfig($this->config, 'group_share', FALSE, FALSE))
-			throw new Exception("group share is not enabled");
-
-		$files = $this->storage->listEntries($this->dbName);
-		foreach ($files as $k => $v) {
-			if ($v['fileOwner'] === $this->auth->getUserId()) {
-				unset ($files[$k]);
-			} else {
-				if (!$this->auth->memberOfGroups($v['shareGroups'])) {
-					unset ($files[$k]);
-				} else {
-					$files[$k]['fileSize'] = bytesToHuman($v['fileSize']);
-				}
-			}
-		}
-		$this->smarty->assign('files', $files);
-		$this->smarty->assign('type', 'groupFiles');
-		$content = $this->smarty->fetch('FileList.tpl');
-		return $content;
-	}
-
-	function logout() {
+/*	function logout() {
 		$this->auth->logout();
 		header("Location: " . $_SERVER['SCRIPT_NAME']);
-	}
+	}*/
 
 	function handleUpload() {
 		// FIXME: this seems to be WAY too crazy
@@ -399,7 +340,7 @@ class Files {
 		if ($chunk == $chunks -1 || $chunks === 0) {
 			$metaData = analyzeFile($targetDir . DIRECTORY_SEPARATOR . $fileName);
 			$metaData['fileOwner'] = $this->auth->getUserId();
-			$this->storage->createEntry($this->dbName, $metaData);
+			$this->storage->createEntry($metaData);
 			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData['fileName'] . "'");
 		}
 

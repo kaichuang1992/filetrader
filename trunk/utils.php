@@ -110,6 +110,7 @@ function generateToken() {
                 $supported = array( array(384,288),	// 288p
 				    array(512,288),	
 				    array(480,360),	// 360p
+				    array(640,264),
 		                    array(640,360),
 				    array(640,480),	// 480p
                 		    array(854,480),
@@ -223,12 +224,12 @@ function generateToken() {
 						imagepng($f->toGDImage(), $still);
 					}
 					// Create Thumbnail
-					if($thumbnail != NULL) { 
-	                                        $fc = $media->getFrameCount();
-	                                        $f = $media->getFrame($fc/8);
-	                                        $f->resize(100, $media->getFrameHeight() / ($media->getFrameWidth()/100));
+					/*if($thumbnail != NULL) { 
+                                                $fc = $media->getFrameCount();
+-	                                        $f = $media->getFrame($fc/8);
+-	                                        $f->resize(100, $media->getFrameHeight() / ($media->getFrameWidth()/100));
 	                                        imagepng($f->toGDImage(), $thumbnail);
-					}
+					}*/
                                 }else {
                                         // not a media file?!
                                 }
@@ -248,11 +249,11 @@ function analyzeFile($fileName) {
         $metaData = array ();
         $mediaData = array ();
 
+	$metaData['type'] = "file";
         $metaData['fileName'] = basename($fileName);
         $metaData['fileSize'] = filesize($fileName);
         $metaData['fileDate'] = filemtime($fileName);
-        $metaData['downloadTokens'] = array ();
-        $metaData['shareGroups'] = array ();
+        $metaData['fileShareGroups'] = array ();
 	$metaData['fileDescription'] = '';
 	$metaData['fileTags'] = array();
 
