@@ -51,6 +51,45 @@
 	$s->createDatabase($dbName);
 	$s->setDatabase($dbName);
 
+	$view = array( "_id" => "_design/files",
+		       "type" => "view",
+		       "language" => "javascript",
+		       "views" => array ( 
+				"all" => array ("map" => "function(doc) { emit(null, doc)}"),
+				"by_date" => array ("map" => "function(doc) { emit(doc.fileDate, doc)}"),
+				
+"tag_count" => array (
+"map" => "
+function(doc) {
+  if (doc.type == 'file' && doc.fileTags) {
+    doc.fileTags.forEach(function(tag) {
+      emit(tag, 1);
+    });
+  }
+}", 
+"reduce" => "
+function(keys, values) {
+  return sum(values);
+}"),
+
+"by_tag" => array (
+"map" => "
+function(doc) {
+  if (doc.type == 'file' && doc.fileTags) {
+    doc.fileTags.forEach(function(tag) {
+      emit(tag, doc);
+    });
+  }
+}
+"),
+
+	),
+);
+	// Add the view
+
+
+	$s->post($view);
+
 	foreach( glob($datadir."/*") as $userDir) {
 		$userName = trim(base64_decode(basename($userDir)));
 		echo "**** $userName\n";
@@ -58,6 +97,7 @@
                         echo "[$userName] Analyzing: $userFile\n";
 			$metadata = analyzeFile($userFile);
 			$metadata['fileOwner'] = $userName;
+			$metadata['fileTags'] = array ( 'Label1', 'Tag1', 'Taggertje' );
 			$s->post($metadata);
 			echo "[$userName] Imported:  $userFile\n";
 		}

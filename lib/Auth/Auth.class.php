@@ -76,11 +76,10 @@ abstract class Auth {
 				throw new Exception("groups should be specified as array");
 			}
 			if (empty ($groups)) {
-				return FALSE;
+				return array();
 			}
 			$userGroups = $this->getUserGroups();
-			$intersect = array_intersect(array_keys($userGroups), $groups);
-			return !empty ($intersect);
+			return array_intersect(array_keys($userGroups), $groups);
 		} else {
 			throw new Exception("not logged in");
 		}
