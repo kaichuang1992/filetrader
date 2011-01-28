@@ -9,13 +9,8 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // use local PEAR 
 $config['pear_path'] = __DIR__."/ext/pear/php";
 
-// NullAuth, OpenIDAuth, GoogleAuth, SAMLAuth
+// NullAuth, SAMLAuth
 $config['auth_type'] = 'NullAuth';
-
-$config['openid_whitelist'] = array (
-	'https://@ID@.wordpress.com' => 'Wordpress',
-	'@ID@' => 'Other...'
-);
 
 // simpleSAMLphp configuration (SAMLAuth)
 $config['saml_path'] = '/var/simplesamlphp';
@@ -24,7 +19,7 @@ $config['saml_uid'] = 'uid';
 $config['saml_display_name'] = 'cn';
 
 // Allow users to share files through email invites
-$config['email_share'] = TRUE;
+$config['email_share'] = FALSE;
 
 // Override the default sender of the email invites
 // $config['email_share_sender'] = 'FileTrader <filetrader@example.com>';
@@ -40,7 +35,7 @@ $config['db_name'] = 'filetrader';
 $config['ssl_only'] = FALSE;
 
 // Location to directory where to store uploaded files
-$config['fileStorageDir'] = 'data/files';
+$config['file_storage_dir'] = 'data/files';
 
 // Allow OAuth consumers
 $config['allow_oauth'] = FALSE;

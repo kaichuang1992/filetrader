@@ -48,13 +48,6 @@ try {
 	require_once ("ext/sag/src/Sag.php");
 	require_once ("lib/Files/Files.class.php");
 
-	if (getConfig($config, 'allow_opensocial', FALSE, FALSE)) {
-		/* try OpenSocial authentication */
-		require_once ("lib/OpenSocialAuth/OpenSocialAuth.class.php");
-		$auth = new OpenSocialAuth($config);
-		$auth->login();
-	}
-
 	if (getConfig($config, 'allow_oauth', FALSE, FALSE)) {
 		/* try OAuth authentication */
 		require_once ("lib/OAuth/OAuth.class.php");
@@ -72,20 +65,20 @@ try {
         $storage = new Sag();
         $storage->setDatabase($dbName);
 
+	if($action === "logout") {
+		$auth->logout();
+		exit(0);
+	}
+
 	if (!in_array($action, array (
 			'deleteFile',
-			'deleteToken',
 			'downloadFile',
 			'fileInfo',
 			'fileUpload',
-			'groupFiles',
 			'handleUpload',
-			'logout',
 			'myFiles',
 			'rawFileInfo',
-			'updateEmailShare',
 			'updateFileInfo',
-			'updateGroupShare',
 		), TRUE))
 		throw new Exception("unregistered action called");
 	$f = new Files($config, $storage, $auth, $smarty);
@@ -95,7 +88,7 @@ try {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
 	$smarty->assign('authenticated', FALSE);
-	$smarty->display('index.tpl');
+	$smarty->display('Page.tpl');
 	logHandler("ERROR: " . $e->getMessage());
 	exit (1);
 }
@@ -103,10 +96,6 @@ try {
 $smarty->assign('authenticated', $auth->isLoggedIn());
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());
-
-$smarty->assign('group_share', getConfig($config, 'group_share', FALSE, FALSE));
-$smarty->assign('email_share', getConfig($config, 'email_share', FALSE, FALSE));
-
 $smarty->assign('container', $content);
-$smarty->display('index.tpl');
+$smarty->display('Page.tpl');
 ?>

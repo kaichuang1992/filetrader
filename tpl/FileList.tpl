@@ -4,17 +4,17 @@
 			</p>
 		{else}
 			<table>
-	                {foreach key=k item=v from=$files}
+	                {foreach $files as $f}
 			<tr>
-				<td><a href="?action=downloadFile&amp;id={$v->value->_id}">{$v->value->fileName}</a></td>
-				<td>{$v->value->fileSize}</td>
-				<td>{$v->value->fileDate|date_format:"%d %b  %H:%M"}</td>
-				<td><a href="?action=fileInfo&id={$v->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
+				<td><a href="?action=downloadFile&amp;id={$f->value->_id}">{$f->value->fileName}</a></td>
+				<td>{$f->value->fileSize}</td>
+				<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
+				<td><a href="?action=fileInfo&id={$f->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
 			</tr>
 	                {/foreach}
 			</table>
 			<h2>Debug</h2>
-			{foreach key=k item=v from=$tagInfo}
-				{$v->key} ({$v->value}) <br />
+			{foreach $tagInfo as $tag}
+				{$tag->key} ({$tag->value}) <br />
 			{/foreach}
 		{/if}
