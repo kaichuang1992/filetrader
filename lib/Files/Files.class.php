@@ -264,7 +264,7 @@ class Files {
 		if ($chunk == $chunks -1 || $chunks === 0) {
 			$metaData = analyzeFile($targetDir . DIRECTORY_SEPARATOR . $fileName);
 			$metaData['fileOwner'] = $this->auth->getUserId();
-			$this->storage->createEntry($metaData);
+			$this->storage->post($metaData);
 			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData['fileName'] . "'");
 		}
 
