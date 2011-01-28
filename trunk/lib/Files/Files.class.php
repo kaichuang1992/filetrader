@@ -32,36 +32,19 @@ class Files {
 		$this->smarty = $smarty;
 	}
 
-	function downloadFile() {
-		$id = getRequest("id", TRUE);
-		$token = getRequest("token", FALSE, 0);
+        function myFiles() {
+                $files = $this->storage->get("_design/files/_view/by_date")->body->rows;
+                /* fix the view to only display from specified user! */
+                /* fix the view to also return total file size! */
+                $this->smarty->assign('files', $files);
+                $this->smarty->assign('type', 'myFiles');
 
-		$info = $this->storage->get($id)->body;
-		$file = $info->fileName;
+                $tagInfo = $this->storage->get("_design/files/_view/tag_count?group=true")->body->rows;
+                $this->smarty->assign('tagInfo', $tagInfo);
 
-		/* FIXME: memberOfGroups and token only if said support is enabled! */
-		if ($info->fileOwner === $this->auth->getUserId() || $this->auth->memberOfGroups($info->shareGroups) || array_key_exists($token, $info->downloadTokens)) {
-			/* Access */
-			$ownerDir = base64_encode($info->fileOwner);
-			$filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/$ownerDir/$file";
-
-			if (!file_exists($filePath))
-				throw new Exception("file does not exist on file system");
-
-			logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $file . "'");
-
-	                set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-        	        require_once ('HTTP/Download.php');
-			$dl = new HTTP_Download();
-			$dl->setFile($filePath);
-			$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $file);
-			$dl->guessContentType();
-			$dl->send();
-			exit (0);
-		} else {
-			throw new Exception("access denied");
-		}
-	}
+                $content = $this->smarty->fetch('FileList.tpl');
+                return $content;
+        }
 
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
@@ -90,31 +73,9 @@ class Files {
 
 		logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
 		$this->storage->delete($id, $info->_rev);
-		$filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 		unlink($filePath);	/* delete file from file system */
 		return $this->myFiles();
-	}
-
-	function deleteToken() {
-		if (!getConfig($this->config, 'email_share', FALSE, FALSE))
-			throw new Exception("email share is not enabled");
-
-		$id = getRequest("id", TRUE);
-		$tokenIds = getRequest("token", FALSE, array ());
-		if (!is_array($tokenIds))
-			throw new Exception("deleteToken should receive array of tokens to delete");
-
-		$info = $this->storage->get($id);
-
-		if ($info->doc->fileOwner !== $this->auth->getUserId())
-			throw new Exception("access denied");
-
-		foreach ($tokenIds as $tokenId) {
-			logHandler("User '" . $this->auth->getUserID() . "' is deleting token for '" . $info->doc->downloadTokens[$tokenId] . "' belonging to file '" . $info->doc->fileName . "'");
-			unset ($info->doc->downloadTokens[$tokenId]);
-		}
-		$this->storage->update($id, $info);
-		header("Location: index.php?action=fileInfo&id=$id");
 	}
 
         function updateFileInfo() {
@@ -131,8 +92,8 @@ class Files {
 		/* Name */
 		if($fileName != $info->fileName) {
 			/* file name changed, update entry and file system */
-	                $filePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
-			$newFilePath = getConfig($this->config, 'fileStorageDir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $fileName;
+	                $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+			$newFilePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $fileName;
 			rename($filePath, $newFilePath);
 			$info->fileName = $fileName;
 		}
@@ -156,74 +117,37 @@ class Files {
 		return $this->fileInfo();
         }
 
-
-	function updateEmailShare() {
-		if (!getConfig($this->config, 'email_share', FALSE, FALSE))
-			throw new Exception("sharing through email not enabled");
-
-		$id = getRequest("id", TRUE);
-		$info = $this->storage->get($id);
-		if ($info->doc->fileOwner !== $this->auth->getUserId())
-			throw new Exception("access denied");
-		$address = getRequest('address', TRUE);
-		$address = filter_var($address, FILTER_VALIDATE_EMAIL);
-		if ($address === FALSE)
-			throw new Exception("invalid email address specified");
-
-		/* add token */
-		$token = generateToken();
-
-		/* add token to data store */
-		$info->doc->downloadTokens[$token] = $address;
-		$this->storage->updateEntry($id, $info);
-
-		$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$id&token=$token";
-
-		$this->smarty->assign('sender', $this->auth->getUserDisplayName());
-		$this->smarty->assign('fileName', $info->doc->fileName);
-		$this->smarty->assign('url', $url);
-		$content = $this->smarty->fetch('EmailInvite.tpl');
-		$message = wordwrap($content, 70);
-
-		/* send email */
-		$subject = '[FileTrader] A file has been shared with you!';
-		$from = getConfig($this->config, 'email_share_sender', FALSE, 'FileTrader <filetrader@' . $_SERVER['HTTP_HOST'] . '>');
-		$headers = "From: $from\r\n" .
-		"Reply-To: $from\r\n" .
-		"X-Mailer: PHP/" . phpversion();
-		$status = mail($address, $subject, $message, $headers);
-
-		if ($status !== TRUE)
-			logHandler("Sending mail to $address failed!");
-		else
-			logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info->doc->fileName . "' with '" . $address . "'");
-
-		header("Location: index.php?action=fileInfo&id=$id");
-	}
-
-	function myFiles() {
-		$files = $this->storage->get("_design/files/_view/by_date")->body->rows;
-		/* fix the view to only display from specified user! */
-		/* fix the view to also return total file size! */
-		$this->smarty->assign('files', $files);
-		$this->smarty->assign('type', 'myFiles');
-
-		$tagInfo = $this->storage->get("_design/files/_view/tag_count?group=true")->body->rows;
-		$this->smarty->assign('tagInfo', $tagInfo);
-
-		$content = $this->smarty->fetch('FileList.tpl');
-		return $content;
-	}
-	
 	function fileUpload() {
                 $content = $this->smarty->fetch('FileUpload.tpl');
 		return $content;
 	}
 
-/*	function logout() {
-		$this->auth->logout();
-		header("Location: " . $_SERVER['SCRIPT_NAME']);
-	}*/
+        function downloadFile() {
+                $id = getRequest("id", TRUE);
+                $token = getRequest("token", FALSE, 0);
+                $info = $this->storage->get($id)->body;
+
+                /* FIXME: memberOfGroups and token only if said support is enabled! */
+                if ($info->fileOwner === $this->auth->getUserId()) {
+                        $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+
+                        if (!file_exists($filePath))
+                                throw new Exception("file does not exist on file system");
+
+                        logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
+
+                        set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
+                        require_once ('HTTP/Download.php');
+                        $dl = new HTTP_Download();
+                        $dl->setFile($filePath);
+                        $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $info->fileName);
+                        $dl->guessContentType();
+                        $dl->send();
+                        exit (0);
+                } else {
+                        throw new Exception("access denied");
+                }
+        }
 
 	function handleUpload() {
 		// FIXME: this seems to be WAY too crazy
@@ -239,7 +163,7 @@ class Files {
 
 		// Settings
 		$ownerDir = base64_encode($this->auth->getUserId());
-		$targetDir = getConfig($this->config, 'fileStorageDir', TRUE) . "/$ownerDir";
+		$targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
 
 		// FIXME: are these variables really needed?
 		$cleanupTargetDir = false; // Remove old files
