@@ -103,7 +103,7 @@ class Files {
 		$info->fileTags = array();
 		foreach($tags as $t) {
 			$t = trim(htmlspecialchars($t));
-			if(!empty($t))
+			if(!empty($t) && !in_array($t, $info->fileTags, TRUE))
 				array_push($info->fileTags, $t);
 		}
 

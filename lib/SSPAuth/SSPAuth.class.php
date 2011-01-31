@@ -18,28 +18,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once(getConfig($config, 'saml_path', TRUE) . '/lib/_autoload.php');
+require_once(getConfig($config, 'ssp_path', TRUE) . '/lib/_autoload.php');
 
-class SAMLAuth extends Auth {
-	var $saml;
+class SSPAuth extends Auth {
+	var $ssp;
 
 	function __construct($config) {
 		parent::__construct($config);
-		$this->saml = new SimpleSAML_Auth_Simple(getConfig($this->config, 'saml_sp', TRUE));
+		$this->ssp = new SimpleSAML_Auth_Simple(getConfig($this->config, 'ssp_sp', TRUE));
 	}
 
 	function login() {
 		if($this->isLoggedIn())
 			return;
 
-			if(isset($_POST['samlProceed'])) {
+			if(isset($_POST['sspProceed'])) {
 		
-				$this->saml->requireAuth();
-				$attr = $this->saml->getAttributes();
+				$this->ssp->requireAuth();
+				$attr = $this->ssp->getAttributes();
 
-       			        $_SESSION['userId'] = $attr[getConfig($this->config, 'saml_uid', TRUE)][0];
+       			        $_SESSION['userId'] = $attr[getConfig($this->config, 'ssp_uid_attr', TRUE)][0];
 				$_SESSION['userAttr'] = $attr;
-				$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'saml_display_name', TRUE)][0];
+				$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'ssp_dn_attr', TRUE)][0];
 				return;
 			}
 
@@ -48,14 +48,14 @@ class SAMLAuth extends Auth {
                 $smarty->compile_dir = 'tpl_c';
                 $smarty->assign('authenticated', FALSE);
                 $smarty->assign('error', FALSE);
-                $smarty->assign('container', $smarty->fetch('SAMLAuth.tpl'));
+                $smarty->assign('container', $smarty->fetch('SSPAuth.tpl'));
                 $smarty->display('Page.tpl');
                 exit (0);
 	}
 
 	function logout($url = NULL) {
 		parent::logout(NULL);
-		$this->saml->logout($url);
+		$this->ssp->logout($url);
 	}		
 }
 ?>

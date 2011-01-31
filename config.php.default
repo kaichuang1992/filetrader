@@ -9,14 +9,14 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // use local PEAR 
 $config['pear_path'] = __DIR__."/ext/pear/php";
 
-// NullAuth, SAMLAuth
+// NullAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
-// simpleSAMLphp configuration (SAMLAuth)
-$config['saml_path'] = '/var/simplesamlphp';
-$config['saml_sp'] = 'default-sp';
-$config['saml_uid'] = 'uid';
-$config['saml_display_name'] = 'cn';
+// simpleSAMLphp configuration (SSPAuth)
+$config['ssp_path'] = '/var/simplesamlphp';
+$config['ssp_sp'] = 'default-sp';
+$config['ssp_uid_attr'] = 'uid';
+$config['ssp_dn_attr'] = 'cn';
 
 // Allow users to share files through email invites
 $config['email_share'] = FALSE;

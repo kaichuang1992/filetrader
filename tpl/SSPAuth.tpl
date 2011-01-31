@@ -4,6 +4,6 @@
 
 	<form method="post">
 		<input id="input_focus" type="submit" value="Proceed" />
-		<input type="hidden" name="samlProceed" value="TRUE" />
+		<input type="hidden" name="sspProceed" value="TRUE" />
 	</form>
 </div>
