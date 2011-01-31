@@ -33,13 +33,13 @@ class Files {
 	}
 
         function myFiles() {
-                $files = $this->storage->get("_design/files/_view/by_date")->body->rows;
-                /* fix the view to only display from specified user! */
-                /* fix the view to also return total file size! */
+		$userId = $this->auth->getUserId();
+                $files = $this->storage->get("_design/files/_view/by_date?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]")->body->rows;
                 $this->smarty->assign('files', $files);
                 $this->smarty->assign('type', 'myFiles');
 
-                $tagInfo = $this->storage->get("_design/files/_view/tag_count?group=true")->body->rows;
+                $tagInfo = $this->storage->get("_design/files/_view/tag_count?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]&group=true")->body->rows;
+
                 $this->smarty->assign('tagInfo', $tagInfo);
 
                 $content = $this->smarty->fetch('FileList.tpl');

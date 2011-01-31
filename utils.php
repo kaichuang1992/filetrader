@@ -171,8 +171,12 @@ function generateToken() {
         function isMediaFile($file) {
                 if(!file_exists($file) || !is_readable($file))
                         throw new Exception("unable to open file '$file'");
-                $mediaFile = @new ffmpeg_movie($file);
-                return !($mediaFile === FALSE);
+		if(function_exists("ffmpeg_movie")) {
+	                $mediaFile = @new ffmpeg_movie($file);
+	                return !($mediaFile === FALSE);
+		}else {
+			return FALSE;
+		}
         }
 
 
@@ -262,7 +266,6 @@ function analyzeFile($fileName) {
         $metaData['fileType'] = finfo_file($finfo, $fileName);
 
         if(isMediaFile($fileName)) {
-                // $mediaData = analyzeMediaFile($fileName, $fileName.".still.png", $fileName.".thumb.png");
 		$mediaData = analyzeMediaFile($fileName, NULL, NULL);
 	}
         return array_merge($metaData, $mediaData);
