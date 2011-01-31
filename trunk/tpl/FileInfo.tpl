@@ -7,10 +7,10 @@
                         <input type="hidden" name="action" value="updateFileInfo">
 
 			<table class="fileInfo">
-			<tr><th>Name</th><td><input type="text" name="fileName" value="{$fileInfo->fileName}"/></td></tr>
+			<tr><th>Name</th><td><input type="text" size="50" name="fileName" value="{$fileInfo->fileName}"/></td></tr>
 			<tr><th>Size</th><td>{$fileInfo->fileSize}</td></tr>
-			<tr><th>Tags</th><td><input type="text" name="fileTags" value="{', '|implode:$fileInfo->fileTags}" /></td></tr>
-			<tr><th>Description</th><td><textarea name="fileDescription" rows="5" cols="30">{$fileInfo->fileDescription}</textarea></td></tr>
+			<tr><th>Tags</th><td><input type="text" size="50" name="fileTags" value="{', '|implode:$fileInfo->fileTags}" /></td></tr>
+			<tr><th>Description</th><td><textarea name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea></td></tr>
 			<tr><th>Groups</th><td>{html_checkboxes name='fileShareGroups' options=$userGroups selected=$fileInfo->fileShareGroups}</td></tr>
 			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
 			</table>

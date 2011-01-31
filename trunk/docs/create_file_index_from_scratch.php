@@ -97,7 +97,7 @@ function(doc) {
                         echo "[$userName] Analyzing: $userFile\n";
 			$metadata = analyzeFile($userFile);
 			$metadata['fileOwner'] = $userName;
-			$metadata['fileTags'] = array ( 'Label1', 'Tag1', 'Taggertje' );
+			$metadata['fileTags'] = array ( 'Demo Tag', "Length".strlen($userFile));
 			$s->post($metadata);
 			echo "[$userName] Imported:  $userFile\n";
 		}
