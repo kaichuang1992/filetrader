@@ -85,17 +85,16 @@ abstract class Auth {
 		}
 	}
 
-	function logout($url = NULL) {
-		if ($this->isLoggedIn()) {
-			unset ($_SESSION['userId']);
-			unset ($_SESSION['userAttr']);
-			unset ($_SESSION['userDisplayName']);
-			if($url == NULL)
-				$url = $_SERVER['SCRIPT_NAME'];
-			header("Location: $url");
-		} else {
-			throw new Exception("not logged in");
-		}
-	}
+        function logout($url = NULL) {
+                if ($this->isLoggedIn()) {
+                        unset ($_SESSION['userId']);
+                        unset ($_SESSION['userAttr']);
+                        unset ($_SESSION['userDisplayName']);
+                        if($url !== NULL)
+                                header("Location: $url");
+                } else {
+                        throw new Exception("not logged in");
+                }
+        }
 }
 ?>

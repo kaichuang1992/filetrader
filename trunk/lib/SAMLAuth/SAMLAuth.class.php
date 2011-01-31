@@ -49,13 +49,13 @@ class SAMLAuth extends Auth {
                 $smarty->assign('authenticated', FALSE);
                 $smarty->assign('error', FALSE);
                 $smarty->assign('container', $smarty->fetch('SAMLAuth.tpl'));
-                $smarty->display('index.tpl');
+                $smarty->display('Page.tpl');
                 exit (0);
 	}
 
-	function logout() {
-		parent::logout();
-		$this->saml->logout($_SERVER['SCRIPT_NAME']);
+	function logout($url = NULL) {
+		parent::logout(NULL);
+		$this->saml->logout($url);
 	}		
 }
 ?>
