@@ -55,15 +55,15 @@
 		       "type" => "view",
 		       "language" => "javascript",
 		       "views" => array ( 
-				"all" => array ("map" => "function(doc) { emit(null, doc)}"),
-				"by_date" => array ("map" => "function(doc) { emit(doc.fileDate, doc)}"),
+				"all" => array ("map" => "function(doc) { emit(doc.fileOwner, doc)}"),
+				"by_date" => array ("map" => "function(doc) { emit([doc.fileOwner, doc.fileDate], doc)}"),
 				
 "tag_count" => array (
 "map" => "
 function(doc) {
   if (doc.type == 'file' && doc.fileTags) {
     doc.fileTags.forEach(function(tag) {
-      emit(tag, 1);
+      emit([doc.fileOwner, tag], 1);
     });
   }
 }", 
@@ -77,7 +77,7 @@ function(keys, values) {
 function(doc) {
   if (doc.type == 'file' && doc.fileTags) {
     doc.fileTags.forEach(function(tag) {
-      emit(tag, doc);
+      emit([doc.fileOwner, tag], doc);
     });
   }
 }
