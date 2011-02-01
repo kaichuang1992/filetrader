@@ -22,9 +22,7 @@ See the script in the docs/ directory to populate CouchDB with some entries.
 Create directories and set file permissions:
 
 # create directories
-$ mkdir -p data
-$ mkdir -p data/files
-$ mkdir -p tpl_c
+$ mkdir -p data/files data/cache tpl_c 
 
 # set unix permissions
 $ chmod o+w -R data tpl_c

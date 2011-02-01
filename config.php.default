@@ -37,6 +37,9 @@ $config['ssl_only'] = FALSE;
 // Location to directory where to store uploaded files
 $config['file_storage_dir'] = 'data/files';
 
+// Location for cache (e.g. thumbnails, transcodes)
+$config['cache_dir'] = 'data/cache';
+
 // Allow OAuth consumers
 $config['allow_oauth'] = FALSE;
 
