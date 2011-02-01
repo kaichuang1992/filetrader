@@ -84,7 +84,7 @@ function bytesToHuman($bytes) {
 		return (int) ($bytes / $megabyte) . "MB";
 	if ($bytes > $kilobyte)
 		return (int) ($bytes / $kilobyte) . "kB";
-	return $bytes . " bytes";
+	return $bytes;
 }
 
 function getProtocol() {
@@ -220,6 +220,8 @@ function generateToken() {
                                                 $mediaData['audio']['duration'] = $media->getDuration();
                                         }
 
+					// FIXME: only for video!
+
 					// Create Still
 					if($still != NULL) {
 						$fc = $media->getFrameCount();
@@ -227,6 +229,8 @@ function generateToken() {
 						$f->resize($media->getFrameWidth(), $media->getFrameHeight());
 						imagepng($f->toGDImage(), $still);
 					}
+
+					// FIXME: only for video!
 					// Create Thumbnail
 					/*if($thumbnail != NULL) { 
                                                 $fc = $media->getFrameCount();
@@ -234,6 +238,16 @@ function generateToken() {
 -	                                        $f->resize(100, $media->getFrameHeight() / ($media->getFrameWidth()/100));
 	                                        imagepng($f->toGDImage(), $thumbnail);
 					}*/
+
+					// FIXME: also for audio!
+
+					// Schedule file for transcoding
+					$transcode = NULL;
+					if($trancode != NULL) {
+						// Video: ffmpeg -f webm -acodec libvorbis -vcodec libvpx -s 640x360 -b 1000000 -i $fileName $transcode[.webm]
+						// Audio: ffmpeg -b 96k -f ogg -ac libvorbis -i $fileName $transcode[.ogg]
+					}
+
                                 }else {
                                         // not a media file?!
                                 }
