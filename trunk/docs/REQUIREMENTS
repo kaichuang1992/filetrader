@@ -1,3 +1,13 @@
+The following external PHP modules are required:
+
+Module		Version		License		URL
+		Tested
+-------------------------------------------------------------------------------
+# If you want to extract information from video/audio files and generate
+# thumbnails from videos
+php-ffmpeg	0.6.3		GPLv2		http://ffmpeg-php.sourceforge.net/
+
+
 The following external PHP libraries are required:
 
 Library         Version         License         URL
@@ -6,8 +16,9 @@ Library         Version         License         URL
 Smarty		3.0.6		LGPL2 or 3?	http://www.smarty.net
 Sag PHP		0.3.0		ASL2.0		http://www.saggingcouch.com/
 
-# If you want to use SAML Auth:
-simpleSAMLphp	1.6.3		LGPL 2.1	http://simplesamlphp.org/
+# If you want to use the authentication backend:
+simpleSAMLphp	1.7.0		LGPL 2.1	http://simplesamlphp.org/
+
 
 The following external JS libraries are required:
 
@@ -16,4 +27,13 @@ Library		Version		License		URL
 -------------------------------------------------------------------------------
 Plupload	1.4.0		GPLv2		http://www.plupload.com/
 jQuery		1.4.4		MIT, GPLv2	http://jquery.com/
+
+
+The following external applications are required:
+
+Application	Version		License		URL
+		Tested
+-------------------------------------------------------------------------------
+# If you want to enable transcoding to WebM format for HTML5 previews
+ffmpeg		git HEAD	GPLv2?		http://www.ffmpeg.org
 

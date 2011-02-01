@@ -2,7 +2,7 @@
 
 /*  
  *  FileTrader - Web based file sharing platform
- *  Copyright (C) 2010 François Kooman <fkooman@tuxed.net>
+ *  Copyright (C) 2011 François Kooman <fkooman@tuxed.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published by
@@ -31,13 +31,11 @@ class NullAuth extends Auth {
 
 	function getUserGroups() {
 		if ($this->isLoggedIn())
-			return array ('12345' => 'NullGroup', 
-				      '55555' => 'OneGroup', 
-				      '98765' => 'TwoGroup');
+			return array ('11111' => 'Alpha', 
+				      '22222' => 'Beta', 
+				      '33333' => 'Gamma');
 		else
 			throw new Exception("not logged in");
 	}
-
-
 }
 ?>
