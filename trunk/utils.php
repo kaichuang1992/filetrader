@@ -111,8 +111,9 @@ function generateToken() {
 
 		if($height > $newHeight) { 
 			$factor = $height / $newHeight;
-			$newWidth = round($width / $factor);
-			return array('width' => $newWidth, 'height' => $newHeight);
+			$newWidth = $width / $factor;
+			if($newWidth %2 == 1) $newWidth++;
+			return array('width' => (int)$newWidth, 'height' => (int)$newHeight);
 		}else {
 			return array('width' => $width, 'height' => $height);
 		}
@@ -159,7 +160,10 @@ function generateToken() {
 		}
         }
 
-        function analyzeMediaFile($fileName, &$metaData, $still = NULL, $thumbnail = NULL) {
+	/** 
+	 * FIXME: make params a file path + cache path and meta data, maybe that is nicer... 
+	 */
+        function analyzeMediaFile($fileName, &$metaData) {
                 if(empty($fileName))
                         throw new Exception("file does not exist, cannot be analyzed");
 
@@ -167,7 +171,6 @@ function generateToken() {
 			throw new Exception("metadata invalid");
 
                 switch($metaData['fileType']) {
-
                         case "video/quicktime":
                         case "application/ogg":
                         case "video/mp4":
@@ -193,30 +196,26 @@ function generateToken() {
                                                 $metaData['audio']['duration'] = $media->getDuration();
                                         }
 
-					// FIXME: only for video!
+					// Thumbnails
 
-					// Create Still
-					if($media->hasVideo() && $still != NULL) {
-						$fc = $media->getFrameCount();
-						$f = $media->getFrame($fc/8);
-						//$f->resize($media->getFrameWidth(), $media->getFrameHeight());
-						imagepng($f->toGDImage(), $still);
+					// FIXME: this should be fixed by generating a still and resizing that to
+					// wanted sizes instead of accessing the file twice! BUG in php-ffmpeg
+					// because you can't call $f->resize twice on the same object as the
+					// image corrupts...
+					$thumbSizes = array(360, 180);
+					if($media->hasVideo()) {
+						foreach($thumbSizes as $tS) {
+		                                	$fc = (int) ($media->getFrameCount() / 32);
+			                                $f = $media->getFrame($fc);
+							if($f !== FALSE) {
+								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
+			                                	$f->resize($sV['width'], $sV['height']);
+	        		                        	imagepng($f->toGDImage(), $fileName.".".$tS.".png");
+							}
+						}
 					}
 
-					// FIXME: only for video!
-
-					// Create Thumbnail
-					if($media->hasVideo() && $thumbnail != NULL) {
-                                                $fc = $media->getFrameCount();
--	                                        $f = $media->getFrame($fc/8);
-						$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight());
--	                                        $f->resize($sV['width'], $sV['height']);
-	                                        imagepng($f->toGDImage(), $thumbnail);
-					}
-
-					// FIXME: also for audio!
-
-					// Schedule file for transcoding
+					// Schedule for transcoding to WebM
 					$transcode = NULL;
 					if(($media->hasVideo() || $media->hasAudio()) && $transcode != NULL) {
 						// Video: ffmpeg -f webm -acodec libvorbis -vcodec libvpx -s 640x360 -b 1000000 -i $fileName $transcode[.webm]
@@ -251,7 +250,7 @@ function analyzeFile($fileName) {
         $metaData['fileType'] = finfo_file($finfo, $fileName);
 
         if(isMediaFile($fileName)) {
-		analyzeMediaFile($fileName, $metaData, NULL, NULL);
+		analyzeMediaFile($fileName, $metaData);
 	}
 	return $metaData;
 }
