@@ -171,7 +171,7 @@ function generateToken() {
         function isMediaFile($file) {
                 if(!file_exists($file) || !is_readable($file))
                         throw new Exception("unable to open file '$file'");
-		if(function_exists("ffmpeg_movie")) {
+		if(class_exists("ffmpeg_movie")) {
 	                $mediaFile = @new ffmpeg_movie($file);
 	                return !($mediaFile === FALSE);
 		}else {
@@ -181,7 +181,7 @@ function generateToken() {
 
 
         function analyzeMediaFile($fileName, $still = NULL, $thumbnail = NULL) {
-                if(empty($fileName) || !is_string($fileName) || !file_exists($fileName))
+                if(empty($fileName))
                         throw new Exception("file does not exist, cannot be analyzed");
 
                 $mediaData = array();
@@ -243,7 +243,7 @@ function generateToken() {
 
 					// Schedule file for transcoding
 					$transcode = NULL;
-					if($trancode != NULL) {
+					if($transcode != NULL) {
 						// Video: ffmpeg -f webm -acodec libvorbis -vcodec libvpx -s 640x360 -b 1000000 -i $fileName $transcode[.webm]
 						// Audio: ffmpeg -b 96k -f ogg -ac libvorbis -i $fileName $transcode[.ogg]
 					}
