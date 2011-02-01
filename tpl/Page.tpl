@@ -18,8 +18,10 @@
 	</div>
 
 	<ul class="menu">
-		<li><a href="?action=myFiles">Home</a></li>
-		<li><a href="?action=fileUpload">Upload Files</a></li>
+		<li><a href="?action=myFiles">My Files</a></li>
+		<li><a href="?action=myMedia">My Media</a></li>
+		<li><a href="?action=sharedFiles">Group Files</a></li>
+		<li><a href="?action=fileUpload">Upload New Files</a></li>
 	</ul>
 
 	{if $error} 
