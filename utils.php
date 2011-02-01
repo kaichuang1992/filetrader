@@ -102,36 +102,16 @@ function generateToken() {
 	/**
 	 * Returns the required scaling depending on the input width/height ratio.
 	 */
-        function scaleVideo($size) {
+        function scaleVideo($size, $newHeight = 360) {
 		if(!is_array($size) && !(sizeof($size) == 2))
 			throw new Exception("size should be array containing width,height");
 
-		/* we only support the following resolutions */
-                $supported = array( array(384,288),	// 288p
-				    array(512,288),	
-				    array(480,360),	// 360p
-				    array(640,264),
-		                    array(640,360),
-				    array(640,480),	// 480p
-                		    array(854,480),
-				    array(960,720),	// 720p
-				    array(1280,720),
-				    array(1440,1080),	// 1080p
-				    array(1920,1080),
-				    array(720,576), 	// Other formats we like
-
-				);
-		if(!in_array($size, $supported))
-			throw new Exception(implode("x", $size) . " is not a supported resolution");
-
-		/* Everything bigger than 360p we scale to 360p */
 		$width = $size[0];
 		$height = $size[1];
 
-		if($height > 360) { 
-			$newHeight = 360;
+		if($height > $newHeight) { 
 			$factor = $height / $newHeight;
-			$newWidth = (int) ($width / $factor);
+			$newWidth = round($width / $factor);
 			return array('width' => $newWidth, 'height' => $newHeight);
 		}else {
 			return array('width' => $width, 'height' => $height);
@@ -179,21 +159,14 @@ function generateToken() {
 		}
         }
 
-
-        function analyzeMediaFile($fileName, $still = NULL, $thumbnail = NULL) {
+        function analyzeMediaFile($fileName, &$metaData, $still = NULL, $thumbnail = NULL) {
                 if(empty($fileName))
                         throw new Exception("file does not exist, cannot be analyzed");
 
-                $mediaData = array();
+		if(!is_array($metaData) || !array_key_exists('fileType', $metaData))
+			throw new Exception("metadata invalid");
 
-                /* MIME-Type */
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $fileType = finfo_file($finfo, $fileName);
-
-                /* perform some special actions depending on the file type */
-                $mediaData = array();
-
-                switch($fileType) {
+                switch($metaData['fileType']) {
 
                         case "video/quicktime":
                         case "application/ogg":
@@ -206,44 +179,46 @@ function generateToken() {
                                 if(isMediaFile($fileName)) {
                                         $media = new ffmpeg_movie($fileName, FALSE);
                                         if($media->hasVideo()) {
-                                                $mediaData['video']['codec'] = $media->getVideoCodec();
-                                                $mediaData['video']['width'] = $media->getFrameWidth();
-                                                $mediaData['video']['height'] = $media->getFrameHeight();
-                                                $mediaData['video']['bitrate'] = $media->getVideoBitRate();
-                                                $mediaData['video']['framerate'] = $media->getFrameRate();
-						$mediaData['video']['duration'] = $media->getDuration();
+                                                $metaData['video']['codec'] = $media->getVideoCodec();
+                                                $metaData['video']['width'] = $media->getFrameWidth();
+                                                $metaData['video']['height'] = $media->getFrameHeight();
+                                                $metaData['video']['bitrate'] = $media->getVideoBitRate();
+                                                $metaData['video']['framerate'] = $media->getFrameRate();
+						$metaData['video']['duration'] = $media->getDuration();
                                         }
                                         if($media->hasAudio()) {
-                                                $mediaData['audio']['codec'] = $media->getAudioCodec();
-                                                $mediaData['audio']['bitrate'] = $media->getAudioBitRate();
-                                                $mediaData['audio']['samplerate'] = $media->getAudioSampleRate();
-                                                $mediaData['audio']['duration'] = $media->getDuration();
+                                                $metaData['audio']['codec'] = $media->getAudioCodec();
+                                                $metaData['audio']['bitrate'] = $media->getAudioBitRate();
+                                                $metaData['audio']['samplerate'] = $media->getAudioSampleRate();
+                                                $metaData['audio']['duration'] = $media->getDuration();
                                         }
 
 					// FIXME: only for video!
 
 					// Create Still
-					if($still != NULL) {
+					if($media->hasVideo() && $still != NULL) {
 						$fc = $media->getFrameCount();
 						$f = $media->getFrame($fc/8);
-						$f->resize($media->getFrameWidth(), $media->getFrameHeight());
+						//$f->resize($media->getFrameWidth(), $media->getFrameHeight());
 						imagepng($f->toGDImage(), $still);
 					}
 
 					// FIXME: only for video!
+
 					// Create Thumbnail
-					/*if($thumbnail != NULL) { 
+					if($media->hasVideo() && $thumbnail != NULL) {
                                                 $fc = $media->getFrameCount();
 -	                                        $f = $media->getFrame($fc/8);
--	                                        $f->resize(100, $media->getFrameHeight() / ($media->getFrameWidth()/100));
+						$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight());
+-	                                        $f->resize($sV['width'], $sV['height']);
 	                                        imagepng($f->toGDImage(), $thumbnail);
-					}*/
+					}
 
 					// FIXME: also for audio!
 
 					// Schedule file for transcoding
 					$transcode = NULL;
-					if($transcode != NULL) {
+					if(($media->hasVideo() || $media->hasAudio()) && $transcode != NULL) {
 						// Video: ffmpeg -f webm -acodec libvorbis -vcodec libvpx -s 640x360 -b 1000000 -i $fileName $transcode[.webm]
 						// Audio: ffmpeg -b 96k -f ogg -ac libvorbis -i $fileName $transcode[.ogg]
 					}
@@ -256,17 +231,13 @@ function generateToken() {
                         default:
                                 /* no idea about this file, let it go... */
                 }
-
-                return $mediaData;
-
 	}
 
 function analyzeFile($fileName) {
         if (empty ($fileName) || !is_string($fileName) || !file_exists($fileName))
                 throw new Exception("file does not exist");
-        $metaData = array ();
-        $mediaData = array ();
 
+        $metaData = array ();
 	$metaData['type'] = "file";
         $metaData['fileName'] = basename($fileName);
         $metaData['fileSize'] = filesize($fileName);
@@ -280,13 +251,8 @@ function analyzeFile($fileName) {
         $metaData['fileType'] = finfo_file($finfo, $fileName);
 
         if(isMediaFile($fileName)) {
-		$mediaData = analyzeMediaFile($fileName, NULL, NULL);
+		analyzeMediaFile($fileName, $metaData, NULL, NULL);
 	}
-        return array_merge($metaData, $mediaData);
+	return $metaData;
 }
-
-function trim_value(&$value) { 
-	$value = trim($value); 
-}
-
 ?>
