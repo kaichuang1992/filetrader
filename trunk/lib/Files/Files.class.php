@@ -141,7 +141,8 @@ class Files {
                         $dl = new HTTP_Download();
                         $dl->setFile($filePath);
                         $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $info->fileName);
-                        $dl->guessContentType();
+                        $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+                        $dl->setContentType($finfo->file($filePath));
                         $dl->send();
                         exit (0);
                 } else {
@@ -173,7 +174,8 @@ class Files {
                         $dl = new HTTP_Download();
                         $dl->setFile($file);
                         $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, basename($file));
-                        $dl->guessContentType();
+                        $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+                        $dl->setContentType($finfo->file($filePath));
                         $dl->send();
                         exit (0);
                 } else {
