@@ -88,11 +88,3 @@ ul.menu li a {
 #debugButton {
 	float: right;
 }
-
-#debugInfo {
-	display: none;
-	position: absolute;
-	background: #000;
-	color: #fff;
-}
-

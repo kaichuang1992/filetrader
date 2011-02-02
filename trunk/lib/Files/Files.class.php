@@ -124,14 +124,14 @@ class Files {
 
         function downloadFile() {
                 $id = getRequest("id", TRUE);
-                $token = getRequest("token", FALSE, 0);
+                // $token = getRequest("token", FALSE, 0);
                 $info = $this->storage->get($id)->body;
 
                 /* FIXME: memberOfGroups and token only if said support is enabled! */
                 if ($info->fileOwner === $this->auth->getUserId()) {
                         $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 
-                        if (!file_exists($filePath))
+                        if (!is_file($filePath))
                                 throw new Exception("file does not exist on file system");
 
                         logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
@@ -149,6 +149,38 @@ class Files {
                 }
         }
 
+	function getCacheObject() {
+                $id = getRequest("id", TRUE);
+		$type = getRequest("type", TRUE);
+
+                $validTypes = array('thumbnail_360','thumbnail_180');
+
+                $info = $this->storage->get($id)->body;
+                if ($info->fileOwner === $this->auth->getUserId()) {
+			if(!in_array($type, $validTypes))
+				throw new Exception("invalid cache type");
+
+			list($t, $subT) = explode("_", $type);
+
+			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t->$subT;
+
+	                if (!is_file($file))
+		                throw new Exception("file does not exist on file system");
+
+                        set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
+                        require_once ('HTTP/Download.php');
+                        $dl = new HTTP_Download();
+                        $dl->setFile($file);
+                        $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, basename($file));
+                        $dl->guessContentType();
+                        $dl->send();
+                        exit (0);
+                } else {
+                        throw new Exception("access denied");
+                }
+	}
+
 	function handleUpload() {
 		// FIXME: this seems to be WAY too crazy
 		// Remove HTML4 support completely, only support HTML5 file upload (and maybe Flash/Silverlight?!)
@@ -164,7 +196,7 @@ class Files {
 		// Settings
 		$ownerDir = base64_encode($this->auth->getUserId());
 		$targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
-		$cachePath = getConfig($this->config, 'cache_path', TRUE);
+		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
 		// FIXME: are these variables really needed?
 		$cleanupTargetDir = false; // Remove old files
