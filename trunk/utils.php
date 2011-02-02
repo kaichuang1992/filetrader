@@ -145,9 +145,13 @@ function getProtocol() {
                 file_put_contents($logFile, $logData, FILE_APPEND);
         }
 
-        function isMediaFile($file) {
-                if(!file_exists($file) || !is_readable($file))
-                        throw new Exception("unable to open file '$file'");
+        function isMediaFile(&$metaData, $filePath) {
+	        if (!is_array($metaData) || !array_key_exists('fileName', $metaData))
+        	        throw new Exception("meta data invalid");
+	        $file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
+
+                if(!is_file($file) || !is_readable($file))
+                        throw new Exception("unable to open file");
 		if(class_exists("ffmpeg_movie")) {
 	                $mediaFile = @new ffmpeg_movie($file);
 	                return !($mediaFile === FALSE);
@@ -156,15 +160,16 @@ function getProtocol() {
 		}
         }
 
-	/** 
-	 * FIXME: make params a file path + cache path and meta data, maybe that is nicer... 
-	 */
-        function analyzeMediaFile($fileName, &$metaData) {
-                if(empty($fileName))
-                        throw new Exception("file does not exist, cannot be analyzed");
+        function analyzeMediaFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
+		if (!is_array($metaData) || !array_key_exists('fileName', $metaData) || !array_key_exists('fileType', $metaData))
+                	throw new Exception("meta data invalid");
+	        $file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
 
-		if(!is_array($metaData) || !array_key_exists('fileType', $metaData))
-			throw new Exception("metadata invalid");
+	        if(!is_file($file) || !is_readable($file))
+        	        throw new Exception("file does not exist");
+
+		if(!is_dir($cachePath))
+			throw new Exception("cache dir does not exist");
 
                 switch($metaData['fileType']) {
                         case "video/quicktime":
@@ -175,8 +180,8 @@ function getProtocol() {
                         case "video/x-ms-asf":
 			case "application/octet-stream":
                                 /* determine width, height, codecs */
-                                if(isMediaFile($fileName)) {
-                                        $media = new ffmpeg_movie($fileName, FALSE);
+                                if(isMediaFile($metaData, $filePath)) {
+                                        $media = new ffmpeg_movie($file, FALSE);
                                         if($media->hasVideo()) {
                                                 $metaData['video']['codec'] = $media->getVideoCodec();
                                                 $metaData['video']['width'] = $media->getFrameWidth();
@@ -206,9 +211,8 @@ function getProtocol() {
 							if($f !== FALSE) {
 								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
 			                                	$f->resize($sV['width'], $sV['height']);
-								$cacheDir = dirname($fileName)."/cache";
-								if(!is_dir($cacheDir)) mkdir($cacheDir);
-								$thumbFile = $cacheDir . "/" . basename($fileName) . "." . $tS .".png";
+								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
+								$metaData['video']['thumbnails'][$tS] = $thumbFile;
 	        		                        	imagepng($f->toGDImage(), $thumbFile);
 							}
 						}
@@ -231,26 +235,27 @@ function getProtocol() {
                 }
 	}
 
-function analyzeFile($fileName) {
-        if (empty ($fileName) || !is_string($fileName) || !file_exists($fileName))
+function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
+	if (!is_array($metaData) || !array_key_exists('fileName', $metaData))
+		throw new Exception("meta data invalid");
+	$file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
+
+	if(!is_file($file) || !is_readable($file))
                 throw new Exception("file does not exist");
 
-        $metaData = array ();
 	$metaData['type'] = "file";
-        $metaData['fileName'] = basename($fileName);
-        $metaData['fileSize'] = filesize($fileName);
-        $metaData['fileDate'] = filemtime($fileName);
-        $metaData['fileShareGroups'] = array ();
+        $metaData['fileSize'] = filesize($file);
+        $metaData['fileDate'] = filemtime($file);
+        $metaData['fileGroups'] = array ();
 	$metaData['fileDescription'] = '';
 	$metaData['fileTags'] = array();
 
         /* MIME-Type */
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $metaData['fileType'] = finfo_file($finfo, $fileName);
+        $metaData['fileType'] = finfo_file($finfo, $file);
 
-        if(isMediaFile($fileName)) {
-		analyzeMediaFile($fileName, $metaData);
+        if(isMediaFile($metaData, $filePath)) {
+		analyzeMediaFile($metaData, $filePath, $cachePath);
 	}
-	return $metaData;
 }
 ?>

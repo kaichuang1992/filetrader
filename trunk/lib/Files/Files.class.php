@@ -87,7 +87,7 @@ class Files {
 		$fileName = getRequest('fileName', FALSE, $info->fileName); 
                 $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
                 $fileTags = getRequest('fileTags', FALSE, $info->fileTags);
-		$fileShareGroups = getRequest('fileShareGroups', FALSE, array()); /* not set means everything deselected! */
+		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */
 		if($fileName != $info->fileName) {
@@ -110,8 +110,8 @@ class Files {
 		/* Description */
 		$info->fileDescription = trim(htmlspecialchars($fileDescription));
 
-		/* ShareGroups */
-		$info->fileShareGroups = $this->auth->memberOfGroups($fileShareGroups);
+		/* Groups */
+		$info->fileGroups = $this->auth->memberOfGroups($fileGroups);
 
                 $this->storage->put($id, $info);
 		return $this->fileInfo();
@@ -164,6 +164,7 @@ class Files {
 		// Settings
 		$ownerDir = base64_encode($this->auth->getUserId());
 		$targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
+		$cachePath = getConfig($this->config, 'cache_path', TRUE);
 
 		// FIXME: are these variables really needed?
 		$cleanupTargetDir = false; // Remove old files
@@ -262,8 +263,9 @@ class Files {
 
 		/* only add entry to the database after receiving the last block */
 		if ($chunk == $chunks -1 || $chunks === 0) {
-			$metaData = analyzeFile($targetDir . DIRECTORY_SEPARATOR . $fileName);
-			$metaData['fileOwner'] = $this->auth->getUserId();
+                        $metaData['fileOwner'] = $this->auth->getUserId();
+			$metaData['fileName'] = $fileName;
+			$metaData = analyzeFile($metaData, $targetDir, $cachePath);
 			$this->storage->post($metaData);
 			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData['fileName'] . "'");
 		}
