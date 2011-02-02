@@ -212,7 +212,7 @@ function getProtocol() {
 								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
 			                                	$f->resize($sV['width'], $sV['height']);
 								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
-								$metaData['video']['thumbnails'][$tS] = $thumbFile;
+								$metaData['video']['thumbnail'][$tS] = basename($thumbFile);
 	        		                        	imagepng($f->toGDImage(), $thumbFile);
 							}
 						}

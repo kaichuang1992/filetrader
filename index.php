@@ -75,6 +75,7 @@ try {
 			'downloadFile',
 			'fileInfo',
 			'fileUpload',
+			'getCacheObject',
 			'handleUpload',
 			'myFiles',
 			'rawFileInfo',

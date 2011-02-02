@@ -13,8 +13,9 @@
 			</tr>
 	                {/foreach}
 			</table>
-			<h2>Tag Frequencies</h2>
+<!--			<h2>Tag Frequencies</h2>
 			{foreach $tagInfo as $tag}
 				{$tag->key[1]} ({$tag->value}) <br />
 			{/foreach}
+-->
 		{/if}
