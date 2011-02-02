@@ -20,7 +20,11 @@
 	include_once('config.php');
 	include_once('utils.php');
 
-	date_default_timezone_set($config['time_zone']);
+if (!isset ($config) || !is_array($config))
+        die("broken or missing configuration file?");
+
+date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
+
 
 	include_once('ext/sag/src/Sag.php');
 
@@ -33,7 +37,7 @@
 	   overwritten! 
 	*/
 
-	$datadir = "data/files";
+	$fileStorageDir = getConfig($config, 'file_storage_dir', TRUE);
 
 	/* each user has their own data directory, easy to link files
 	   to users in case the index breaks, so at least the files 
@@ -41,7 +45,7 @@
 	   sharing groups.
 	 */
 
-	$dbName = $config['db_name'];
+        $dbName = getConfig($config, 'db_name', TRUE);
 
 	$s = new Sag();
 	$dbs = $s->getAllDatabases()->body;
@@ -50,54 +54,30 @@
 	        $s->deleteDatabase($dbName);
 	$s->createDatabase($dbName);
 	$s->setDatabase($dbName);
-
+	
+	/* load all the map/reduce js functions from mapReduce directory */
+	$views = array();
+        foreach( glob("docs/mapReduce/*") as $mrFiles) {
+		list($name,$type) = explode(".", basename($mrFiles));
+		$views[$name][$type] = file_get_contents($mrFiles);
+	}
 	$view = array( "_id" => "_design/files",
 		       "type" => "view",
 		       "language" => "javascript",
-		       "views" => array ( 
-				"all" => array ("map" => "function(doc) { emit(doc.fileOwner, doc)}"),
-				"by_date" => array ("map" => "function(doc) { emit([doc.fileOwner, doc.fileDate], doc)}"),
-				
-"tag_count" => array (
-"map" => "
-function(doc) {
-  if (doc.type == 'file' && doc.fileTags) {
-    doc.fileTags.forEach(function(tag) {
-      emit([doc.fileOwner, tag], 1);
-    });
-  }
-}", 
-"reduce" => "
-function(keys, values) {
-  return sum(values);
-}"),
+		       "views" => $views,
+		);
 
-"by_tag" => array (
-"map" => "
-function(doc) {
-  if (doc.type == 'file' && doc.fileTags) {
-    doc.fileTags.forEach(function(tag) {
-      emit([doc.fileOwner, tag], doc);
-    });
-  }
-}
-"),
-
-	),
-);
 	// Add the view
-
-
 	$s->post($view);
 
-	foreach( glob($datadir."/*") as $userDir) {
+	foreach( glob($fileStorageDir."/*") as $userDir) {
 		$userName = trim(base64_decode(basename($userDir)));
 		echo "**** $userName\n";
 		foreach(glob($userDir."/*") as $userFile) {
                         echo "[$userName] Analyzing: $userFile\n";
 			$metadata = analyzeFile($userFile);
 			$metadata['fileOwner'] = $userName;
-			$metadata['fileTags'] = array ( 'Demo Tag', "Length".strlen($userFile));
+			$metadata['fileTags'] = array ( 'Demo Tag', "Length".strlen(basename($userFile)));
 			$s->post($metadata);
 			echo "[$userName] Imported:  $userFile\n";
 		}
