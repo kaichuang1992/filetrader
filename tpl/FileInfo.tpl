@@ -11,7 +11,7 @@
 			<tr><th>Size</th><td>{$fileInfo->fileSize}</td></tr>
 			<tr><th>Tags</th><td><input type="text" size="50" name="fileTags" value="{', '|implode:$fileInfo->fileTags}" /></td></tr>
 			<tr><th>Description</th><td><textarea name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea></td></tr>
-			<tr><th>Groups</th><td>{html_checkboxes name='fileShareGroups' options=$userGroups selected=$fileInfo->fileShareGroups}</td></tr>
+			<tr><th>Groups</th><td>{html_checkboxes name='fileGroups' options=$userGroups selected=$fileInfo->fileGroups}</td></tr>
 			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
 			</table>
 			</form>

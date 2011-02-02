@@ -38,6 +38,7 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 	*/
 
 	$fileStorageDir = getConfig($config, 'file_storage_dir', TRUE);
+	$cachePath = getConfig($config, 'cache_dir', TRUE);
 
 	/* each user has their own data directory, easy to link files
 	   to users in case the index breaks, so at least the files 
@@ -70,18 +71,27 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 	// Add the view
 	$s->post($view);
 
+	// Delete all cache entries as to not accumulate too many
+        foreach( glob($cachePath."/*") as $cacheEntry) {
+		unlink($cacheEntry);
+	}
+
+	// Import all new entries
 	foreach( glob($fileStorageDir."/*") as $userDir) {
 		$userName = trim(base64_decode(basename($userDir)));
 		echo "**** $userName\n";
 		foreach(glob($userDir."/*") as $userFile) {
 			if(!is_file($userFile))
 				continue;
-                        echo "[$userName] Analyzing: $userFile\n";
-			$metadata = analyzeFile($userFile);
-			$metadata['fileOwner'] = $userName;
-			$metadata['fileTags'] = array ( 'Demo Tag', "Length".strlen(basename($userFile)));
-			$s->post($metadata);
-			echo "[$userName] Imported:  $userFile\n";
+                        echo "[$userName] Analyzing: " . basename($userFile) . "\n";
+			$metaData = array();
+			$metaData['fileName'] = basename($userFile);
+			analyzeFile($metaData, dirname($userFile), $cachePath);
+                        $metaData['fileOwner'] = $userName;
+                        $metaData['fileTags'] = array ( 'Demo Tag', "Length".strlen(basename($userFile)));
+			$metaData['fileDescription'] = 'Imported by FileTrader CLI on ' . strftime("%c", time());
+			$s->post($metaData);
+			echo "[$userName] Imported:  " . basename($userFile) . "\n";
 		}
 	}
 ?>
