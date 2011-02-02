@@ -74,6 +74,8 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 		$userName = trim(base64_decode(basename($userDir)));
 		echo "**** $userName\n";
 		foreach(glob($userDir."/*") as $userFile) {
+			if(!is_file($userFile))
+				continue;
                         echo "[$userName] Analyzing: $userFile\n";
 			$metadata = analyzeFile($userFile);
 			$metadata['fileOwner'] = $userName;

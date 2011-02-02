@@ -206,7 +206,10 @@ function getProtocol() {
 							if($f !== FALSE) {
 								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
 			                                	$f->resize($sV['width'], $sV['height']);
-	        		                        	imagepng($f->toGDImage(), $fileName.".".$tS.".png");
+								$cacheDir = dirname($fileName)."/cache";
+								if(!is_dir($cacheDir)) mkdir($cacheDir);
+								$thumbFile = $cacheDir . "/" . basename($fileName) . "." . $tS .".png";
+	        		                        	imagepng($f->toGDImage(), $thumbFile);
 							}
 						}
 					}
