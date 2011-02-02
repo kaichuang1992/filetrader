@@ -94,10 +94,6 @@ function getProtocol() {
 		) ? "https://" : "http://";
 }
 
-function generateToken() {
-	return bin2hex(openssl_random_pseudo_bytes(16));
-}
-
 
 	/**
 	 * Returns the required scaling depending on the input width/height ratio.

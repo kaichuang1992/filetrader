@@ -1,0 +1,7 @@
+function (doc) {
+	if (doc.type == 'file' && doc.fileTags) {
+		doc.fileTags.forEach(function (tag) {
+			emit([doc.fileOwner, tag], doc);
+		});
+	}
+}
