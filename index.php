@@ -37,7 +37,7 @@ try {
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
 		// only allow SSL connections
 		if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS']))
-			throw new Exception("This service only available through SSL connection");
+			throw new Exception("only available through secure connection");
 	}
 
 	$authType = getConfig($config, 'auth_type', TRUE);
@@ -55,8 +55,10 @@ try {
 		$auth->login();
 	}
 
-	if (!isset ($auth) || empty ($auth) || !$auth->isLoggedIn()) {
+	if (!isset ($auth) || empty ($auth)) {
 		$auth = new $authType ($config);
+	}
+	if(!$auth->isLoggedIn()) {
 		$auth->login();
 	}
 
