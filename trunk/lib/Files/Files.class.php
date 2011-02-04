@@ -37,12 +37,16 @@ class Files {
                 $files = $this->storage->get("_design/files/_view/by_date?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]")->body->rows;
                 $this->smarty->assign('files', $files);
                 $this->smarty->assign('type', 'myFiles');
-
-                $tagInfo = $this->storage->get("_design/files/_view/tag_count?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]&group=true")->body->rows;
-
-                $this->smarty->assign('tagInfo', $tagInfo);
-
                 $content = $this->smarty->fetch('FileList.tpl');
+                return $content;
+        }
+
+        function myMedia() {
+                $userId = $this->auth->getUserId();
+                $files = $this->storage->get("_design/files/_view/by_date_media?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]")->body->rows;
+                $this->smarty->assign('files', $files);
+                $this->smarty->assign('type', 'myFiles');
+                $content = $this->smarty->fetch('MediaList.tpl');
                 return $content;
         }
 
@@ -154,7 +158,7 @@ class Files {
                 $id = getRequest("id", TRUE);
 		$type = getRequest("type", TRUE);
 
-                $validTypes = array('thumbnail_360','thumbnail_180');
+                $validTypes = array('thumbnail_90', 'thumbnail_180','thumbnail_360');
 
                 $info = $this->storage->get($id)->body;
                 if ($info->fileOwner === $this->auth->getUserId()) {

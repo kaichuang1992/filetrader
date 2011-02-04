@@ -78,6 +78,7 @@ try {
 			'getCacheObject',
 			'handleUpload',
 			'myFiles',
+			'myMedia',
 			'rawFileInfo',
 			'updateFileInfo',
 		), TRUE))

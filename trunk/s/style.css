@@ -48,6 +48,10 @@ td, th {
 	text-align: left;
 }
 
+td.thumbnail {
+	text-align: center;
+}
+
 label {
 	display: block;
 	margin: 10px;

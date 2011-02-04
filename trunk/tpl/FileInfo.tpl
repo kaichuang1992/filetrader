@@ -1,3 +1,8 @@
+                        {if !empty($fileInfo->video->thumbnail->{360})}
+                                <h2>Still</h2>
+                                <img src="?action=getCacheObject&id={$fileInfo->_id}&type=thumbnail_360" alt="Video Still" title="Video Still">
+                        {/if}
+
 			<h2>Info</h2>
 			<form method="post">
 		
@@ -15,7 +20,3 @@
 			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
 			</table>
 			</form>
-			{if !empty($fileInfo->video->thumbnail->{360})}
-				<h2>Still</h2>
-				<img src="?action=getCacheObject&id={$fileInfo->_id}&type=thumbnail_360" alt="Video Still" title="Video Still">
-			{/if}
