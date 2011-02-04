@@ -200,7 +200,7 @@ function getProtocol() {
 					// Thumbnails
 
 					// FIXME: this should be fixed by generating a still and resizing that to
-					// wanted sizes instead of accessing the file twice! BUG in php-ffmpeg
+					// wanted sizes instead of accessing the thrice! BUG in php-ffmpeg
 					// because you can't call $f->resize twice on the same object as the
 					// image corrupts...
 					$thumbSizes = array(90, 180, 360);
@@ -219,12 +219,12 @@ function getProtocol() {
 					}
 
 					// Schedule for transcoding to WebM
-					$transcode = NULL;
-					if(($media->hasVideo() || $media->hasAudio()) && $transcode != NULL) {
-						// Video: ffmpeg -f webm -acodec libvorbis -vcodec libvpx -s 640x360 -b 1000000 -i $fileName $transcode[.webm]
-						// Audio: ffmpeg -b 96k -f ogg -ac libvorbis -i $fileName $transcode[.ogg]
+					if(($media->hasVideo() || $media->hasAudio())) {
+						// Status can be "TODO", "PROGRESS" or "DONE"
+						$metaData['video']['transcodeStatus'] = 'TODO';
+						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
+						$metaData['video']['transcode'] = basename($transcodeFile);
 					}
-
                                 }else {
                                         // not a media file?!
                                 }
