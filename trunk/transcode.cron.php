@@ -29,14 +29,14 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 $dbName = getConfig($config, 'db_name', TRUE);
 
 require_once ("ext/sag/src/Sag.php");
-//require_once ("lib/Files/Files.class.php");	// FIXME needed?
 
 $storage = new Sag();
 $storage->setDatabase($dbName);
 
 $toTranscode = $storage->get("_design/files/_view/to_transcode")->body->rows;
 
-//var_dump($toTranscode);
+$videoHeight = 360;
+
 foreach($toTranscode as $t) {
 	$id = $t->id;
 
@@ -46,14 +46,10 @@ foreach($toTranscode as $t) {
 
 	$fileOwner = $info->fileOwner;
 	$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-	$width = $info->video->width;
-        $height = $info->video->height;
-	$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->{360};
-	$resize = scaleVideo(array($width, $height));
-	$newSize = $resize['width'] . "x" . $resize['height'];
+	$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
+	$newSize = $info->video->transcode->$videoHeight->width . "x" . $videoHeight;
 	$cmd = "ffmpeg -i \"$fileName\" -threads 8 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 $transcodeFileName";
 
-#	echo "$cmd\n";
         execCommand($cmd, 'data/transcoder.log', "Transcoding $fileName");
 
         $info = $storage->get($id)->body;

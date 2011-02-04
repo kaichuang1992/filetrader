@@ -168,7 +168,7 @@ class Files {
 			list($t, $subT) = explode("_", $type);
 
 			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t->$subT;
+			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t->$subT->file;
 
 	                if (!is_file($file))
 		                throw new Exception("file does not exist on file system");

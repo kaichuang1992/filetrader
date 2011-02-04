@@ -6,7 +6,7 @@
 			<table>
 	                {foreach $files as $f}
 			<tr>
-				<td class="thumbnail"><a href="?action=downloadFile&amp;id={$f->value->_id}"><img src="?action=getCacheObject&amp;id={$f->value->_id}&type=thumbnail_90" /></a></td>
+				<td class="thumbnail"><a href="?action=fileInfo&amp;id={$f->value->_id}"><img width="{$f->value->video->thumbnail->{90}->width}" height="90" src="?action=getCacheObject&amp;id={$f->value->_id}&type=thumbnail_90" /></a></td>
 				<td>
 					<strong>{$f->value->fileName}</strong><br/>
 					{$f->value->video->duration}<br/>
@@ -14,7 +14,6 @@
 					Transcode Status: <strong>{$f->value->video->transcodeStatus}</strong><br/>
 				</td>
 				<td>{$f->value->fileDescription}</td>
-				<td><a href="?action=fileInfo&id={$f->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
 			</tr>
 	                {/foreach}
 			</table>

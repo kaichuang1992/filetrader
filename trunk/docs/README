@@ -27,6 +27,16 @@ $ mkdir -p data/files data/cache tpl_c
 # set unix permissions
 $ chmod o+w -R data tpl_c
 
+*** WARNING ***
+Make sure the data directory is not accessible through the web browser,
+use a .htaccess file to limit access to directory structure!
+
+	echo "Deny from all" > data/.htaccess
+
+Make sure Apache allows the use of "Limit" as override in your (virtual host)
+directory:
+
+	AllowOverride Limit
 
 --- SELinux Configuration ---
 Set the correct SELinux labels (only for Fedora/Red Hat systems?)
@@ -54,3 +64,13 @@ This will make PEAR available in the "ext" directory. If you have
 a complete PEAR installation (including HTTP_Download) on your 
 system you can set the config flag 'pear_path' in config.php.
 
+*** WARNING ***
+Make sure your PHP "error_reporting" is not configured to development
+value, but set it to Production value. There are some issues with PEAR
+and E_STRICT.
+
+; Default Value: E_ALL & ~E_NOTICE
+; Development Value: E_ALL | E_STRICT
+; Production Value: E_ALL & ~E_DEPRECATED
+
+Choose "E_ALL & ~E_DEPRECATED".
