@@ -3,7 +3,7 @@
 
 	$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
 	$mT = $finfo->file("BigBuckBunnyFrame.webm");
-	if($mT === "video/webxm") {
+	if($mT === "video/webm") {
 		echo "*** Mime Type is '$mT' as expected, you are all set! :-)\n";
 
 	} else {
