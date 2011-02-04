@@ -48,10 +48,10 @@ foreach($toTranscode as $t) {
 	$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
 	$width = $info->video->width;
         $height = $info->video->height;
-	$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode;
+	$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->{360};
 	$resize = scaleVideo(array($width, $height));
 	$newSize = $resize['width'] . "x" . $resize['height'];
-	$cmd = "ffmpeg -i \"$fileName\" -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 $transcodeFileName";
+	$cmd = "ffmpeg -i \"$fileName\" -threads 8 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 $transcodeFileName";
 
 #	echo "$cmd\n";
         execCommand($cmd, 'data/transcoder.log', "Transcoding $fileName");

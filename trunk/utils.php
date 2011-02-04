@@ -223,7 +223,7 @@ function getProtocol() {
 						// Status can be "TODO", "PROGRESS" or "DONE"
 						$metaData['video']['transcodeStatus'] = 'TODO';
 						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
-						$metaData['video']['transcode'] = basename($transcodeFile);
+						$metaData['video']['transcode']['360'] = basename($transcodeFile);
 					}
                                 }else {
                                         // not a media file?!
