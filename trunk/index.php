@@ -48,16 +48,19 @@ try {
 	require_once ("ext/sag/src/Sag.php");
 	require_once ("lib/Files/Files.class.php");
 
+	/*
 	if (getConfig($config, 'allow_oauth', FALSE, FALSE)) {
-		/* try OAuth authentication */
+		// try OAuth authentication
 		require_once ("lib/OAuth/OAuth.class.php");
 		$auth = new OAuth($config);
 		$auth->login();
 	}
+	*/
 
 	if (!isset ($auth) || empty ($auth)) {
 		$auth = new $authType ($config);
 	}
+
 	if(!$auth->isLoggedIn()) {
 		$auth->login();
 	}
@@ -68,7 +71,7 @@ try {
         $storage->setDatabase($dbName);
 
 	if($action === "logout") {
-		$auth->logout();
+		$auth->logout($_SERVER["SCRIPT_NAME"]);
 		exit(0);
 	}
 
@@ -94,6 +97,7 @@ try {
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('Page.tpl');
 	logHandler("ERROR: " . $e->getMessage());
+	logHandler("ERROR TRACE: " . $e->getTraceAsString());
 	exit (1);
 }
 
