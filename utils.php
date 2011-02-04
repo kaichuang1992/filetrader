@@ -105,14 +105,10 @@ function getProtocol() {
 		$width = $size[0];
 		$height = $size[1];
 
-		if($height > $newHeight) { 
-			$factor = $height / $newHeight;
-			$newWidth = $width / $factor;
-			if($newWidth %2 == 1) $newWidth++;
-			return array('width' => (int)$newWidth, 'height' => (int)$newHeight);
-		}else {
-			return array('width' => $width, 'height' => $height);
-		}
+		$factor = $height / $newHeight;
+		$newWidth = $width / $factor;
+		if($newWidth %2 == 1) $newWidth++;
+		return array('width' => (int)$newWidth, 'height' => (int)$newHeight);
         }
 
         /**
@@ -212,18 +208,21 @@ function getProtocol() {
 								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
 			                                	$f->resize($sV['width'], $sV['height']);
 								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
-								$metaData['video']['thumbnail'][$tS] = basename($thumbFile);
+	                                                        $metaData['video']['thumbnail'][$tS] = array ('file' => basename($thumbFile), 'width' => $sV['width']);
 	        		                        	imagepng($f->toGDImage(), $thumbFile);
 							}
 						}
 					}
 
+					$transcodeSizes = array(360);
 					// Schedule for transcoding to WebM
-					if(($media->hasVideo() || $media->hasAudio())) {
-						// Status can be "TODO", "PROGRESS" or "DONE"
-						$metaData['video']['transcodeStatus'] = 'TODO';
-						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
-						$metaData['video']['transcode']['360'] = basename($transcodeFile);
+					if($media->hasVideo()) {
+                                                $metaData['video']['transcodeStatus'] = 'TODO';
+                                                foreach($transcodeSizes as $tS) {
+							$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
+                                                        $sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
+							$metaData['video']['transcode'][$tS] = array ( 'file' => basename($transcodeFile), 'width' => $sV['width']);
+						}
 					}
                                 }else {
                                         // not a media file?!
