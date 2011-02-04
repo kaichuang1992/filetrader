@@ -1,4 +1,17 @@
-<?php
+<?php 
+/**
+ */
+
+/*
+ * In order to create a small WebM sample video one can take a PNG file
+ * and encode it with ffmpeg:
+ *
+ * ffmpeg -r 24 -i big_buck_bunny_00100.png output.webm
+ *
+ * This will create a video containing one frame only, a tiny 
+ * video for testing whether the system recognized the file type...
+ */
+
 	echo "--- Verifying Mime Type of WebM sample file...\n";
 
 	$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
