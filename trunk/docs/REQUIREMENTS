@@ -27,13 +27,13 @@ Library		Version		License		URL
 -------------------------------------------------------------------------------
 Plupload	1.4.1		GPLv2		http://www.plupload.com/
 jQuery		1.5		MIT, GPLv2	http://jquery.com/
-
+VideoJS		2.0.2		LGPLv3+		http://www.videojs.com/
 
 The following external applications are required:
 
 Application	Version		License		URL
 		Tested
 -------------------------------------------------------------------------------
-# If you want to enable transcoding to WebM format for HTML5 previews
+# If you want to enable transcoding to WebM format for HTML5 video
 ffmpeg		git HEAD	GPLv2?		http://www.ffmpeg.org
 
