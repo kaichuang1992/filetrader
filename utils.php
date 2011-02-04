@@ -203,7 +203,7 @@ function getProtocol() {
 					// wanted sizes instead of accessing the file twice! BUG in php-ffmpeg
 					// because you can't call $f->resize twice on the same object as the
 					// image corrupts...
-					$thumbSizes = array(360, 180);
+					$thumbSizes = array(90, 180, 360);
 					if($media->hasVideo()) {
 						foreach($thumbSizes as $tS) {
 		                                	$fc = (int) ($media->getFrameCount() / 32);
