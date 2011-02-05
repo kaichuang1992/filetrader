@@ -73,20 +73,6 @@ function return_bytes($val) {
 	return $val;
 }
 
-function bytesToHuman($bytes) {
-	$kilobyte = 1024;
-	$megabyte = $kilobyte * $kilobyte;
-	$gigabyte = $megabyte * $megabyte;
-
-	if ($bytes > $gigabyte)
-		return (int) ($bytes / $gigabyte) . "GB";
-	if ($bytes > $megabyte)
-		return (int) ($bytes / $megabyte) . "MB";
-	if ($bytes > $kilobyte)
-		return (int) ($bytes / $kilobyte) . "kB";
-	return $bytes;
-}
-
 function getProtocol() {
 	return (   isset($_SERVER['HTTPS']) && 
 		   !empty($_SERVER['HTTPS']) && 
