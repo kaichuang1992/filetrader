@@ -31,6 +31,7 @@ require_once ("ext/smarty/libs/Smarty.class.php");
 $smarty = new Smarty();
 $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
+$smarty->plugins_dir[] = 'smarty_plugins';
 $smarty->assign('error', FALSE);
 
 try {
