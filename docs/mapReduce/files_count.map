@@ -1,0 +1,5 @@
+function (doc) {
+	if (doc.type == 'file' && doc.fileOwner) {
+		emit([doc.fileOwner], 1);
+	}
+}
