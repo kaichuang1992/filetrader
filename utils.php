@@ -250,8 +250,8 @@ function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
 	$metaData['fileTags'] = array();
 
         /* MIME-Type */
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $metaData['fileType'] = finfo_file($finfo, $file);
+	$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+        $metaData['fileType'] = $finfo->file($file);
 
         if(isMediaFile($metaData, $filePath)) {
 		analyzeMediaFile($metaData, $filePath, $cachePath);
