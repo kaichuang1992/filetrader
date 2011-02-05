@@ -37,10 +37,10 @@ class Files {
                 $skip = getRequest("skip", FALSE, 0);
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
 
-                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body;
-		$noOfFiles = $files->total_rows;
+                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+		$noOfFiles = $this->storage->get("_design/files/_view/files_count?key=[\"$userId\"]")->body->rows[0]->value;
 
-                $this->smarty->assign('files', $files->rows);
+                $this->smarty->assign('files', $files);
 		$this->smarty->assign('skip', $skip);
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
@@ -55,10 +55,10 @@ class Files {
 		$skip = getRequest("skip", FALSE, 0);
                 $limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
 
-                $files = $this->storage->get("_design/files/_view/by_date_media?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body;
-                $noOfFiles = $files->total_rows;
+                $files = $this->storage->get("_design/files/_view/by_date_media?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+                $noOfFiles = $this->storage->get("_design/files/_view/media_count?key=[\"$userId\"]")->body->rows[0]->value;
 
-                $this->smarty->assign('files', $files->rows);
+                $this->smarty->assign('files', $files);
                 $this->smarty->assign('skip', $skip);
                 $this->smarty->assign('limit', $limit);
                 $this->smarty->assign('no_of_files', $noOfFiles);
