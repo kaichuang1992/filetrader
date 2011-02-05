@@ -3,6 +3,9 @@ $config = array ();
 
 $config['time_zone'] = 'Europe/Amsterdam';
 
+// Files/Media per page
+$config['objects_per_page'] = 10;
+
 // use system wide PEAR installation
 // $config['pear_path'] = '/usr/share/pear';
 

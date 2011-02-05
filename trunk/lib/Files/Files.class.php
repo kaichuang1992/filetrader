@@ -34,8 +34,17 @@ class Files {
 
         function myFiles() {
 		$userId = $this->auth->getUserId();
-                $files = $this->storage->get("_design/files/_view/by_date?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]")->body->rows;
-                $this->smarty->assign('files', $files);
+                $skip = getRequest("skip", FALSE, 0);
+		$limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
+
+                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body;
+		$noOfFiles = $files->total_rows;
+
+                $this->smarty->assign('files', $files->rows);
+		$this->smarty->assign('skip', $skip);
+		$this->smarty->assign('limit', $limit);
+		$this->smarty->assign('no_of_files', $noOfFiles);
+
                 $this->smarty->assign('type', 'myFiles');
                 $content = $this->smarty->fetch('FileList.tpl');
                 return $content;
@@ -43,8 +52,17 @@ class Files {
 
         function myMedia() {
                 $userId = $this->auth->getUserId();
-                $files = $this->storage->get("_design/files/_view/by_date_media?startkey=[\"$userId\"]&endkey=[\"$userId\",{}]")->body->rows;
-                $this->smarty->assign('files', $files);
+		$skip = getRequest("skip", FALSE, 0);
+                $limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
+
+                $files = $this->storage->get("_design/files/_view/by_date_media?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body;
+                $noOfFiles = $files->total_rows;
+
+                $this->smarty->assign('files', $files->rows);
+                $this->smarty->assign('skip', $skip);
+                $this->smarty->assign('limit', $limit);
+                $this->smarty->assign('no_of_files', $noOfFiles);
+
                 $this->smarty->assign('type', 'myFiles');
                 $content = $this->smarty->fetch('MediaList.tpl');
                 return $content;

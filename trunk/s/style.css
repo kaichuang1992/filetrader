@@ -24,17 +24,19 @@ img {
 	margin: 0;
 	padding: 5px;
 	color: #fff;
-/*	height: 2em;*/
 }
 
-#header span.right {
+span.right {
 	float: right;
 }
 
-#header span.left {
+span.left {
 	float: left;
 }
 
+table {
+	margin-top: 10px;
+}
 
 #content {
 	padding: 10px;
