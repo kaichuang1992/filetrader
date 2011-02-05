@@ -33,9 +33,8 @@
                         {/if}
 
 			<h2>Info</h2>
+
 			<form method="post">
-		
-			<a id="debugButton" href="?action=rawFileInfo&amp;id={$fileInfo->_id}">Raw Info</a>
 
                         <input type="hidden" name="id" value="{$fileInfo->_id}" />
                         <input type="hidden" name="action" value="updateFileInfo">
@@ -49,3 +48,6 @@
 			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
 			</table>
 			</form>
+
+                        <p><small>[DEBUG] <a href="?action=rawFileInfo&amp;id={$fileInfo->_id}">Raw File Info</a></small></p>
+
