@@ -49,6 +49,7 @@ class SSPAuth extends Auth {
                 $smarty->assign('authenticated', FALSE);
                 $smarty->assign('error', FALSE);
                 $smarty->assign('container', $smarty->fetch('SSPAuth.tpl'));
+		$smarty->assign('action', NULL);
                 $smarty->display('Page.tpl');
                 exit (0);
 	}
