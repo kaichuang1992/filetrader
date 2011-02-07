@@ -50,6 +50,33 @@ class Files {
                 return $content;
         }
 
+        function groupFiles() {
+                $userId = $this->auth->getUserId();
+		$userGroups = $this->auth->getUserGroups();
+		$selectedGroup = getRequest("selected_group", FALSE, NULL);
+
+                $skip = getRequest("skip", FALSE, 0);
+                $limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
+
+		if($selectedGroup !== NULL) {
+			$files = $this->storage->get("_design/files/_view/by_group?key=$selectedGroup")->body->rows;
+	                #$noOfFiles = $this->storage->get("_design/files/_view/files_count?key=[\"$userId\"]")->body->rows[0]->value;
+			$noOfFiles = 5;
+
+	                $this->smarty->assign('selected_group', $selectedGroup);
+	                $this->smarty->assign('files', $files);
+	                $this->smarty->assign('skip', $skip);
+	                $this->smarty->assign('limit', $limit);
+	                $this->smarty->assign('no_of_files', $noOfFiles);
+	                $this->smarty->assign('type', 'myFiles');
+		}else {
+			$this->smarty->assign('user_groups', $userGroups);
+		}
+                $content = $this->smarty->fetch('FileList.tpl');
+                return $content;
+        }
+
+
         function myMedia() {
                 $userId = $this->auth->getUserId();
 		$skip = getRequest("skip", FALSE, 0);

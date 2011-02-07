@@ -20,7 +20,7 @@
 	<ul class="menu">
 		<li><a href="?action=myFiles">My Files</a></li>
 		<li><a href="?action=myMedia">My Media</a></li>
-		<li><a href="?action=sharedFiles">Group Files</a></li>
+		<li><a href="?action=groupFiles">Group Files</a></li>
 		<li><a href="?action=fileUpload">Upload New Files</a></li>
 	</ul>
 
