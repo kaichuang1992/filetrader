@@ -9,29 +9,58 @@
 <script type="text/javascript" src="ext/jquery.js"></script>
 </head>
 <body>
+	{if $authenticated}
+		<span class="auth"><span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a></span>
+        {/if}
+
 	<div id="header">
-		<span class="left">FileTrader</span>			
-        {if $authenticated} 
-		<span class="right">| User: <span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a> |</span>
-	{/if}
+	        <ul class="menu">
+			{if $action == "myFiles"}
+	                	<li class="selected">
+			{else}
+				<li>
+			{/if}
+				<a href="?action=myFiles">My Files</a>
+			</li>
 
-	</div>
+                        {if $action == "myMedia"}
+                                <li class="selected">
+                        {else}
+                                <li>
+                        {/if}
+                                <a href="?action=myMedia">My Media</a>
+                        </li>   
 
-	<ul class="menu">
-		<li><a href="?action=myFiles">My Files</a></li>
-		<li><a href="?action=myMedia">My Media</a></li>
-		<li><a href="?action=groupFiles">Group Files</a></li>
-		<li><a href="?action=fileUpload">Upload New Files</a></li>
-	</ul>
+                        {if $action == "groupFiles"}
+                                <li class="selected">
+                        {else}
+                                <li>
+                        {/if}
+                                <a href="?action=groupFiles">Group Files</a>
+                        </li>   
+
+                        {if $action == "fileUpload"}
+                                <li class="selected">
+                        {else}
+                                <li>
+                        {/if}
+                                <a href="?action=fileUpload">Upload New Files</a>
+                        </li>   
+	        </ul>
+        </div> <!-- /header -->
 
 	{if $error} 
 		<div id="error">
 			<p>Error: {$errorMessage}</p>
-		</div>
+		</div> <!-- /error -->
 	{else}
 		<div id="content">
 		{$container}
-		</div>
+		</div> <!-- /content -->
 	{/if}
+
+	<div id="footer">
+		This Site is Using <a href="http://filetrader.googlecode.com">FileTrader</a> :)
+	</div>
 </body>
 </html>

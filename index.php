@@ -103,6 +103,7 @@ try {
 	exit (1);
 }
 
+$smarty->assign('action', $action);
 $smarty->assign('authenticated', $auth->isLoggedIn());
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());
