@@ -85,6 +85,7 @@ try {
 			'handleUpload',
 			'myFiles',
 			'myMedia',
+			'groupFiles',
 			'rawFileInfo',
 			'updateFileInfo',
 		), TRUE))
