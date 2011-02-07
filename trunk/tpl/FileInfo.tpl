@@ -1,6 +1,4 @@
                         {if !empty($fileInfo->video->transcode->{360}) && $fileInfo->video->transcodeStatus == 'DONE' && !empty($fileInfo->video->thumbnail->{360})}
-				<h2>Video</h2>
-
 				<script type="text/javascript" src="ext/video-js/video.js"></script>
                                 <script type="text/javascript">
 					$(document).ready(function() {
@@ -26,9 +24,7 @@
 				    </p>
 				  </div>
 				  <!-- End VideoJS -->
-
 			{elseif !empty($fileInfo->video->thumbnail->{360})}
-                                <h2>Still</h2>
                                 <img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=thumbnail_360" alt="Video Still" title="Video Still">
                         {/if}
 
