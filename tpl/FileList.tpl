@@ -8,7 +8,7 @@
 					{/foreach}
 				</ul>
 			{else}
-				<em>You are not a member of any group. Nothing to share here.</em>
+				<em>You are not a member of any group. Nothing to see here.</em>
 			{/if}
 		{else}
 			{if empty($files)}
