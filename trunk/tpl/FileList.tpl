@@ -1,11 +1,10 @@
 		{if isset($user_groups)}
-			Select a group for which you want to see the files. They will the files you shared yourself as well!
+			Select a group for which you want to see the files. They will include the files you shared yourself as well!
 			<ul>
 				{foreach $user_groups as $k => $v}
 				<li><a href="?action=groupFiles&selected_group={$k}">{$v}</a></li>
 				{/foreach}
 			</ul>
-
 		{else}
 			{if empty($files)}
 				<p>	
