@@ -21,6 +21,8 @@
 require_once ('config.php');
 require_once ('utils.php');
 
+$videoHeight = 360;
+
 if (!isset ($config) || !is_array($config))
         die("broken or missing configuration file?");
 
@@ -33,27 +35,28 @@ require_once ("ext/sag/src/Sag.php");
 $storage = new Sag();
 $storage->setDatabase($dbName);
 
-$toTranscode = $storage->get("_design/files/_view/to_transcode")->body->rows;
+do { 
+	$toTranscode = $storage->get("_design/files/_view/to_transcode?limit=1")->body->rows;
 
-$videoHeight = 360;
+	if(!empty($toTranscode)) {
+		$t = $toTranscode[0];
+		$id = $t->id;
 
-foreach($toTranscode as $t) {
-	$id = $t->id;
+	 	$info = $storage->get($id)->body;
+		$info->video->transcodeStatus = 'PROGRESS';
+	        $storage->put($id, $info);
 
- 	$info = $storage->get($id)->body;
-	$info->video->transcodeStatus = 'PROGRESS';
-        $storage->put($id, $info);
-
-	$fileOwner = $info->fileOwner;
-	$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-	$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
-	$newSize = $info->video->transcode->$videoHeight->width . "x" . $videoHeight;
-	$cmd = "ffmpeg -i \"$fileName\" -threads 8 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 $transcodeFileName";
-
-        execCommand($cmd, 'data/transcoder.log', "Transcoding $fileName");
-
-        $info = $storage->get($id)->body;
-	$info->video->transcodeStatus = 'DONE';
-        $storage->put($id, $info);
-}
+		$fileOwner = $info->fileOwner;
+		$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
+		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
+		$newSize = $info->video->transcode->$videoHeight->width . "x" . $videoHeight;
+		$cmd = "ffmpeg -i \"$fileName\" -threads 8 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 $transcodeFileName";
+	
+	        execCommand($cmd, 'data/transcoder.log', "Transcoding $fileName");
+	
+	        $info = $storage->get($id)->body;
+		$info->video->transcodeStatus = 'DONE';
+	        $storage->put($id, $info);
+	}
+}while(!empty($toTranscode));
 ?>
