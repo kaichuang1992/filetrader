@@ -101,3 +101,11 @@ img {
         border: 0;
 }
 
+span.left {
+	float: left;
+}
+
+span.right {
+	float: right;
+}
+
