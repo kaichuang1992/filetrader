@@ -1,5 +1,5 @@
 function (doc) {
-	if (doc.type == 'file' && doc.video.transcodeStatus == 'TODO') {
+	if (doc.type == 'file' && doc.video.transcodeStatus == 'WAITING') {
 		emit([doc.fileOwner, doc.fileDate], doc)
 	}
 }
