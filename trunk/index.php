@@ -96,6 +96,7 @@ try {
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
+	$smarty->assign('action', NULL);
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('Page.tpl');
 	logHandler("ERROR: " . $e->getMessage());

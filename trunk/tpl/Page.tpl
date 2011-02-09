@@ -49,18 +49,18 @@
 	        </ul>
         </div> <!-- /header -->
 
-	{if $error} 
-		<div id="error">
-			<p>Error: {$errorMessage}</p>
-		</div> <!-- /error -->
-	{else}
-		<div id="content">
-		{$container}
-		</div> <!-- /content -->
-	{/if}
+        <div id="content">
+        {if $error}
+                <div id="error">
+                        <p>Error: {$errorMessage}</p>
+                </div> <!-- /error -->
+        {else}
+                {$container}
+        {/if}
+        </div> <!-- /content -->
 
 	<div id="footer">
-		Powered by <a href="http://filetrader.googlecode.com">FileTrader</a> :)
-	</div>
+		Powered by <a href="http://filetrader.googlecode.com">FileTrader</a>
+	</div> <!-- /footer -->
 </body>
 </html>
