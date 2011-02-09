@@ -60,7 +60,7 @@
 	{/if}
 
 	<div id="footer">
-		This Site is Using <a href="http://filetrader.googlecode.com">FileTrader</a> :)
+		Powered by <a href="http://filetrader.googlecode.com">FileTrader</a> :)
 	</div>
 </body>
 </html>
