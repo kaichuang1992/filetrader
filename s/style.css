@@ -36,12 +36,12 @@ span.auth {
 }
 
 ul.menu {
-        list-style: none;
         padding: 0;
         margin: 0;
 }
 
 ul.menu li {
+	list-style: none;
         display: inline;
         padding: 3px;
 	margin: 0 5px;
@@ -61,6 +61,20 @@ ul.menu li a {
         text-decoration: none;
         color: #fff;
 }
+
+ul.menu li ul {
+    display: none;
+}
+
+ul.menu li ul li {
+	display: block;
+	
+}
+
+/*ul.menu li:hover > ul {
+    display: block;
+}*/
+
 
 #footer {
 	margin: 20px auto;
@@ -108,4 +122,5 @@ span.left {
 span.right {
 	float: right;
 }
+
 
