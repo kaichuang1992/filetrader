@@ -189,13 +189,17 @@ function getProtocol() {
 					if($media->hasVideo()) {
 						foreach($thumbSizes as $tS) {
 		                                	$fc = (int) ($media->getFrameCount() / 32);
-			                                $f = $media->getFrame($fc);
-							if($f !== FALSE) {
-								$sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
-			                                	$f->resize($sV['width'], $sV['height']);
-								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
-	                                                        $metaData['video']['thumbnail'][$tS] = array ('file' => basename($thumbFile), 'width' => $sV['width']);
-	        		                        	imagepng($f->toGDImage(), $thumbFile);
+							/* frame count is not necessarily reliable! */
+							foreach (array($fc, 100, 10, 1) as $fno) {
+				                                $f = $media->getFrame($fno);
+								if($f !== FALSE) {
+	                                                                $sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
+	                                                                $f->resize($sV['width'], $sV['height']);
+	                                                                $thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
+	                                                                $metaData['video']['thumbnail'][$tS] = array ('file' => basename($thumbFile), 'width' => $sV['width']);
+	                                                                imagepng($f->toGDImage(), $thumbFile);
+									break;
+								}
 							}
 						}
 					}

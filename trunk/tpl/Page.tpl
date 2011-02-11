@@ -37,6 +37,12 @@
                                 <li>
                         {/if}
                                 <a href="?action=groupFiles">Group Files</a>
+
+				<ul>
+				{foreach $userGroups as $k => $v}
+					<li><a href="?action=groupFiles&selected_group={$k}">{$v}</li>
+				{/foreach}
+				</ul>
                         </li>   
 
                         {if $action == "fileUpload"}

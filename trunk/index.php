@@ -106,6 +106,7 @@ try {
 
 $smarty->assign('action', $action);
 $smarty->assign('authenticated', $auth->isLoggedIn());
+$smarty->assign('userGroups', $auth->getUserGroups());
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());
 $smarty->assign('container', $content);
