@@ -36,8 +36,12 @@ class Files {
 		$userId = $this->auth->getUserId();
                 $skip = getRequest("skip", FALSE, 0);
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
-
-                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+		$tag = getRequest("tag", FALSE, FALSE);
+		if($tag) {
+			$files = $this->storage->get("_design/files/_view/by_tag?limit=$limit&skip=$skip&descending=true&key=[\"$userId\",\"$tag\"]")->body->rows;
+		} else {
+	                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+		}
 		$noOfFiles = $this->storage->get("_design/files/_view/files_count?key=[\"$userId\"]")->body->rows[0]->value;
 
                 $this->smarty->assign('files', $files);
@@ -119,11 +123,26 @@ class Files {
                 $info = $this->storage->get($id)->body;
                 if ($info->fileOwner !== $this->auth->getUserId())
                         throw new Exception("access denied");
-
 		logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
+
+		/* delete the file from the file system */
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
+		unlink($filePath);
+
+		/* delete the cache objects belonging to this file from the file system */
+		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+                if(isset($info->video->transcode)) {
+			foreach($info->video->transcode as $k => $v) {
+				unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+			}
+		}
+		if(isset($info->video->thumbnail)) {
+	                foreach($info->video->thumbnail as $k => $v) {
+        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+			}
+		}
+
 		$this->storage->delete($id, $info->_rev);
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
-		unlink($filePath);	/* delete file from file system */
 		return $this->myFiles();
 	}
 
