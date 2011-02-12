@@ -1,9 +1,9 @@
 function (doc) {
 	if (doc.type == 'file' && doc.fileGroups && doc.fileDate && doc.fileTags) {
 		doc.fileTags.forEach(function(tag) { 
-			doc.fileGroups.forEach(function (group) {
-				emit([group, tag, doc.fileDate], doc);
-			});
+	                for(var idx in doc.fileGroups) {
+	                        emit([doc.fileGroups[idx], tag, doc.fileDate], doc);
+	                }
 		});
 	}
 }

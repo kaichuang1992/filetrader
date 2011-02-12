@@ -84,7 +84,6 @@ try {
 			'getCacheObject',
 			'handleUpload',
 			'showFiles',
-			'groupFiles',
 			'rawFileInfo',
 			'updateFileInfo',
 		), TRUE))

@@ -34,19 +34,28 @@ class Files {
 
         function showFiles() {
 		$userId = $this->auth->getUserId();
-                $tag = getRequest("tag", FALSE, FALSE);
-		$view = getRequest("view", FALSE, "FileList");
+
+                $view   = getRequest("view", FALSE, "FileList");
+                $tag    = getRequest("tag", FALSE, 0);
+                $group  = getRequest("group", FALSE, 0);
+
+                $skip   = getRequest("skip", FALSE, 0);
+
 		if(!in_array($view, array("FileList", "MediaList")))
 			throw new Exception("invalid view");
-                $skip = getRequest("skip", FALSE, 0);
+
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
-		if($tag) {
+
+		if($tag && !$group) {
 			$query = "_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
-			$files = $this->storage->get($query)->body->rows;
-		} else {
+		} elseif (!$tag && !$group) {
 			$query =     "_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
-	                $files = $this->storage->get($query)->body->rows;
+		} elseif ($tag && $group) {
+                        $query = "_design/files/_view/get_group_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",\"".strtoupper($tag)."\",{}]&endkey=[\"$group\",\"".strtolower($tag)."\"]";
+		} elseif (!$tag && $group) {
+                        $query =     "_design/files/_view/get_group_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
 		}
+                $files = $this->storage->get($query)->body->rows;
 
 		$noOfFiles = sizeof($files);		// SHOULD BE WITHOUT LIMIT AND SKIP OPTIONS
 
@@ -55,26 +64,8 @@ class Files {
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
 		$this->smarty->assign('view', $view);
-                $content = $this->smarty->fetch('FileList.tpl');
-                return $content;
-        }
-
-        function groupFiles() {
-                $userId = $this->auth->getUserId();
-		$userGroups = $this->auth->getUserGroups();
-		$group = getRequest("group", TRUE);
-
-                $skip = getRequest("skip", FALSE, 0);
-                $limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
-
-		$files = $this->storage->get("_design/files/_view/group_files?limit=$limit&skip=$skip&descending=true&endkey=[\"$group\"]&startkey=[\"$group\",{}]")->body->rows;
-		$noOfFiles = sizeof($files);
-
-                $this->smarty->assign('selected_group', $group);
-                $this->smarty->assign('files', $files);
-                $this->smarty->assign('skip', $skip);
-                $this->smarty->assign('limit', $limit);
-                $this->smarty->assign('no_of_files', $noOfFiles);
+		$this->smarty->assign('tag', $tag);
+		$this->smarty->assign('group', $group);
                 $content = $this->smarty->fetch('FileList.tpl');
                 return $content;
         }

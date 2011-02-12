@@ -22,25 +22,29 @@ span.auth {
         -moz-box-shadow: 3px 3px 3px #aaa;
         -webkit-box-shadow: 3px 3px 3px #aaa;
         box-shadow: 3px 3px 3px #aaa;
-
+	overflow: auto;
 }
 
 #header form {
-        display: inline;
-	float: right;
 	color: #fff;
-	font-size: 85%;
 }
 
 #header form label {
+	display: inline;
 	margin: 0;
 	padding: 0;
 }
 
 #header form input {
+	display: inline;
 	margin: 0;
 	padding: 0;
-	font-size: 85%;
+}
+
+#header form select {
+	display: inline;
+	margin: 0;
+	padding: 0;
 }
 
 #content {
@@ -55,52 +59,8 @@ span.auth {
 	-moz-box-shadow: 3px 3px 3px #aaa;
 	-webkit-box-shadow: 3px 3px 3px #aaa;
 	box-shadow: 3px 3px 3px #aaa;
+	overflow: auto;
 }
-
-ul.menu {
-        padding: 0;
-        margin: 0;
-	display: inline;
-}
-
-ul.menu li {
-	list-style: none;
-        display: inline;
-        padding: 3px;
-	margin: 0 5px;
-	border: 1px solid #eee;
-	background-color: #000;
-        -moz-box-shadow: 1px 1px 1px #aaa;
-        -webkit-box-shadow: 1px 1px 1px #aaa;
-        box-shadow: 1px 1px 1px #aaa;
-}
-
-ul.menu li.selected {
-	background-color: #600;
-}
-
-ul.menu li a {
-	font-size: small;
-        text-decoration: none;
-        color: #fff;
-}
-
-ul.menu li ul {
-	position: absolute;
-	display: none;
-	margin: 0;
-	padding: 0;
-}
-
-ul.menu li ul li {
-	display: block;
-	width: 100px;
-}
-
-ul.menu li:hover > ul {
-	display: block;
-}
-
 
 #footer {
 	margin: 20px auto;
@@ -141,10 +101,10 @@ img {
         border: 0;
 }
 
-span.left {
+.left {
 	float: left;
 }
 
-span.right {
+.right {
 	float: right;
 }

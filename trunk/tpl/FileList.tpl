@@ -1,7 +1,6 @@
 			{if empty($files)}
 				<p>	
-					<!-- FIXME: never shows for videos! -->
-					No files matching this request. Maybe no files exist in your account, group or with this tag?
+					No files in this collection.
 				</p>
 			{else}
 				{if $skip - $limit >= 0}
