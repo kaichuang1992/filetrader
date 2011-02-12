@@ -22,9 +22,11 @@
 			<label> File Collection 
 			<select name="group">
 				<option value="0">My Files</option>
+				{if !empty($userGroups)}
 				<optgroup label="Groups">
 				{html_options options=$userGroups selected=$group}
 				</optgroup>
+				{/if}
 			</select></label>
 			<input type="submit" value="Show">
 		</form>
