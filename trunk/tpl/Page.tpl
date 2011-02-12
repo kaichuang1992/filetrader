@@ -14,6 +14,8 @@
         {/if}
 
 	<div id="header">
+		{if $authenticated}
+
 		<form method="get" class="left" name="collection">
 			<input type="hidden" name="action" value="showFiles">
 			<input type="hidden" name="view" value="{$view}">
@@ -37,6 +39,9 @@
 	                        <label>Search for Tag <input type="text" name="tag" size="10" /></label>
                         </form>
 		{/if}
+		{else}
+			Welcome to FileTrader
+		{/if}		
         </div> <!-- /header -->
 
         <div id="content">
