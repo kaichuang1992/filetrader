@@ -19,6 +19,26 @@ span.auth {
 	border-radius: 10px 10px 0 0;
         -moz-border-radius: 10px 10px 0 0;
 	border: 1px solid #000;
+        -moz-box-shadow: 3px 3px 3px #aaa;
+        -webkit-box-shadow: 3px 3px 3px #aaa;
+        box-shadow: 3px 3px 3px #aaa;
+
+}
+
+#header form {
+        display: inline;
+	float: right;
+	color: #fff;
+}
+
+#header form label {
+	margin: 0;
+	padding: 0;
+}
+
+#header form input {
+	margin: 0;
+	padding: 0;
 }
 
 #content {
@@ -38,6 +58,7 @@ span.auth {
 ul.menu {
         padding: 0;
         margin: 0;
+	display: inline;
 }
 
 ul.menu li {
@@ -63,17 +84,20 @@ ul.menu li a {
 }
 
 ul.menu li ul {
-    display: none;
+	position: absolute;
+	display: none;
+	margin: 0;
+	padding: 0;
 }
 
 ul.menu li ul li {
 	display: block;
-	
+	width: 100px;
 }
 
-/*ul.menu li:hover > ul {
-    display: block;
-}*/
+ul.menu li:hover > ul {
+	display: block;
+}
 
 
 #footer {
@@ -122,5 +146,3 @@ span.left {
 span.right {
 	float: right;
 }
-
-

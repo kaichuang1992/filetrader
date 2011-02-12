@@ -36,7 +36,7 @@ $storage = new Sag();
 $storage->setDatabase($dbName);
 
 do { 
-	$toTranscode = $storage->get("_design/files/_view/to_transcode?limit=1")->body->rows;
+	$toTranscode = $storage->get("_design/files/_view/all_waiting_for_transcode?limit=1")->body->rows;
 
 	if(!empty($toTranscode)) {
 		$t = $toTranscode[0];

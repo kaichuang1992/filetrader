@@ -1,5 +1,0 @@
-function (doc) {
-	if (doc.type == 'file' && doc.fileOwner && doc.video) {
-		emit([doc.fileOwner], 1);
-	}
-}

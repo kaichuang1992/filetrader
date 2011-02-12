@@ -15,44 +15,26 @@
 
 	<div id="header">
 	        <ul class="menu">
-			{if $action == "myFiles"}
-	                	<li class="selected">
-			{else}
-				<li>
-			{/if}
-				<a href="?action=myFiles">My Files</a>
+			<li>
+				<a href="?action=showFiles&view=FileList">Files</a>
 			</li>
 
-                        {if $action == "myMedia"}
-                                <li class="selected">
-                        {else}
-                                <li>
-                        {/if}
-                                <a href="?action=myMedia">My Media</a>
-                        </li>   
+			<li>
+				<a href="?action=showFiles&view=MediaList">Videos</a>
+			</li>
 
-                        {if $action == "groupFiles"}
-                                <li class="selected">
-                        {else}
-                                <li>
-                        {/if}
-                                <a href="?action=groupFiles">Group Files</a>
-
-				<ul>
-				{foreach $userGroups as $k => $v}
-					<li><a href="?action=groupFiles&selected_group={$k}">{$v}</li>
-				{/foreach}
-				</ul>
-                        </li>   
-
-                        {if $action == "fileUpload"}
-                                <li class="selected">
-                        {else}
-                                <li>
-                        {/if}
+                        <li>
                                 <a href="?action=fileUpload">Upload New Files</a>
                         </li>   
 	        </ul>
+
+                        <form method="post">
+                        <input type="hidden" name="action" value="{$action}">
+                        <label>Tag
+                        <input type="text" name="tag" size="10" />
+                        </label>
+                        </form>
+
         </div> <!-- /header -->
 
         <div id="content">

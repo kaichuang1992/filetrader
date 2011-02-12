@@ -1,5 +1,0 @@
-function (doc) {
-	if (doc.type == 'file') {
-		emit([doc.fileOwner, doc.fileDate], doc)
-	}
-}
