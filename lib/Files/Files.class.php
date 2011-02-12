@@ -72,20 +72,37 @@ class Files {
 
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
+                $view   = getRequest("view", FALSE, "FileList");
+                $tag    = getRequest("tag", FALSE, 0);
+                $group  = getRequest("group", FALSE, 0);
+
+
 		$info = $this->storage->get($id)->body;
 		if ($info->fileOwner !== $this->auth->getUserId())
 			throw new Exception("access denied");
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('userGroups', $this->auth->getUserGroups());
+
+
+                $this->smarty->assign('view', $view);
+                $this->smarty->assign('group', $group);
+
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
 
 	function rawFileInfo() {
                 $id = getRequest("id", TRUE);
+
+                $view   = getRequest("view", FALSE, "FileList");
+                $group  = getRequest("group", FALSE, 0);
+
                 $info = $this->storage->get($id)->body;
                 if ($info->fileOwner !== $this->auth->getUserId())
                         throw new Exception("access denied");
                 $this->smarty->assign('fileInfo', var_export($info, TRUE));
+                $this->smarty->assign('view', $view);
+                $this->smarty->assign('group', $group);
+
                 return $this->smarty->fetch('RawFileInfo.tpl');
 	}
 

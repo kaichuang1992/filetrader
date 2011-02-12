@@ -3,6 +3,15 @@
 					No files in this collection.
 				</p>
 			{else}
+				<form class="right" method="get">
+					<input type="hidden" name="action" value="showFiles">
+					<input type="hidden" name="tag" value="{$tag}">
+					<select name="view">
+                                                <option value="FileList">File List</option>     
+						<option value="MediaList">Media List</option>
+					</select>
+				</form>
+
 				{if $skip - $limit >= 0}
 					<span class="left"><a href="?action=showFiles&view={$view}&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
 				{/if}
