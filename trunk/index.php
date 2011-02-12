@@ -66,7 +66,7 @@ try {
 		$auth->login();
 	}
 
-	$action = getRequest('action', FALSE, 'myFiles');
+	$action = getRequest('action', FALSE, 'showFiles');
 
         $storage = new Sag();
         $storage->setDatabase($dbName);
@@ -83,8 +83,7 @@ try {
 			'fileUpload',
 			'getCacheObject',
 			'handleUpload',
-			'myFiles',
-			'myMedia',
+			'showFiles',
 			'groupFiles',
 			'rawFileInfo',
 			'updateFileInfo',
@@ -97,6 +96,7 @@ try {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
 	$smarty->assign('action', NULL);
+	$smarty->assign('userGroups', $auth->getUserGroups());
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('Page.tpl');
 	logHandler("ERROR: " . $e->getMessage());

@@ -1,7 +1,0 @@
-function (doc) {
-	if (doc.type == 'file' && doc.fileGroups) {
-	    for(var idx in doc.fileGroups) {
-        	emit(doc.fileGroups[idx], doc);
-	    }
-	}
-}

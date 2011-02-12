@@ -1,0 +1,7 @@
+function (doc) {
+	if (doc.type == 'file' && doc.fileGroups && doc.fileDate) {
+		for(var idx in doc.fileGroups) {
+	        	emit([doc.fileGroups[idx], doc.fileData], doc);
+		}
+	}
+}

@@ -1,38 +1,43 @@
-		{if isset($user_groups)}
-			{if !empty($user_groups)}
-				Select a group for which you want to see the files. They will include the files you shared yourself as well!
-		
-				<ul>
-					{foreach $user_groups as $k => $v}
-					<li><a href="?action=groupFiles&selected_group={$k}">{$v}</a></li>
-					{/foreach}
-				</ul>
-			{else}
-				<em>You are not a member of any group. Nothing to see here.</em>
-			{/if}
-		{else}
 			{if empty($files)}
 				<p>	
-					You did not upload any files yet. Please upload some files :)
+					<!-- FIXME: never shows for videos! -->
+					No files matching this request. Maybe no files exist in your account, group or with this tag?
 				</p>
 			{else}
 				{if $skip - $limit >= 0}
-					<span class="left"><a href="?action=myFiles&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
+					<span class="left"><a href="?action=showFiles&view={$view}&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
 				{/if}
 				{if $skip + $limit < $no_of_files}
-					<span class="right"><a href="?action=myFiles&skip={$skip+$limit}"><img src="i/resultset_next.png" alt="Next Page"></a></span>
+					<span class="right"><a href="?action=showFiles&view={$view}&skip={$skip+$limit}"><img src="i/resultset_next.png" alt="Next Page"></a></span>
 				{/if}
-	
-				<table>
-		                {foreach $files as $f}
-				<tr>
-					<td><a href="?action=downloadFile&amp;id={$f->value->_id}">{$f->value->fileName}</a></td>
-					<td>{$f->value->fileSize|to_human_size}</td>
-					<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
-					<td><a href="?action=fileInfo&id={$f->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
-				</tr>
-		                {/foreach}
-				</table>
-			{/if}
-		{/if}
 
+				{if $view == 'FileList'}	
+					<table>
+			                {foreach $files as $f}
+					<tr>
+						<td><a href="?action=downloadFile&amp;id={$f->value->_id}">{$f->value->fileName}</a></td>
+						<td>{$f->value->fileSize|to_human_size}</td>
+						<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
+						<td><a href="?action=fileInfo&id={$f->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
+					</tr>
+			                {/foreach}
+					</table>
+				{elseif $view == 'MediaList'}
+		                        <table>
+		                        {foreach $files as $f}
+		                                {if isset($f->value->video)}
+		                                <tr>
+                		                        <td class="thumbnail"><a href="?action=fileInfo&amp;id={$f->value->_id}"><img width="{$f->value->video->thumbnail->{90}->width}" height="90" src="?action=getCacheObject&amp;id={$f->value->_id}&type=thumbnail_90" /></a></td>
+		                                        <td>
+		                                                <strong>{$f->value->fileName}</strong><br/>
+		                                                {$f->value->video->duration|to_duration}<br/>
+		                                                {$f->value->fileDate|date_format:"%d %b  %H:%M"}<br/>
+		                                                Transcode Status: <strong>{$f->value->video->transcodeStatus}</strong><br/>
+		                                        </td>
+		                                        <td>{$f->value->fileDescription}</td>
+		                                </tr>
+                		                {/if}
+		                        {/foreach}
+		                        </table>
+				{/if}
+			{/if}

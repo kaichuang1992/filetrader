@@ -32,24 +32,28 @@ class Files {
 		$this->smarty = $smarty;
 	}
 
-        function myFiles() {
+        function showFiles() {
 		$userId = $this->auth->getUserId();
+                $tag = getRequest("tag", FALSE, FALSE);
+		$view = getRequest("view", FALSE, "FileList");
+		if(!in_array($view, array("FileList", "MediaList")))
+			throw new Exception("invalid view");
+
                 $skip = getRequest("skip", FALSE, 0);
-		$limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
-		$tag = getRequest("tag", FALSE, FALSE);
+		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
 		if($tag) {
-			$files = $this->storage->get("_design/files/_view/by_tag?limit=$limit&skip=$skip&descending=true&key=[\"$userId\",\"$tag\"]")->body->rows;
+			$files = $this->storage->get("_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\",\"$tag\"]&startkey=[\"$userId\",\"$tag\",{}]")->body->rows;
 		} else {
-	                $files = $this->storage->get("_design/files/_view/by_date?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+	                $files = $this->storage->get("_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
 		}
-		$noOfFiles = $this->storage->get("_design/files/_view/files_count?key=[\"$userId\"]")->body->rows[0]->value;
+
+		$noOfFiles = sizeof($files);		// SHOULD BE WITHOUT LIMIT AND SKIP OPTIONS
 
                 $this->smarty->assign('files', $files);
 		$this->smarty->assign('skip', $skip);
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
-
-                $this->smarty->assign('type', 'myFiles');
+		$this->smarty->assign('view', $view);
                 $content = $this->smarty->fetch('FileList.tpl');
                 return $content;
         }
@@ -57,45 +61,20 @@ class Files {
         function groupFiles() {
                 $userId = $this->auth->getUserId();
 		$userGroups = $this->auth->getUserGroups();
-		$selectedGroup = getRequest("selected_group", FALSE, NULL);
+		$group = getRequest("group", TRUE);
 
                 $skip = getRequest("skip", FALSE, 0);
-                $limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
+                $limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
 
-		if($selectedGroup !== NULL) {
-			$files = $this->storage->get("_design/files/_view/by_group?key=$selectedGroup")->body->rows;
-	                #$noOfFiles = $this->storage->get("_design/files/_view/files_count?key=[\"$userId\"]")->body->rows[0]->value;
-			$noOfFiles = 5;
+		$files = $this->storage->get("_design/files/_view/group_files?limit=$limit&skip=$skip&descending=true&endkey=[\"$group\"]&startkey=[\"$group\",{}]")->body->rows;
+		$noOfFiles = sizeof($files);
 
-	                $this->smarty->assign('selected_group', $selectedGroup);
-	                $this->smarty->assign('files', $files);
-	                $this->smarty->assign('skip', $skip);
-	                $this->smarty->assign('limit', $limit);
-	                $this->smarty->assign('no_of_files', $noOfFiles);
-	                $this->smarty->assign('type', 'myFiles');
-		}else {
-			$this->smarty->assign('user_groups', $userGroups);
-		}
-                $content = $this->smarty->fetch('FileList.tpl');
-                return $content;
-        }
-
-
-        function myMedia() {
-                $userId = $this->auth->getUserId();
-		$skip = getRequest("skip", FALSE, 0);
-                $limit = getConfig($this->config, 'objects_per_page', FALSE, 10);
-
-                $files = $this->storage->get("_design/files/_view/by_date_media?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
-                $noOfFiles = $this->storage->get("_design/files/_view/media_count?key=[\"$userId\"]")->body->rows[0]->value;
-
+                $this->smarty->assign('selected_group', $group);
                 $this->smarty->assign('files', $files);
                 $this->smarty->assign('skip', $skip);
                 $this->smarty->assign('limit', $limit);
                 $this->smarty->assign('no_of_files', $noOfFiles);
-
-                $this->smarty->assign('type', 'myFiles');
-                $content = $this->smarty->fetch('MediaList.tpl');
+                $content = $this->smarty->fetch('FileList.tpl');
                 return $content;
         }
 
@@ -143,7 +122,7 @@ class Files {
 		}
 
 		$this->storage->delete($id, $info->_rev);
-		return $this->myFiles();
+		return $this->showFiles();
 	}
 
         function updateFileInfo() {
