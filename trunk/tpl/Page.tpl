@@ -23,7 +23,7 @@
 			<select name="group">
 				<option value="0">My Files</option>
 				{if !empty($userGroups)}
-				<optgroup label="Groups">
+				<optgroup label="Group">
 				{html_options options=$userGroups selected=$group}
 				</optgroup>
 				{/if}

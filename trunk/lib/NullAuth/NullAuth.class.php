@@ -31,9 +31,9 @@ class NullAuth extends Auth {
 
 	function getUserGroups() {
 		if ($this->isLoggedIn())
-			return array ('1abcd' => 'Alpha', 
-				      '2acde' => 'Beta', 
-				      '3r4s3' => 'Gamma');
+			return array ('1abcd' => 'Test Group', 
+				      '2acde' => 'Colleagues', 
+				      '3r4s3' => 'Friends');
 		else
 			throw new Exception("not logged in");
 	}
