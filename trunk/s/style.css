@@ -108,3 +108,10 @@ img {
 .right {
 	float: right;
 }
+
+#error {
+	border: 1px solid #000;
+	background-color: #c00;
+	color: #fff;
+	padding: 10px;
+}
