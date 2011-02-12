@@ -29,6 +29,7 @@ span.auth {
         display: inline;
 	float: right;
 	color: #fff;
+	font-size: 85%;
 }
 
 #header form label {
@@ -39,6 +40,7 @@ span.auth {
 #header form input {
 	margin: 0;
 	padding: 0;
+	font-size: 85%;
 }
 
 #content {

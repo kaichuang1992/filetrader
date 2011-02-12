@@ -29,10 +29,10 @@
 	        </ul>
 
                 {if $action == 'showFiles'}
-		        <form method="post">
+		        <form method="get">
 	                        <input type="hidden" name="action" value="showFiles">
 				<input type="hidden" name="view" value="{$view}">
-	                        <label>Tag <input type="text" name="tag" size="10" /></label>
+	                        <label>Search for Tag <input type="text" name="tag" size="10" /></label>
                         </form>
 		{/if}
         </div> <!-- /header -->
