@@ -28,13 +28,13 @@
                         </li>   
 	        </ul>
 
-                        <form method="post">
-                        <input type="hidden" name="action" value="{$action}">
-                        <label>Tag
-                        <input type="text" name="tag" size="10" />
-                        </label>
+                {if $action == 'showFiles'}
+		        <form method="post">
+	                        <input type="hidden" name="action" value="showFiles">
+				<input type="hidden" name="view" value="{$view}">
+	                        <label>Tag <input type="text" name="tag" size="10" /></label>
                         </form>
-
+		{/if}
         </div> <!-- /header -->
 
         <div id="content">

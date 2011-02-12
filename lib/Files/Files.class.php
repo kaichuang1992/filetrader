@@ -38,13 +38,14 @@ class Files {
 		$view = getRequest("view", FALSE, "FileList");
 		if(!in_array($view, array("FileList", "MediaList")))
 			throw new Exception("invalid view");
-
                 $skip = getRequest("skip", FALSE, 0);
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
 		if($tag) {
-			$files = $this->storage->get("_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\",\"$tag\"]&startkey=[\"$userId\",\"$tag\",{}]")->body->rows;
+			$query = "_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
+			$files = $this->storage->get($query)->body->rows;
 		} else {
-	                $files = $this->storage->get("_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&endkey=[\"$userId\"]&startkey=[\"$userId\",{}]")->body->rows;
+			$query =     "_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
+	                $files = $this->storage->get($query)->body->rows;
 		}
 
 		$noOfFiles = sizeof($files);		// SHOULD BE WITHOUT LIMIT AND SKIP OPTIONS
@@ -133,7 +134,7 @@ class Files {
 
 		$fileName = getRequest('fileName', FALSE, $info->fileName); 
                 $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
-                $fileTags = getRequest('fileTags', FALSE, $info->fileTags);
+                $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
 		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */
