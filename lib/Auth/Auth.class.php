@@ -59,6 +59,13 @@ abstract class Auth {
 	 */
 	abstract function login();
 
+	/**
+	 * Function returns the groups a user is a member of
+         *
+	 * WARNING: MAKE SURE THAT THE KEY OF THE ARRAY IS NOT A NUMBER!
+         *
+	 * Example: return array('grp133' => 'My Group', 'grp123' => 'Other Group');
+	 */
 	function getUserGroups() {
 		if ($this->isLoggedIn())
 			return array ();

@@ -14,24 +14,26 @@
         {/if}
 
 	<div id="header">
-	        <ul class="menu">
-			<li>
-				<a href="?action=showFiles&view=FileList">Files</a>
-			</li>
-
-			<li>
-				<a href="?action=showFiles&view=MediaList">Videos</a>
-			</li>
-
-                        <li>
-                                <a href="?action=fileUpload">Upload New Files</a>
-                        </li>   
-	        </ul>
+		<form method="get" class="left" name="collection">
+			<input type="hidden" name="action" value="showFiles">
+			<input type="hidden" name="view" value="{$view}">
+			<label> File Collection 
+			<select name="group">
+				<option value="0">My Files</option>
+				<optgroup label="Groups">
+				{html_options options=$userGroups selected=$group}
+				</optgroup>
+			</select></label>
+			<input type="submit" value="Show">
+		</form>
 
                 {if $action == 'showFiles'}
-		        <form method="get">
+		        <form method="get" class="right">
 	                        <input type="hidden" name="action" value="showFiles">
 				<input type="hidden" name="view" value="{$view}">
+				{if $group}
+					<input type="hidden" name="group" value="{$group}">
+				{/if}
 	                        <label>Search for Tag <input type="text" name="tag" size="10" /></label>
                         </form>
 		{/if}
@@ -43,7 +45,7 @@
                         <p>Error: {$errorMessage}</p>
                 </div> <!-- /error -->
         {else}
-                {$container}
+		{$container}
         {/if}
         </div> <!-- /content -->
 
