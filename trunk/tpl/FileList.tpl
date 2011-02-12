@@ -3,13 +3,11 @@
 					No files in this collection.
 				</p>
 			{else}
-				<form class="right" method="get">
+				<form class="right change_view" method="get">
 					<input type="hidden" name="action" value="showFiles">
 					<input type="hidden" name="tag" value="{$tag}">
-					<select name="view">
-                                                <option value="FileList">File List</option>     
-						<option value="MediaList">Media List</option>
-					</select>
+					<input type="hidden" name="group" value="{$group}">
+                                	<label>View {html_options class="change_view" name=view options=$views selected=$view}</label>
 				</form>
 
 				{if $skip - $limit >= 0}

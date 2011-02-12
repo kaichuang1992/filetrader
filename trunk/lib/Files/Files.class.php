@@ -63,6 +63,7 @@ class Files {
 		$this->smarty->assign('skip', $skip);
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
+		$this->smarty->assign('views', array('FileList'=>'File','MediaList'=>'Media'));
 		$this->smarty->assign('view', $view);
 		$this->smarty->assign('tag', $tag);
 		$this->smarty->assign('group', $group);
