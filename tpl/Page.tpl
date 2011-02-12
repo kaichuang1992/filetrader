@@ -7,6 +7,7 @@
 	@import url("s/style.css");
 </style>
 <script type="text/javascript" src="ext/jquery.js"></script>
+<script type="text/javascript" src="j/filetrader.js"></script>
 </head>
 <body>
 	{if $authenticated}
@@ -16,19 +17,10 @@
 	<div id="header">
 		{if $authenticated}
 
-		<form method="get" class="left" name="collection">
+		<form method="get" class="change_group left">
 			<input type="hidden" name="action" value="showFiles">
 			<input type="hidden" name="view" value="{$view}">
-			<label> File Collection 
-			<select name="group">
-				<option value="0">My Files</option>
-				{if !empty($userGroups)}
-				<optgroup label="Group">
-				{html_options options=$userGroups selected=$group}
-				</optgroup>
-				{/if}
-			</select></label>
-			<input type="submit" value="Show">
+                        <label>Collection {html_options name=group class=change_group options=$groups selected=$group}</label>
 		</form>
 
                 {if $action == 'showFiles'}
@@ -45,8 +37,8 @@
 			Welcome to FileTrader
 		{/if}		
         </div> <!-- /header -->
-
-        <div id="content">
+        
+<div id="content">
         {if $error}
                 <div id="error">
                         <p>Error: {$errorMessage}</p>

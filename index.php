@@ -95,7 +95,7 @@ try {
 	$smarty->assign('error', TRUE);
 	$smarty->assign('errorMessage', $e->getMessage());
 	$smarty->assign('action', NULL);
-	$smarty->assign('userGroups', $auth->getUserGroups());
+	$smarty->assign('groups', array(0 => 'My Files', 'Group' => $auth->getUserGroups()));
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('Page.tpl');
 	logHandler("ERROR: " . $e->getMessage());
@@ -105,7 +105,9 @@ try {
 
 $smarty->assign('action', $action);
 $smarty->assign('authenticated', $auth->isLoggedIn());
-$smarty->assign('userGroups', $auth->getUserGroups());
+$smarty->assign('groups', array(0 => 'My Files', 'Group' => $auth->getUserGroups()));
+$smarty->assign('group', getRequest("group", FALSE, 0));
+//$smarty->assign('userGroups', $auth->getUserGroups());
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());
 $smarty->assign('container', $content);
