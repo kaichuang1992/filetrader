@@ -10,34 +10,38 @@
 <script type="text/javascript" src="j/filetrader.js"></script>
 </head>
 <body>
-	{if $authenticated}
-		<span class="auth"><span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a></span>
-        {/if}
-
 	<div id="header">
-		{if $authenticated}
-
-		<form method="get" class="change_group left">
-			<input type="hidden" name="action" value="showFiles">
-			<input type="hidden" name="view" value="{$view}">
-                        <label>Collection {html_options name=group class=change_group options=$groups selected=$group}</label>
-		</form>
-
-                {if $action == 'showFiles'}
-		        <form method="get" class="right">
-	                        <input type="hidden" name="action" value="showFiles">
-				<input type="hidden" name="view" value="{$view}">
-				{if $group}
-					<input type="hidden" name="group" value="{$group}">
-				{/if}
-	                        <label>Search for Tag <input type="text" name="tag" size="10" /></label>
-                        </form>
-		{/if}
+	        {if $authenticated}
+	                <ul><li><a href="?action=showFiles&view={$view}">Home</a></li></ul>
+		        <span class="right"><span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a></span>
 		{else}
-			Welcome to FileTrader
-		{/if}		
+			<span class="left">FileTrader</span>
+		{/if}
         </div> <!-- /header -->
-        
+
+	<div id="nav">
+                {if $authenticated}
+	                <form method="get" class="change_group left">
+	                        <input type="hidden" name="action" value="showFiles">
+	                        <input type="hidden" name="view" value="{$view}">
+	                        <label>Collection {html_options name=group class=change_group options=$groups selected=$group}</label>
+        	        </form>
+
+	                {if $action == 'showFiles'}
+	                        <form method="get" class="right">
+	                                <input type="hidden" name="action" value="showFiles">
+	                                <input type="hidden" name="view" value="{$view}">
+	                                {if $group}
+	                                        <input type="hidden" name="group" value="{$group}">
+	                                {/if}
+	                                <label>Search <input type="text" name="tag" size="10" /></label>
+	                        </form>
+	                {/if}
+		{else}
+			Login
+                {/if}
+	</div> <!-- /nav -->
+
 <div id="content">
         {if $error}
                 <div id="error">
