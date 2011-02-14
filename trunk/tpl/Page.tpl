@@ -41,8 +41,6 @@
 	                                <label>Search <input type="text" name="tag" size="10" /></label>
 	                        </form>
 	                {/if}
-		{else}
-			Login
                 {/if}
 	</div> <!-- /nav -->
 	{/if}

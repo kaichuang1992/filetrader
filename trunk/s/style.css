@@ -139,3 +139,10 @@ img {
         -moz-border-radius: 10px;
         border: 1px solid #000;
 }
+
+form.change_view {
+	float: right;
+	margin-top: -10px;
+	margin-right: -10px;
+	padding: 0;
+}
