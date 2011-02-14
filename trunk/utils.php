@@ -237,6 +237,7 @@ function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
         $metaData['fileDate'] = filemtime($file);
         $metaData['fileGroups'] = array ();
 	$metaData['fileDescription'] = '';
+	$metaData['fileLicense'] = 'none';
 	$metaData['fileTags'] = array();
 
         /* MIME-Type */
@@ -247,4 +248,5 @@ function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
 		analyzeMediaFile($metaData, $filePath, $cachePath);
 	}
 }
+
 ?>
