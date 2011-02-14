@@ -21,7 +21,7 @@
 class Files {
 
 	var $licenses = array(
-		'none' => 'None',
+		'none' => 'Unspecified',
 	        'cc3-by' => 'Creative Commons 3.0 BY (Attribution)',
 	        'cc3-by-sa' => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)');
 
