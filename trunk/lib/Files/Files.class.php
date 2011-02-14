@@ -82,13 +82,13 @@ class Files {
                 $tag    = getRequest("tag", FALSE, 0);
                 $group  = getRequest("group", FALSE, 0);
 
-
 		$info = $this->storage->get($id)->body;
-		if ($info->fileOwner !== $this->auth->getUserId())
+
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE)
 			throw new Exception("access denied");
+
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('userGroups', $this->auth->getUserGroups());
-
 
                 $this->smarty->assign('view', $view);
                 $this->smarty->assign('group', $group);
@@ -104,8 +104,11 @@ class Files {
                 $group  = getRequest("group", FALSE, 0);
 
                 $info = $this->storage->get($id)->body;
-                if ($info->fileOwner !== $this->auth->getUserId())
+
+
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
                         throw new Exception("access denied");
+
                 $this->smarty->assign('fileInfo', var_export($info, TRUE));
                 $this->smarty->assign('view', $view);
                 $this->smarty->assign('group', $group);
@@ -192,11 +195,11 @@ class Files {
 
         function downloadFile() {
                 $id = getRequest("id", TRUE);
-                // $token = getRequest("token", FALSE, 0);
                 $info = $this->storage->get($id)->body;
 
-                /* FIXME: memberOfGroups and token only if said support is enabled! */
-                if ($info->fileOwner === $this->auth->getUserId()) {
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
+                        throw new Exception("access denied");
+
                         $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 
                         if (!is_file($filePath))
@@ -213,9 +216,6 @@ class Files {
                         $dl->setContentType($finfo->file($filePath));
                         $dl->send();
                         exit (0);
-                } else {
-                        throw new Exception("access denied");
-                }
         }
 
 	function getCacheObject() {
@@ -225,7 +225,10 @@ class Files {
                 $validTypes = array('thumbnail_90', 'thumbnail_180','thumbnail_360', 'transcode_360');
 
                 $info = $this->storage->get($id)->body;
-                if ($info->fileOwner === $this->auth->getUserId()) {
+
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
+                        throw new Exception("access denied");
+
 			if(!in_array($type, $validTypes))
 				throw new Exception("invalid cache type");
 
@@ -246,9 +249,6 @@ class Files {
                         $dl->setContentType($finfo->file($file));
                         $dl->send();
                         exit (0);
-                } else {
-                        throw new Exception("access denied");
-                }
 	}
 
 	function handleUpload() {

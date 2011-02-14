@@ -57,6 +57,23 @@ class SSPAuth extends Auth {
 	function logout($url = NULL) {
 		parent::logout(NULL);
 		$this->ssp->logout($url);
-	}		
+	}
+
+	/* Temp Hack! */
+        function getUserGroups() {
+                if ($this->isLoggedIn())
+			if($this->getUserId() == "fkooman") {
+	                        return array ('fk123' => 'FK Private',
+        	                              'sh123' => 'Shared');
+			}else if($this->getUserId() == "katja") {
+				return array ('ka123' => 'KA Private',
+                                              'sh123' => 'Shared');
+			}else {
+				return array();
+			}
+                else
+                        throw new Exception("not logged in");
+        }
+	/* End of Temp Hack! */
 }
 ?>

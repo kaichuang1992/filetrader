@@ -86,7 +86,10 @@ abstract class Auth {
 				return array();
 			}
 			$userGroups = $this->getUserGroups();
-			return array_intersect(array_keys($userGroups), $groups);
+			$intersect = array_intersect(array_keys($userGroups), $groups);
+			if(empty($intersect))
+				return FALSE;
+			return array_values($intersect);
 		} else {
 			throw new Exception("not logged in");
 		}

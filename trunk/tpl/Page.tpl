@@ -41,7 +41,7 @@
 <div id="content">
         {if $error}
                 <div id="error">
-                        <p>Error: {$errorMessage}</p>
+                        <p><strong>Error</strong>: {$errorMessage}</p>
                 </div> <!-- /error -->
         {else}
 		{$container}
