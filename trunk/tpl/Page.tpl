@@ -12,13 +12,17 @@
 <body>
 	<div id="header">
 	        {if $authenticated}
-	                <ul><li><a href="?action=showFiles&view={$view}">Home</a></li></ul>
+	                <ul>
+				<li><a href="?action=showFiles">Home</a></li>
+				<li><a href="?action=fileUpload">Upload</a></li>
+			</ul>
 		        <span class="right"><span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a></span>
 		{else}
 			<span class="left">FileTrader</span>
 		{/if}
         </div> <!-- /header -->
-
+	
+	{if $action == 'showFiles'}
 	<div id="nav">
                 {if $authenticated}
 	                <form method="get" class="change_group left">
@@ -41,6 +45,7 @@
 			Login
                 {/if}
 	</div> <!-- /nav -->
+	{/if}
 
 <div id="content">
         {if $error}
