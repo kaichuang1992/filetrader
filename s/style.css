@@ -72,10 +72,15 @@ body {
 	margin: 0;
 }
 
-#header li {
+#header ul li {
 	list-style: none;
 	margin: 0;
+	display: inline;
 	padding: 0;
+}
+
+#header ul li:before {
+	content: "» ";
 }
 
 #footer {
