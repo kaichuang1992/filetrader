@@ -20,6 +20,11 @@
 
 class Files {
 
+	var $licenses = array(
+		'none' => 'None',
+	        'cc3-by' => 'Creative Commons 3.0 BY (Attribution)',
+	        'cc3-by-sa' => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)');
+
 	var $config;
 	var $storage;
 	var $auth;
@@ -87,6 +92,7 @@ class Files {
 
                 $this->smarty->assign('view', $view);
                 $this->smarty->assign('group', $group);
+		$this->smarty->assign('licenses', $this->licenses);
 
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
@@ -144,6 +150,7 @@ class Files {
 		$fileName = getRequest('fileName', FALSE, $info->fileName); 
                 $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
                 $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
+		$fileLicense = getRequest('fileLicense', FALSE, 'none');
 		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */
@@ -169,6 +176,10 @@ class Files {
 
 		/* Groups */
 		$info->fileGroups = $this->auth->memberOfGroups($fileGroups);
+
+		if(!array_key_exists($fileLicense, $this->licenses))
+			throw new Exception("invalid license specified");
+		$info->fileLicense = $fileLicense;
 
                 $this->storage->put($id, $info);
 		return $this->fileInfo();
