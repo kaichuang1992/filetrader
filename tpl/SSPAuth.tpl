@@ -1,4 +1,5 @@
 <div class="login">
+	<h2>Login</h2>
 	<p>You can login using the account provided to you by your organization.</p>
 
 	<form method="post">
