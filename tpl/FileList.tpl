@@ -24,7 +24,7 @@
 						<td><a href="?action=downloadFile&amp;id={$f->value->_id}">{$f->value->fileName}</a></td>
 						<td>{$f->value->fileSize|to_human_size}</td>
 						<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
-						<td><a href="?action=fileInfo&id={$f->value->_id}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
+						<td><a href="?action=fileInfo&id={$f->value->_id}&amp;group={$group}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
 					</tr>
 			                {/foreach}
 					</table>
