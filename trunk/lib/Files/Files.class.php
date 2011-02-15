@@ -41,8 +41,11 @@ class Files {
 		$userId = $this->auth->getUserId();
 
                 $view   = getRequest("view", FALSE, "FileList");
-                $tag    = getRequest("tag", FALSE, 0);
+                $tag    = getRequest("tag", FALSE, FALSE);
                 $group  = getRequest("group", FALSE, 0);
+
+		if(is_numeric($group))
+			$group = (int) $group;
 
                 $skip   = getRequest("skip", FALSE, 0);
 
@@ -51,14 +54,27 @@ class Files {
 
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
 
-		if($tag && !$group) {
+		/*
+		 * FIXME: this is a bit ugly, group identifiers cannot be numeric, but
+		 *        this was a requirement anyway for broken CouchDB? 
+		 *
+		 * $group === 0		--> Private Files
+		 * $group === 1		--> Public Files
+		 */
+		if($tag !== FALSE && $group === 0) {
 			$query = "_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
-		} elseif (!$tag && !$group) {
+		} elseif ($tag === FALSE && $group === 0) {
 			$query =     "_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
-		} elseif ($tag && $group) {
+                } else if($tag !== FALSE && $group === 1) {
+                        $query = "_design/files/_view/get_public_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"".strtoupper($tag)."\",{}]&endkey=[\"".strtolower($tag)."\"]";
+                } elseif ($tag === FALSE && $group === 1) {
+                        $query =     "_design/files/_view/get_public_files?limit=$limit&skip=$skip&descending=true"; 
+		} elseif ($tag !== FALSE) {
                         $query = "_design/files/_view/get_group_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",\"".strtoupper($tag)."\",{}]&endkey=[\"$group\",\"".strtolower($tag)."\"]";
-		} elseif (!$tag && $group) {
+		} elseif ($tag === FALSE) {
                         $query =     "_design/files/_view/get_group_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
+		} else {
+			throw new Exception("tag, group confusion, does not match a pattern?");
 		}
                 $files = $this->storage->get($query)->body->rows;
 

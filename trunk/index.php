@@ -104,7 +104,7 @@ try {
 
 $smarty->assign('action', $action);
 $smarty->assign('authenticated', $auth->isLoggedIn());
-$smarty->assign('groups', array(0 => 'My Files', 'Group' => $auth->getUserGroups()));
+$smarty->assign('groups', array(0 => 'My Files', 1 => 'Public Files', 'Group' => $auth->getUserGroups()));
 $smarty->assign('group', getRequest("group", FALSE, 0));
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());

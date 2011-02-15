@@ -1,0 +1,7 @@
+function (doc) {
+	if (doc.type == 'file' && doc.fileTags && doc.fileDate && doc.filePublic) {
+		doc.fileTags.forEach(function (tag) {
+			emit([tag, doc.fileDate], doc);
+		});
+	}
+}
