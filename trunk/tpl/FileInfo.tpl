@@ -42,7 +42,9 @@
 			<tr><th>License</th><td>{html_options name='fileLicense' options=$licenses selected=$fileInfo->fileLicense}</td></tr>
 			<tr><th>Description</th><td><textarea name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea></td></tr>
 			{if !empty($userGroups)}
-				<tr><th>Groups</th><td>{html_checkboxes name='fileGroups' options=$userGroups selected=$fileInfo->fileGroups}</td></tr>
+			<tr><th>Sharing</th><td>
+				<label><input class="share_public" type="checkbox" name="filePublic" {if $fileInfo->filePublic} checked="checked" {/if}><strong>Public</strong></label>
+				{html_checkboxes class='share_group' name='fileGroups' options=$userGroups selected=$fileInfo->fileGroups}</td></tr>
 			{/if}
 			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
 			</table>
