@@ -84,7 +84,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE)
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', $info);
@@ -105,8 +105,7 @@ class Files {
 
                 $info = $this->storage->get($id)->body;
 
-
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
                         throw new Exception("access denied");
 
                 $this->smarty->assign('fileInfo', var_export($info, TRUE));
@@ -207,7 +206,7 @@ class Files {
                 $id = getRequest("id", TRUE);
                 $info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic) 
                         throw new Exception("access denied");
 
                         $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
@@ -236,7 +235,7 @@ class Files {
 
                 $info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE) 
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
                         throw new Exception("access denied");
 
 			if(!in_array($type, $validTypes))
