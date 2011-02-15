@@ -154,6 +154,8 @@ class Files {
                 $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
                 $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
 		$fileLicense = getRequest('fileLicense', FALSE, 'none');
+		$filePublic = getRequest('filePublic', FALSE, 'off');
+
 		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */
@@ -180,9 +182,17 @@ class Files {
 		/* Groups */
 		$info->fileGroups = $this->auth->memberOfGroups($fileGroups);
 
+		/* License */
 		if(!array_key_exists($fileLicense, $this->licenses))
 			throw new Exception("invalid license specified");
 		$info->fileLicense = $fileLicense;
+
+		/* Public */
+		if($filePublic === 'on') {
+			$info->filePublic = TRUE;
+		} else {
+			$info->filePublic = FALSE;
+		}
 
                 $this->storage->put($id, $info);
 		return $this->fileInfo();
