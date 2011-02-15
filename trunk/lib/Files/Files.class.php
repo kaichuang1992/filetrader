@@ -44,6 +44,9 @@ class Files {
                 $tag    = getRequest("tag", FALSE, FALSE);
                 $group  = getRequest("group", FALSE, 0);
 
+		if(empty($tag))
+			$tag = FALSE;
+
 		if(is_numeric($group))
 			$group = (int) $group;
 
