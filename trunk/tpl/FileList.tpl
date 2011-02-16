@@ -10,13 +10,6 @@
                                 	<label>View {html_options class="change_view" name=view options=$views selected=$view}</label>
 				</form>
 
-				{if $skip - $limit >= 0}
-					<span class="left"><a href="?action=showFiles&view={$view}&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
-				{/if}
-				{if $skip + $limit < $no_of_files}
-					<span class="right"><a href="?action=showFiles&view={$view}&skip={$skip+$limit}"><img src="i/resultset_next.png" alt="Next Page"></a></span>
-				{/if}
-
 				{if $view == 'FileList'}	
 					<table>
 			                {foreach $files as $f}
@@ -50,4 +43,12 @@
 		                        {/foreach}
 		                        </table>
 				{/if}
+
+                                {if $skip - $limit >= 0}
+                                        <span class="left"><a href="?action=showFiles&view={$view}&tag={$tag}&group={$group}&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
+                                {/if}
+                                {if $skip + $limit < $no_of_files}
+                                        <span class="right"><a href="?action=showFiles&view={$view}&tag={$tag}&group={$group}&skip={$skip+$limit}"><img src="i/resultset_next.png" alt="Next Page"></a></span>
+                                {/if}
+
 			{/if}

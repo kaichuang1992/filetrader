@@ -65,23 +65,26 @@ class Files {
 		 * $group === 1		--> Public Files
 		 */
 		if($tag !== FALSE && $group === 0) {
-			$query = "_design/files/_view/get_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
+			$query = "_design/files/_view/get_files_tag?descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
 		} elseif ($tag === FALSE && $group === 0) {
-			$query =     "_design/files/_view/get_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
+			$query =     "_design/files/_view/get_files?descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
                 } else if($tag !== FALSE && $group === 1) {
-                        $query = "_design/files/_view/get_public_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"".strtoupper($tag)."\",{}]&endkey=[\"".strtolower($tag)."\"]";
+                        $query = "_design/files/_view/get_public_files_tag?descending=true&startkey=[\"".strtoupper($tag)."\",{}]&endkey=[\"".strtolower($tag)."\"]";
                 } elseif ($tag === FALSE && $group === 1) {
-                        $query =     "_design/files/_view/get_public_files?limit=$limit&skip=$skip&descending=true"; 
+                        $query =     "_design/files/_view/get_public_files?descending=true"; 
 		} elseif ($tag !== FALSE) {
-                        $query = "_design/files/_view/get_group_files_tag?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",\"".strtoupper($tag)."\",{}]&endkey=[\"$group\",\"".strtolower($tag)."\"]";
+                        $query = "_design/files/_view/get_group_files_tag?descending=true&startkey=[\"$group\",\"".strtoupper($tag)."\",{}]&endkey=[\"$group\",\"".strtolower($tag)."\"]";
 		} elseif ($tag === FALSE) {
-                        $query =     "_design/files/_view/get_group_files?limit=$limit&skip=$skip&descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
+                        $query =     "_design/files/_view/get_group_files?descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
 		} else {
 			throw new Exception("tag, group confusion, does not match a pattern?");
 		}
-                $files = $this->storage->get($query)->body->rows;
-
-		$noOfFiles = sizeof($files);		// SHOULD BE WITHOUT LIMIT AND SKIP OPTIONS
+                $files = $this->storage->get($query . "&limit=$limit&skip=$skip&reduce=false")->body->rows;
+		if(sizeof($files)>0) {
+	                $noOfFiles = $this->storage->get($query)->body->rows[0]->value;
+		} else {
+			$noOfFiles = 0;
+		}
 
                 $this->smarty->assign('files', $files);
 		$this->smarty->assign('skip', $skip);
