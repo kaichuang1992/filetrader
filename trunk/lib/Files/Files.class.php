@@ -143,18 +143,21 @@ class Files {
 
 		/* delete the file from the file system */
 		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-		unlink($filePath);
+		if(is_file($filePath))
+			unlink($filePath);
 
 		/* delete the cache objects belonging to this file from the file system */
 		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
                 if(isset($info->video->transcode)) {
 			foreach($info->video->transcode as $k => $v) {
-				unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+				if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+					unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
 			}
 		}
 		if(isset($info->video->thumbnail)) {
 	                foreach($info->video->thumbnail as $k => $v) {
-        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+				if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+	        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
 			}
 		}
 
