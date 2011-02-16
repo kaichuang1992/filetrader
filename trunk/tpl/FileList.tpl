@@ -35,10 +35,14 @@
 		                                <tr>
                 		                        <td class="thumbnail"><a href="?action=fileInfo&amp;id={$f->value->_id}"><img width="{$f->value->video->thumbnail->{90}->width}" height="90" src="?action=getCacheObject&amp;id={$f->value->_id}&type=thumbnail_90" /></a></td>
 		                                        <td>
-		                                                <strong>{$f->value->fileName}</strong><br/>
-		                                                {$f->value->video->duration|to_duration}<br/>
-		                                                {$f->value->fileDate|date_format:"%d %b  %H:%M"}<br/>
-		                                                Transcode Status: <strong>{$f->value->video->transcodeStatus}</strong><br/>
+		                                                <strong>{$f->value->fileName}</strong>
+								<br/>{$f->value->video->duration|to_duration}
+		                                                <br/>{$f->value->fileDate|date_format:"%d %b  %H:%M"}
+								<br/>
+								{if $f->value->fileLicense != 'none'}
+									<img src="i/{$f->value->fileLicense}.png" alt="{$f->value->fileLicense}" />
+								{/if}
+<!--		                                                <br/>Transcode Status: <strong>{$f->value->video->transcodeStatus}</strong> -->
 		                                        </td>
 		                                        <td>{$f->value->fileDescription}</td>
 		                                </tr>
