@@ -13,7 +13,7 @@ The following external PHP libraries are required:
 Library         Version         License         URL
                 Tested
 -------------------------------------------------------------------------------
-Smarty		3.0.6		LGPL2 or 3?	http://www.smarty.net
+Smarty		3.0.7		LGPL2 or 3?	http://www.smarty.net
 Sag PHP		0.3.0		ASL2.0		http://www.saggingcouch.com/
 
 # If you want to use the authentication backend:
