@@ -77,7 +77,6 @@ try {
 	}
 
 	if (!in_array($action, array (
-			'deleteFile',
 			'downloadFile',
 			'fileInfo',
 			'fileUpload',

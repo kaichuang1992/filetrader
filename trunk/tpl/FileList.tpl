@@ -10,10 +10,13 @@
                                 	<label>View {html_options class="change_view" name=view options=$views selected=$view}</label>
 				</form>
 
+				<form method="post">
+				<input type="hidden" name="action" value="updateFileInfo">
 				{if $view == 'FileList'}	
 					<table>
 			                {foreach $files as $f}
 					<tr>
+						<td><input type="checkbox" name="markedFiles[]" value="{$f->value->_id}" /></td>
 						<td><a href="?action=downloadFile&amp;id={$f->value->_id}">{$f->value->fileName}</a></td>
 						<td>{$f->value->fileSize|to_human_size}</td>
 						<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
@@ -43,6 +46,8 @@
 		                        {/foreach}
 		                        </table>
 				{/if}
+				<input type="submit" value="Delete Files" name="buttonPressed">
+				</form>
 
                                 {if $skip - $limit >= 0}
                                         <span class="left"><a href="?action=showFiles&view={$view}&tag={$tag}&group={$group}&skip={$skip-$limit}"><img src="i/resultset_previous.png" alt="Previous Page"></a></span>
