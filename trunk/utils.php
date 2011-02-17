@@ -191,6 +191,8 @@ function getProtocol() {
 		                                	$fc = (int) ($media->getFrameCount() / 32);
 							/* frame count is not necessarily reliable! */
 							foreach (array($fc, 100, 10, 1) as $fno) {
+								if($fno == 0)
+									continue;
 				                                $f = $media->getFrame($fno);
 								if($f !== FALSE) {
 	                                                                $sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);
