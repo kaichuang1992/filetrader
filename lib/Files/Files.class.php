@@ -137,38 +137,65 @@ class Files {
                 return $this->smarty->fetch('RawFileInfo.tpl');
 	}
 
-	function deleteFile() {
-		$id = getRequest("id", TRUE);
-                $info = $this->storage->get($id)->body;
-                if ($info->fileOwner !== $this->auth->getUserId())
-                        throw new Exception("access denied");
-		logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
+	function deleteFiles($filesToDelete = NULL) {
+		if(!is_array($filesToDelete))
+			throw new Exception("should be array");
+		
+		foreach($filesToDelete as $id) { 
+	                $info = $this->storage->get($id)->body;
+	                if ($info->fileOwner !== $this->auth->getUserId())
+	                        throw new Exception("access denied");
+			logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
 
-		/* delete the file from the file system */
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-		if(is_file($filePath))
-			unlink($filePath);
+			/* delete the file from the file system */
+			$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
+			if(is_file($filePath))
+				unlink($filePath);
 
-		/* delete the cache objects belonging to this file from the file system */
-		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-                if(isset($info->video->transcode)) {
-			foreach($info->video->transcode as $k => $v) {
-				if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
-					unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+			/* delete the cache objects belonging to this file from the file system */
+			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+	                if(isset($info->video->transcode)) {
+				foreach($info->video->transcode as $k => $v) {
+					if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+						unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+				}
 			}
-		}
-		if(isset($info->video->thumbnail)) {
-	                foreach($info->video->thumbnail as $k => $v) {
-				if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
-	        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+			if(isset($info->video->thumbnail)) {
+		                foreach($info->video->thumbnail as $k => $v) {
+					if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+		        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+				}
 			}
+	
+			$this->storage->delete($id, $info->_rev);
 		}
-
-		$this->storage->delete($id, $info->_rev);
 		return $this->showFiles();
 	}
 
         function updateFileInfo() {
+		$button = getRequest("buttonPressed", TRUE);
+
+		switch($button) {
+
+                        /* called from the {File,Media}List page */
+                        case "Delete Files":
+                                $markedFiles = getRequest("markedFiles", FALSE, array());
+                                return $this->deleteFiles($markedFiles);
+
+			/* called from the FileInfo page */
+			case "Delete":
+				$id = getRequest("id", TRUE);
+                                return $this->deleteFiles(array($id));
+
+			/* called from the FileInfo page */
+			case "Update":
+				/* continue with the rest of the function */
+				break;
+
+			default:
+				throw new Exception("invalid button type");
+		}
+	
                 $id = getRequest("id", TRUE);
                 $info = $this->storage->get($id)->body;
                 if ($info->fileOwner !== $this->auth->getUserId())
@@ -177,9 +204,8 @@ class Files {
 		$fileName = getRequest('fileName', FALSE, $info->fileName); 
                 $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
                 $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
-		$fileLicense = getRequest('fileLicense', FALSE, 'none');
+		$fileLicense = getRequest('fileLicense', FALSE, $info->fileLicense);
 		$filePublic = getRequest('filePublic', FALSE, 'off');
-
 		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */

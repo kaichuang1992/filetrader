@@ -46,14 +46,11 @@
 				<label><input class="share_public" type="checkbox" name="filePublic" {if $fileInfo->filePublic} checked="checked" {/if}><strong>Public</strong></label>
 				{html_checkboxes class='share_group' name='fileGroups' options=$userGroups selected=$fileInfo->fileGroups}</td></tr>
 			{/if}
-			<tr><td colspan="2"><input type="submit" value="Update"></td></tr>
+			<tr><td colspan="2">
+				<input type="submit" value="Update" name="buttonPressed">
+                                <input type="submit" value="Delete" name="buttonPressed">
+			</td></tr>
 			</table>
-			</form>
-
-                        <form method="post">
-                        <input type="hidden" name="id" value="{$fileInfo->_id}" />
-                        <input type="hidden" name="action" value="deleteFile">
-			<input type="submit" value="Delete">
 			</form>
 
                         <p><small>[DEBUG] <a href="?action=rawFileInfo&amp;id={$fileInfo->_id}">Raw File Info</a></small></p>
