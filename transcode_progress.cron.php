@@ -36,28 +36,54 @@ $storage = new Sag();
 $storage->setDatabase($dbName);
 
 do { 
-	$toTranscode = $storage->get("_design/files/_view/get_video_status?limit=1&startkey=[\"WAITING\"]&endkey=[\"WAITING\",{}]")->body->rows;
+	$transcodingNow = $storage->get("_design/files/_view/get_video_status?limit=1&startkey=[\"PROGRESS\"]&endkey=[\"PROGRESS\",{}]")->body->rows;
 
-	if(!empty($toTranscode)) {
-		$t = $toTranscode[0];
+	if(!empty($transcodingNow)) {
+		$t = $transcodingNow[0];
 		$id = $t->id;
 
 	 	$info = $storage->get($id)->body;
-		$info->video->transcodeStatus = 'PROGRESS';
-	        $storage->put($id, $info);
 
-		$fileOwner = $info->fileOwner;
-		$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
-		$newSize = $info->video->transcode->$videoHeight->width . "x" . $videoHeight;
-		// -vf transpose=1   (for rotating clockwise 90 degrees)
-		$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 -y $transcodeFileName";
-	
-	        execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
-	
-	        $info = $storage->get($id)->body;
-		$info->video->transcodeStatus = 'DONE';
+		// read log file
+		echo "Progress: $info->fileName\n";
+		$progress = determineProgress($info->video->transcode->$videoHeight->file . ".log", $info->video->duration);
+
+		// set progress indicator
+
+		$info->video->transcodeProgress = $progress;
 	        $storage->put($id, $info);
 	}
-}while(!empty($toTranscode));
+	sleep(10);
+}while(!empty($transcodingNow));
+
+function determineProgress($logFile, $videoDuration) {
+	$fp = fopen("data/$logFile", 'r');
+
+	$pos = -1; $line = ''; $c = '';
+	do {
+    		$line = $c . $line;
+    		fseek($fp, $pos--, SEEK_END);
+   		$c = fgetc($fp);
+	} while (strpos($line, 'frame') === FALSE);
+
+	//$line = substr($line, 0, $eol);
+	preg_match("/time=([0-9]+\.[0-9]+)/s", $line, $matches);
+
+	$elapsedTime = (int) $matches[1];
+	
+	//var_dump($matches);
+	//echo $elapsedTime . "\n";
+
+	$progress = (int)  ($elapsedTime / $videoDuration * 100);
+
+	
+	//echo trim($line);
+	echo $progress . "\n";
+
+	fclose($fp);
+	//return $line;
+
+	return $progress;
+}
+
 ?>

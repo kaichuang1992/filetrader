@@ -157,7 +157,8 @@ function getProtocol() {
                         case "video/quicktime":
                         case "application/ogg":
                         case "video/mp4":
-                        case "video/ogg":
+			case "video/x-msvideo":
+			case "video/ogg":
                         case "video/webm":
                         case "video/x-ms-asf":
 			case "application/octet-stream":
