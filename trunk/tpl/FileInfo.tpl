@@ -38,6 +38,15 @@
 			<table class="fileInfo">
 			<tr><th>Name</th><td><input type="text" size="50" name="fileName" value="{$fileInfo->fileName}"/></td></tr>
 			<tr><th>Size</th><td>{$fileInfo->fileSize|to_human_size}</td></tr>
+			{if isset($fileInfo->video)}
+				{if $fileInfo->video->transcodeStatus != 'DONE'}
+					<tr><th>Transcoding</th>
+					<td>{$fileInfo->video->transcodeStatus}
+						{if $fileInfo->video->transcodeStatus == 'PROGRESS'}
+							(<strong>{$fileInfo->video->transcodeProgress}%</strong>)
+						{/if}</td></tr>
+				{/if}
+			{/if}
 			<tr><th>Tags</th><td><input type="text" size="50" name="fileTags" value="{', '|implode:$fileInfo->fileTags}" /></td></tr>
 			<tr><th>License</th><td>{html_options name='fileLicense' options=$licenses selected=$fileInfo->fileLicense}</td></tr>
 			<tr><th>Description</th><td><textarea name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea></td></tr>

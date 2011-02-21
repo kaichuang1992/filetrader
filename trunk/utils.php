@@ -211,6 +211,8 @@ function getProtocol() {
 					// Schedule for transcoding to WebM
 					if($media->hasVideo()) {
                                                 $metaData['video']['transcodeStatus'] = 'WAITING';
+                                                $metaData['video']['transcodeProgress'] = 0;
+
                                                 foreach($transcodeSizes as $tS) {
 							$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
                                                         $sV = scaleVideo(array($media->getFrameWidth(), $media->getFrameHeight()), $tS);

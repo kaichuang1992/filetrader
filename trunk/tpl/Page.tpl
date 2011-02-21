@@ -28,7 +28,7 @@
 	                <form method="get" class="change_group left">
 	                        <input type="hidden" name="action" value="showFiles">
 	                        <input type="hidden" name="view" value="{$view}">
-	                        <label>Collection {html_options name=group class=change_group options=$groups selected=$group}</label>
+	                        <label>List {html_options name=group class=change_group options=$groups selected=$group}</label>
         	        </form>
 
 	                {if $action == 'showFiles'}
