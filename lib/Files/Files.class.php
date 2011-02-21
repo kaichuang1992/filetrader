@@ -172,20 +172,42 @@ class Files {
 		return $this->showFiles();
 	}
 
+	function confirmDelete($filesToDelete = NULL) {
+                if(!is_array($filesToDelete))
+                        throw new Exception("should be array");
+
+  		$deleteList = array();
+	        foreach($filesToDelete as $id) {
+       	                $info = $this->storage->get($id)->body;
+                        if ($info->fileOwner !== $this->auth->getUserId())
+                                throw new Exception("access denied");
+			$deleteList[$info->_id] = $info->fileName;
+		}
+
+       	        $this->smarty->assign('deleteList', $deleteList);
+		$this->smarty->assign('markedFiles', $filesToDelete);
+                $content = $this->smarty->fetch('ConfirmDelete.tpl');
+       	        return $content;
+	}	
+
         function updateFileInfo() {
 		$button = getRequest("buttonPressed", TRUE);
 
 		switch($button) {
-
                         /* called from the {File,Media}List page */
                         case "Delete Files":
                                 $markedFiles = getRequest("markedFiles", FALSE, array());
-                                return $this->deleteFiles($markedFiles);
+                                return $this->confirmDelete($markedFiles);
 
 			/* called from the FileInfo page */
 			case "Delete":
 				$id = getRequest("id", TRUE);
-                                return $this->deleteFiles(array($id));
+                                return $this->confirmDelete(array($id));
+
+			/* called from the ConfirmDelete page */
+			case "Confirm Delete":
+                                $markedFiles = getRequest("markedFiles", FALSE, array());
+                                return $this->deleteFiles($markedFiles);
 
 			/* called from the FileInfo page */
 			case "Update":
