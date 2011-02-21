@@ -13,7 +13,7 @@
 				  <!-- Begin VideoJS -->
 				  <div class="video-js-box">
 				    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-				    <video id="video_1" class="video-js" width="640" height="360" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=thumbnail_360">
+				    <video id="video_1" class="video-js" width="{$fileInfo->video->transcode->{360}->width}" height="360" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=thumbnail_360">
 				      <source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=transcode_360" type='video/webm; codecs="vp8, vorbis"' />
 				    </video>
 				    <!-- Download links provided for devices that can't play video in the browser. -->
