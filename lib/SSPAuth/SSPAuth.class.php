@@ -18,62 +18,67 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once(getConfig($config, 'ssp_path', TRUE) . '/lib/_autoload.php');
+require_once (getConfig($config, 'ssp_path', TRUE) . '/lib/_autoload.php');
 
 class SSPAuth extends Auth {
 	var $ssp;
 
 	function __construct($config) {
-		parent::__construct($config);
+		parent :: __construct($config);
 		$this->ssp = new SimpleSAML_Auth_Simple(getConfig($this->config, 'ssp_sp', TRUE));
 	}
 
 	function login() {
-		if($this->isLoggedIn())
+		if ($this->isLoggedIn())
 			return;
 
-			if(isset($_POST['sspProceed'])) {
-		
-				$this->ssp->requireAuth();
-				$attr = $this->ssp->getAttributes();
+		if (isset ($_POST['sspProceed'])) {
 
-       			        $_SESSION['userId'] = $attr[getConfig($this->config, 'ssp_uid_attr', TRUE)][0];
-				$_SESSION['userAttr'] = $attr;
-				$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'ssp_dn_attr', TRUE)][0];
-				return;
-			}
+			$this->ssp->requireAuth();
+			$attr = $this->ssp->getAttributes();
 
-                $smarty = new Smarty();
-                $smarty->template_dir = 'tpl';
-                $smarty->compile_dir = 'tpl_c';
-                $smarty->assign('authenticated', FALSE);
-                $smarty->assign('error', FALSE);
-                $smarty->assign('container', $smarty->fetch('SSPAuth.tpl'));
+			$_SESSION['userId'] = $attr[getConfig($this->config, 'ssp_uid_attr', TRUE)][0];
+			$_SESSION['userAttr'] = $attr;
+			$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'ssp_dn_attr', TRUE)][0];
+			return;
+		}
+
+		$smarty = new Smarty();
+		$smarty->template_dir = 'tpl';
+		$smarty->compile_dir = 'tpl_c';
+		$smarty->assign('authenticated', FALSE);
+		$smarty->assign('error', FALSE);
+		$smarty->assign('container', $smarty->fetch('SSPAuth.tpl'));
 		$smarty->assign('action', NULL);
-                $smarty->display('Page.tpl');
-                exit (0);
+		$smarty->display('Page.tpl');
+		exit (0);
 	}
 
 	function logout($url = NULL) {
-		parent::logout(NULL);
+		parent :: logout(NULL);
 		$this->ssp->logout($url);
 	}
 
 	/* Temp Hack! */
-        function getUserGroups() {
-                if ($this->isLoggedIn())
-			if($this->getUserId() == "fkooman") {
-	                        return array ('fk123' => 'FK Private',
-        	                              'sh123' => 'Shared');
-			}else if($this->getUserId() == "katja") {
-				return array ('ka123' => 'KA Private',
-                                              'sh123' => 'Shared');
-			}else {
-				return array();
-			}
-                else
-                        throw new Exception("not logged in");
-        }
+	function getUserGroups() {
+		if ($this->isLoggedIn())
+			if ($this->getUserId() == "fkooman") {
+				return array (
+					'fk123' => 'FK Private',
+					'sh123' => 'Shared'
+				);
+			} else
+				if ($this->getUserId() == "katja") {
+					return array (
+						'ka123' => 'KA Private',
+						'sh123' => 'Shared'
+					);
+				} else {
+					return array ();
+				}
+		else
+			throw new Exception("not logged in");
+	}
 	/* End of Temp Hack! */
 }
 ?>

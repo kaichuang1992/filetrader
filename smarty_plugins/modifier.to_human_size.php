@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Smarty plugin
  * -------------------------------------------------------------
@@ -8,18 +9,17 @@
  * Purpose:  convert byte to human readable size
  * -------------------------------------------------------------
  */
-function smarty_modifier_to_human_size($bytes = 0)
-{
-        $kilobyte = 1024;
-        $megabyte = $kilobyte * $kilobyte;
-        $gigabyte = $megabyte * $megabyte;
+function smarty_modifier_to_human_size($bytes = 0) {
+	$kilobyte = 1024;
+	$megabyte = $kilobyte * $kilobyte;
+	$gigabyte = $megabyte * $megabyte;
 
-        if ($bytes > $gigabyte)
-                return (int) ($bytes / $gigabyte) . "GB";
-        if ($bytes > $megabyte)
-                return (int) ($bytes / $megabyte) . "MB";
-        if ($bytes > $kilobyte)
-                return (int) ($bytes / $kilobyte) . "kB";
-        return $bytes;
+	if ($bytes > $gigabyte)
+		return (int) ($bytes / $gigabyte) . "GB";
+	if ($bytes > $megabyte)
+		return (int) ($bytes / $megabyte) . "MB";
+	if ($bytes > $kilobyte)
+		return (int) ($bytes / $kilobyte) . "kB";
+	return $bytes;
 }
 ?>

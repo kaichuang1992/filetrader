@@ -20,10 +20,11 @@
 
 class Files {
 
-	var $licenses = array(
+	var $licenses = array (
 		'none' => 'Unspecified',
-	        'cc3-by' => 'Creative Commons 3.0 BY (Attribution)',
-	        'cc3-by-sa' => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)');
+		'cc3-by' => 'Creative Commons 3.0 BY (Attribution)',
+		'cc3-by-sa' => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)'
+	);
 
 	var $config;
 	var $storage;
@@ -37,22 +38,25 @@ class Files {
 		$this->smarty = $smarty;
 	}
 
-        function showFiles() {
+	function showFiles() {
 		$userId = $this->auth->getUserId();
 
-                $view   = getRequest("view", FALSE, "FileList");
-                $tag    = getRequest("tag", FALSE, FALSE);
-                $group  = getRequest("group", FALSE, 0);
+		$view = getRequest("view", FALSE, "FileList");
+		$tag = getRequest("tag", FALSE, FALSE);
+		$group = getRequest("group", FALSE, 0);
 
-		if(empty($tag))
+		if (empty ($tag))
 			$tag = FALSE;
 
-		if(is_numeric($group))
+		if (is_numeric($group))
 			$group = (int) $group;
 
-                $skip   = getRequest("skip", FALSE, 0);
+		$skip = getRequest("skip", FALSE, 0);
 
-		if(!in_array($view, array("FileList", "MediaList")))
+		if (!in_array($view, array (
+				"FileList",
+				"MediaList"
+			)))
 			throw new Exception("invalid view");
 
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
@@ -64,178 +68,188 @@ class Files {
 		 * $group === 0		--> Private Files
 		 * $group === 1		--> Public Files
 		 */
-		if($tag !== FALSE && $group === 0) {
-			$query = "_design/files/_view/get_files_tag?descending=true&startkey=[\"$userId\",\"".strtoupper($tag)."\",{}]&endkey=[\"$userId\",\"".strtolower($tag)."\"]";
-		} elseif ($tag === FALSE && $group === 0) {
-			$query =     "_design/files/_view/get_files?descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
-                } else if($tag !== FALSE && $group === 1) {
-                        $query = "_design/files/_view/get_public_files_tag?descending=true&startkey=[\"".strtoupper($tag)."\",{}]&endkey=[\"".strtolower($tag)."\"]";
-                } elseif ($tag === FALSE && $group === 1) {
-                        $query =     "_design/files/_view/get_public_files?descending=true"; 
-		} elseif ($tag !== FALSE) {
-                        $query = "_design/files/_view/get_group_files_tag?descending=true&startkey=[\"$group\",\"".strtoupper($tag)."\",{}]&endkey=[\"$group\",\"".strtolower($tag)."\"]";
-		} elseif ($tag === FALSE) {
-                        $query =     "_design/files/_view/get_group_files?descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
+		if ($tag !== FALSE && $group === 0) {
+			$query = "_design/files/_view/get_files_tag?descending=true&startkey=[\"$userId\",\"" . strtoupper($tag) . "\",{}]&endkey=[\"$userId\",\"" . strtolower($tag) . "\"]";
+		}
+		elseif ($tag === FALSE && $group === 0) {
+			$query = "_design/files/_view/get_files?descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
+		} else
+			if ($tag !== FALSE && $group === 1) {
+				$query = "_design/files/_view/get_public_files_tag?descending=true&startkey=[\"" . strtoupper($tag) . "\",{}]&endkey=[\"" . strtolower($tag) . "\"]";
+			}
+		elseif ($tag === FALSE && $group === 1) {
+			$query = "_design/files/_view/get_public_files?descending=true";
+		}
+		elseif ($tag !== FALSE) {
+			$query = "_design/files/_view/get_group_files_tag?descending=true&startkey=[\"$group\",\"" . strtoupper($tag) . "\",{}]&endkey=[\"$group\",\"" . strtolower($tag) . "\"]";
+		}
+		elseif ($tag === FALSE) {
+			$query = "_design/files/_view/get_group_files?descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
 		} else {
 			throw new Exception("tag, group confusion, does not match a pattern?");
 		}
-                $files = $this->storage->get($query . "&limit=$limit&skip=$skip&reduce=false")->body->rows;
-		if(sizeof($files)>0) {
-	                $noOfFiles = $this->storage->get($query)->body->rows[0]->value;
+		$files = $this->storage->get($query . "&limit=$limit&skip=$skip&reduce=false")->body->rows;
+		if (sizeof($files) > 0) {
+			$noOfFiles = $this->storage->get($query)->body->rows[0]->value;
 		} else {
 			$noOfFiles = 0;
 		}
 
-                $this->smarty->assign('files', $files);
+		$this->smarty->assign('files', $files);
 		$this->smarty->assign('skip', $skip);
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
-		$this->smarty->assign('views', array('FileList'=>'File','MediaList'=>'Media'));
+		$this->smarty->assign('views', array (
+			'FileList' => 'File',
+			'MediaList' => 'Media'
+		));
 		$this->smarty->assign('view', $view);
 		$this->smarty->assign('tag', $tag);
 		$this->smarty->assign('group', $group);
-                $content = $this->smarty->fetch('FileList.tpl');
-                return $content;
-        }
+		$content = $this->smarty->fetch('FileList.tpl');
+		return $content;
+	}
 
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
-                $view   = getRequest("view", FALSE, "FileList");
-                $tag    = getRequest("tag", FALSE, 0);
-                $group  = getRequest("group", FALSE, 0);
+		$view = getRequest("view", FALSE, "FileList");
+		$tag = getRequest("tag", FALSE, 0);
+		$group = getRequest("group", FALSE, 0);
 
 		$info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('userGroups', $this->auth->getUserGroups());
 
-                $this->smarty->assign('view', $view);
-                $this->smarty->assign('group', $group);
+		$this->smarty->assign('view', $view);
+		$this->smarty->assign('group', $group);
 		$this->smarty->assign('licenses', $this->licenses);
 
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
 
 	function rawFileInfo() {
-                $id = getRequest("id", TRUE);
+		$id = getRequest("id", TRUE);
 
-                $view   = getRequest("view", FALSE, "FileList");
-                $group  = getRequest("group", FALSE, 0);
+		$view = getRequest("view", FALSE, "FileList");
+		$group = getRequest("group", FALSE, 0);
 
-                $info = $this->storage->get($id)->body;
+		$info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
-                        throw new Exception("access denied");
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+			throw new Exception("access denied");
 
-                $this->smarty->assign('fileInfo', var_export($info, TRUE));
-                $this->smarty->assign('view', $view);
-                $this->smarty->assign('group', $group);
+		$this->smarty->assign('fileInfo', var_export($info, TRUE));
+		$this->smarty->assign('view', $view);
+		$this->smarty->assign('group', $group);
 
-                return $this->smarty->fetch('RawFileInfo.tpl');
+		return $this->smarty->fetch('RawFileInfo.tpl');
 	}
 
 	function deleteFiles($filesToDelete = NULL) {
-		if(!is_array($filesToDelete))
+		if (!is_array($filesToDelete))
 			throw new Exception("should be array");
-		
-		foreach($filesToDelete as $id) { 
-	                $info = $this->storage->get($id)->body;
-	                if ($info->fileOwner !== $this->auth->getUserId())
-	                        throw new Exception("access denied");
+
+		foreach ($filesToDelete as $id) {
+			$info = $this->storage->get($id)->body;
+			if ($info->fileOwner !== $this->auth->getUserId())
+				throw new Exception("access denied");
 			logHandler("User '" . $this->auth->getUserId() . "' is deleting file '" . $info->fileName . "'");
 
 			/* delete the file from the file system */
 			$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-			if(is_file($filePath))
+			if (is_file($filePath))
 				unlink($filePath);
 
 			/* delete the cache objects belonging to this file from the file system */
 			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-	                if(isset($info->video->transcode)) {
-				foreach($info->video->transcode as $k => $v) {
-					if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+			if (isset ($info->video->transcode)) {
+				foreach ($info->video->transcode as $k => $v) {
+					if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
 						unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
 				}
 			}
-			if(isset($info->video->thumbnail)) {
-		                foreach($info->video->thumbnail as $k => $v) {
-					if(is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
-		        	                unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+			if (isset ($info->video->thumbnail)) {
+				foreach ($info->video->thumbnail as $k => $v) {
+					if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+						unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
 				}
 			}
-	
+
 			$this->storage->delete($id, $info->_rev);
 		}
 		return $this->showFiles();
 	}
 
 	function confirmDelete($filesToDelete = NULL) {
-                if(!is_array($filesToDelete))
-                        throw new Exception("should be array");
+		if (!is_array($filesToDelete))
+			throw new Exception("should be array");
 
-  		$deleteList = array();
-	        foreach($filesToDelete as $id) {
-       	                $info = $this->storage->get($id)->body;
-                        if ($info->fileOwner !== $this->auth->getUserId())
-                                throw new Exception("access denied");
+		$deleteList = array ();
+		foreach ($filesToDelete as $id) {
+			$info = $this->storage->get($id)->body;
+			if ($info->fileOwner !== $this->auth->getUserId())
+				throw new Exception("access denied");
 			$deleteList[$info->_id] = $info->fileName;
 		}
 
-       	        $this->smarty->assign('deleteList', $deleteList);
+		$this->smarty->assign('deleteList', $deleteList);
 		$this->smarty->assign('markedFiles', $filesToDelete);
-                $content = $this->smarty->fetch('ConfirmDelete.tpl');
-       	        return $content;
-	}	
+		$content = $this->smarty->fetch('ConfirmDelete.tpl');
+		return $content;
+	}
 
-        function updateFileInfo() {
+	function updateFileInfo() {
 		$button = getRequest("buttonPressed", TRUE);
 
-		switch($button) {
-                        /* called from the {File,Media}List page */
-                        case "Delete Files":
-                                $markedFiles = getRequest("markedFiles", FALSE, array());
-                                return $this->confirmDelete($markedFiles);
+		switch ($button) {
+			/* called from the {File,Media}List page */
+			case "Delete Files" :
+				$markedFiles = getRequest("markedFiles", FALSE, array ());
+				return $this->confirmDelete($markedFiles);
 
-			/* called from the FileInfo page */
-			case "Delete":
+				/* called from the FileInfo page */
+			case "Delete" :
 				$id = getRequest("id", TRUE);
-                                return $this->confirmDelete(array($id));
+				return $this->confirmDelete(array (
+					$id
+				));
 
-			/* called from the ConfirmDelete page */
-			case "Confirm Delete":
-                                $markedFiles = getRequest("markedFiles", FALSE, array());
-                                return $this->deleteFiles($markedFiles);
+				/* called from the ConfirmDelete page */
+			case "Confirm Delete" :
+				$markedFiles = getRequest("markedFiles", FALSE, array ());
+				return $this->deleteFiles($markedFiles);
 
-			/* called from the FileInfo page */
-			case "Update":
+				/* called from the FileInfo page */
+			case "Update" :
 				/* continue with the rest of the function */
 				break;
 
-			default:
+			default :
 				throw new Exception("invalid button type");
 		}
-	
-                $id = getRequest("id", TRUE);
-                $info = $this->storage->get($id)->body;
-                if ($info->fileOwner !== $this->auth->getUserId())
-                        throw new Exception("access denied");
 
-		$fileName = getRequest('fileName', FALSE, $info->fileName); 
-                $fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
-                $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
+		$id = getRequest("id", TRUE);
+		$info = $this->storage->get($id)->body;
+		if ($info->fileOwner !== $this->auth->getUserId())
+			throw new Exception("access denied");
+
+		$fileName = getRequest('fileName', FALSE, $info->fileName);
+		$fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
+		$fileTags = getRequest('fileTags', FALSE, implode(",", $info->fileTags));
 		$fileLicense = getRequest('fileLicense', FALSE, $info->fileLicense);
 		$filePublic = getRequest('filePublic', FALSE, 'off');
 
-		$fileTokens = getRequest('fileTokens', FALSE, implode(",",array_values((array)$info->fileTokens)));
-		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
+		$fileTokens = getRequest('fileTokens', FALSE, implode(",", array_values((array) $info->fileTokens)));
+		$fileGroups = getRequest('fileGroups', FALSE, array ()); /* not set means everything deselected! */
 
 		/* Name */
-		if($fileName != $info->fileName) {
+		if ($fileName != $info->fileName) {
 			/* file name changed, update entry and file system */
-	                $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+			$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 			$newFilePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $fileName;
 			rename($filePath, $newFilePath);
 			$info->fileName = $fileName;
@@ -243,15 +257,15 @@ class Files {
 
 		/* Tags */
 		$tags = explode(",", $fileTags);
-		$info->fileTags = array();
-		foreach($tags as $t) {
+		$info->fileTags = array ();
+		foreach ($tags as $t) {
 			$t = trim(htmlspecialchars($t));
-			if(!empty($t) && !in_array($t, $info->fileTags, TRUE))
+			if (!empty ($t) && !in_array($t, $info->fileTags, TRUE))
 				array_push($info->fileTags, $t);
 		}
 
 		/* Tokens */
-                $tokens = explode(",", $fileTokens);
+		$tokens = explode(",", $fileTokens);
 
 		/*
 		   - We may have some tokens already stored ($info->fileTokens)
@@ -266,45 +280,45 @@ class Files {
 		*/
 
 		/* The new addresses, clean them all first! */
-		$newAddresses = array();
-                foreach($tokens as $t) {
+		$newAddresses = array ();
+		foreach ($tokens as $t) {
 			$t = trim($t);
-			if(!empty($t)) {
-	                        $address = filter_var($t, FILTER_VALIDATE_EMAIL);
-	                        if ($address === FALSE)
-	                                throw new Exception("invalid email address specified");
-				if(!empty($address) && !in_array($address, $newAddresses, TRUE))
+			if (!empty ($t)) {
+				$address = filter_var($t, FILTER_VALIDATE_EMAIL);
+				if ($address === FALSE)
+					throw new Exception("invalid email address specified");
+				if (!empty ($address) && !in_array($address, $newAddresses, TRUE))
 					$newAddresses[generateToken()] = $address;
 			}
 		}
 
 		/* Woah, can this really not be made simpler? */
-	        $isec = array_intersect((array)$info->fileTokens,$newAddresses);
-	        $diff = array_diff($newAddresses,(array)$info->fileTokens);
-	        $info->fileTokens = array_merge($isec,$diff);
+		$isec = array_intersect((array) $info->fileTokens, $newAddresses);
+		$diff = array_diff($newAddresses, (array) $info->fileTokens);
+		$info->fileTokens = array_merge($isec, $diff);
 
 		/* Send an email to all new addresses (from diff) */
-                $this->smarty->assign('sender', $this->auth->getUserDisplayName());
-                $this->smarty->assign('fileName', $info->fileName);
+		$this->smarty->assign('sender', $this->auth->getUserDisplayName());
+		$this->smarty->assign('fileName', $info->fileName);
 
-		foreach($diff as $token => $address) {
-	                $url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$info->_id&token=$token";
-	                $this->smarty->assign('url', $url);
-        	        $content = $this->smarty->fetch('EmailInvite.tpl');
-	                $message = wordwrap($content, 70);
+		foreach ($diff as $token => $address) {
+			$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$info->_id&token=$token";
+			$this->smarty->assign('url', $url);
+			$content = $this->smarty->fetch('EmailInvite.tpl');
+			$message = wordwrap($content, 70);
 
-	                /* send email */
-	                $subject = '[FileTrader] A file has been shared with you!';
-	                $from = getConfig($this->config, 'email_share_sender', FALSE, 'FileTrader <filetrader@' . $_SERVER['HTTP_HOST'] . '>');
-	                $headers = "From: $from\r\n" .
-	                "Reply-To: $from\r\n" .
-	                "X-Mailer: PHP/" . phpversion();
-	                $status = mail($address, $subject, $message, $headers);
+			/* send email */
+			$subject = '[FileTrader] A file has been shared with you!';
+			$from = getConfig($this->config, 'email_share_sender', FALSE, 'FileTrader <filetrader@' . $_SERVER['HTTP_HOST'] . '>');
+			$headers = "From: $from\r\n" .
+			"Reply-To: $from\r\n" .
+			"X-Mailer: PHP/" . phpversion();
+			$status = mail($address, $subject, $message, $headers);
 
-	                if ($status !== TRUE)
-	                        logHandler("Sending mail to $address failed!");
-	                else
-	                        logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info->fileName . "' with '" . $address . "'");
+			if ($status !== TRUE)
+				logHandler("Sending mail to $address failed!");
+			else
+				logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info->fileName . "' with '" . $address . "'");
 		}
 
 		/* Description */
@@ -314,87 +328,89 @@ class Files {
 		$info->fileGroups = $this->auth->memberOfGroups($fileGroups);
 
 		/* License */
-		if(!array_key_exists($fileLicense, $this->licenses))
+		if (!array_key_exists($fileLicense, $this->licenses))
 			throw new Exception("invalid license specified");
 		$info->fileLicense = $fileLicense;
 
 		/* Public */
-		if($filePublic === 'on') {
+		if ($filePublic === 'on') {
 			$info->filePublic = TRUE;
 		} else {
 			$info->filePublic = FALSE;
 		}
 
-                $this->storage->put($id, $info);
+		$this->storage->put($id, $info);
 		return $this->fileInfo();
-        }
+	}
 
 	function fileUpload() {
-                $content = $this->smarty->fetch('FileUpload.tpl');
+		$content = $this->smarty->fetch('FileUpload.tpl');
 		return $content;
 	}
 
-        function downloadFile() {
-                $id = getRequest("id", TRUE);
+	function downloadFile() {
+		$id = getRequest("id", TRUE);
 		$token = getRequest("token", FALSE, NULL);
 
-                $info = $this->storage->get($id)->body;
+		$info = $this->storage->get($id)->body;
 
-                if($info->fileOwner !== $this->auth->getUserId() &&
-		   $this->auth->memberOfGroups($info->fileGroups) === FALSE &&
-		   !$info->filePublic &&
-		   ($token == NULL || !array_key_exists($token, $info->fileTokens))) 
-                        throw new Exception("access denied");
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
+			throw new Exception("access denied");
 
-                $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 
-                if (!is_file($filePath))
-	              throw new Exception("file does not exist on file system");
+		if (!is_file($filePath))
+			throw new Exception("file does not exist on file system");
 
-                logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
+		logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
 
-                        set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-                        require_once ('HTTP/Download.php');
-                        $dl = new HTTP_Download();
-                        $dl->setFile($filePath);
-                        $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $info->fileName);
-                        $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
-                        $dl->setContentType($finfo->file($filePath));
-                        $dl->send();
-                        exit (0);
-        }
+		set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
+		require_once ('HTTP/Download.php');
+		$dl = new HTTP_Download();
+		$dl->setFile($filePath);
+		$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $info->fileName);
+		$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+		$dl->setContentType($finfo->file($filePath));
+		$dl->send();
+		exit (0);
+	}
 
 	function getCacheObject() {
-                $id = getRequest("id", TRUE);
+		$id = getRequest("id", TRUE);
 		$type = getRequest("type", TRUE);
 
-                $validTypes = array('thumbnail_90', 'thumbnail_180','thumbnail_360', 'transcode_360');
+		$validTypes = array (
+			'thumbnail_90',
+			'thumbnail_180',
+			'thumbnail_360',
+			'transcode_360'
+		);
 
-                $info = $this->storage->get($id)->body;
+		$info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
-                        throw new Exception("access denied");
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+			throw new Exception("access denied");
 
-			if(!in_array($type, $validTypes))
-				throw new Exception("invalid cache type");
+		if (!in_array($type, $validTypes))
+			throw new Exception("invalid cache type");
 
-			list($t, $subT) = explode("_", $type);
+		list ($t, $subT) = explode("_", $type);
 
-			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t->$subT->file;
+		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+		$file = $cachePath . DIRECTORY_SEPARATOR . $info->video-> $t-> $subT->file;
 
-	                if (!is_file($file))
-		                throw new Exception("file does not exist on file system");
+		if (!is_file($file))
+			throw new Exception("file does not exist on file system");
 
-                        set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-                        require_once ('HTTP/Download.php');
-                        $dl = new HTTP_Download();
-                        $dl->setFile($file);
-                        $dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, basename($file));
-                        $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
-                        $dl->setContentType($finfo->file($file));
-                        $dl->send();
-                        exit (0);
+		set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
+		require_once ('HTTP/Download.php');
+		$dl = new HTTP_Download();
+		$dl->setFile($file);
+		$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, basename($file));
+		$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+		$dl->setContentType($finfo->file($file));
+		$dl->send();
+		exit (0);
 	}
 
 	function handleUpload() {
@@ -511,7 +527,7 @@ class Files {
 
 		/* only add entry to the database after receiving the last block */
 		if ($chunk == $chunks -1 || $chunks === 0) {
-                        $metaData['fileOwner'] = $this->auth->getUserId();
+			$metaData['fileOwner'] = $this->auth->getUserId();
 			$metaData['fileName'] = $fileName;
 			analyzeFile($metaData, $targetDir, $cachePath);
 			$this->storage->post($metaData);

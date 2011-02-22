@@ -62,18 +62,18 @@ try {
 		$auth = new $authType ($config);
 	}
 
-	if(!$auth->isLoggedIn()) {
+	if (!$auth->isLoggedIn()) {
 		$auth->login();
 	}
 
 	$action = getRequest('action', FALSE, 'showFiles');
 
-        $storage = new Sag();
-        $storage->setDatabase($dbName);
+	$storage = new Sag();
+	$storage->setDatabase($dbName);
 
-	if($action === "logout") {
+	if ($action === "logout") {
 		$auth->logout($_SERVER["SCRIPT_NAME"]);
-		exit(0);
+		exit (0);
 	}
 
 	if (!in_array($action, array (
@@ -85,6 +85,8 @@ try {
 			'showFiles',
 			'rawFileInfo',
 			'updateFileInfo',
+
+			
 		), TRUE))
 		throw new Exception("unregistered action called");
 	$f = new Files($config, $storage, $auth, $smarty);
@@ -103,7 +105,11 @@ try {
 
 $smarty->assign('action', $action);
 $smarty->assign('authenticated', $auth->isLoggedIn());
-$smarty->assign('groups', array(0 => 'My Files', 1 => 'Public Files', 'Group' => $auth->getUserGroups()));
+$smarty->assign('groups', array (
+	0 => 'My Files',
+	1 => 'Public Files',
+	'Group' => $auth->getUserGroups()
+));
 $smarty->assign('group', getRequest("group", FALSE, 0));
 $smarty->assign('userId', $auth->getUserId());
 $smarty->assign('userDisplayName', $auth->getUserDisplayName());

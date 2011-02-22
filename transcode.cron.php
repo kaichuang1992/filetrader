@@ -24,7 +24,7 @@ require_once ('utils.php');
 $videoHeight = 360;
 
 if (!isset ($config) || !is_array($config))
-        die("broken or missing configuration file?");
+	die("broken or missing configuration file?");
 
 date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
@@ -35,29 +35,29 @@ require_once ("ext/sag/src/Sag.php");
 $storage = new Sag();
 $storage->setDatabase($dbName);
 
-do { 
+do {
 	$toTranscode = $storage->get("_design/files/_view/get_video_status?limit=1&startkey=[\"WAITING\"]&endkey=[\"WAITING\",{}]")->body->rows;
 
-	if(!empty($toTranscode)) {
+	if (!empty ($toTranscode)) {
 		$t = $toTranscode[0];
 		$id = $t->id;
 
-	 	$info = $storage->get($id)->body;
+		$info = $storage->get($id)->body;
 		$info->video->transcodeStatus = 'PROGRESS';
-	        $storage->put($id, $info);
+		$storage->put($id, $info);
 
 		$fileOwner = $info->fileOwner;
 		$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
-		$newSize = $info->video->transcode->$videoHeight->width . "x" . $videoHeight;
+		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode-> $videoHeight->file;
+		$newSize = $info->video->transcode-> $videoHeight->width . "x" . $videoHeight;
 		// -vf transpose=1   (for rotating clockwise 90 degrees)
 		$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 -y $transcodeFileName";
-	
-	        execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
-	
-	        $info = $storage->get($id)->body;
+
+		execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
+
+		$info = $storage->get($id)->body;
 		$info->video->transcodeStatus = 'DONE';
-	        $storage->put($id, $info);
+		$storage->put($id, $info);
 	}
-}while(!empty($toTranscode));
+} while (!empty ($toTranscode));
 ?>
