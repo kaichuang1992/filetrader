@@ -55,6 +55,10 @@
 				<label><input class="share_public" type="checkbox" name="filePublic" {if $fileInfo->filePublic} checked="checked" {/if}><strong>Public</strong></label>
 				{html_checkboxes class='share_group' name='fileGroups' options=$userGroups selected=$fileInfo->fileGroups}</td></tr>
 			{/if}
+
+                        <tr><th>Email Tokens</th><td>
+                                <textarea rows="5" cols="55" name="fileTokens">{', '|implode:array_values((array)$fileInfo->fileTokens)}</textarea></td></tr>
+
 			<tr><td colspan="2">
 				<input type="submit" value="Update" name="buttonPressed">
                                 <input type="submit" value="Delete" name="buttonPressed">

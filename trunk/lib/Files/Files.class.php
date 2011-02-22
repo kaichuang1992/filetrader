@@ -228,6 +228,8 @@ class Files {
                 $fileTags = getRequest('fileTags', FALSE, implode(",",$info->fileTags));
 		$fileLicense = getRequest('fileLicense', FALSE, $info->fileLicense);
 		$filePublic = getRequest('filePublic', FALSE, 'off');
+
+		$fileTokens = getRequest('fileTokens', FALSE, implode(",",array_values((array)$info->fileTokens)));
 		$fileGroups = getRequest('fileGroups', FALSE, array()); /* not set means everything deselected! */
 
 		/* Name */
@@ -247,6 +249,39 @@ class Files {
 			if(!empty($t) && !in_array($t, $info->fileTags, TRUE))
 				array_push($info->fileTags, $t);
 		}
+
+		/* Tokens */
+                $tokens = explode(",", $fileTokens);
+
+		/*
+		   - We may have some tokens already stored ($info->fileTokens)
+		   - The token consists of the email address with the key being the token
+		   - Now we get only email addresses from the form submit
+		   - We only keep the email addresses still in the form submit (intersect)
+		   - For all the new addresses we generate tokens
+		   - We find out now which ones are actually new (diff)
+		   - We add the new ones with their new tokens to the tokens in $info->fileTokens,
+		     while keeping the old tokens if existing
+		*/
+
+		/* The new addresses, clean them all first! */
+		$newAddresses = array();
+                foreach($tokens as $t) {
+			$t = trim($t);
+			if(!empty($t)) {
+	                        $address = filter_var($t, FILTER_VALIDATE_EMAIL);
+	                        if ($address === FALSE)
+	                                throw new Exception("invalid email address specified");
+				if(!empty($address) && !in_array($address, $newAddresses, TRUE))
+					$newAddresses[generateToken()] = $address;
+			}
+		}
+
+		/* Woah, can this really not be made simpler? */
+	        $isec = array_intersect((array)$info->fileTokens,$newAddresses);
+	        $diff = array_diff($newAddresses,(array)$info->fileTokens);
+		/* FIXME: we need to send an email to all the addresses in $diff */
+	        $info->fileTokens = array_merge($isec,$diff);
 
 		/* Description */
 		$info->fileDescription = trim(htmlspecialchars($fileDescription));

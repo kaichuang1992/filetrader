@@ -241,6 +241,7 @@ function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
         $metaData['fileSize'] = filesize($file);
         $metaData['fileDate'] = filemtime($file);
         $metaData['fileGroups'] = array ();
+	$metaData['fileTokens'] = array ();
 	$metaData['fileDescription'] = '';
 	$metaData['fileLicense'] = 'none';
 	$metaData['filePublic'] = FALSE;
@@ -254,5 +255,9 @@ function analyzeFile(&$metaData, $filePath = NULL, $cachePath = NULL) {
 		analyzeMediaFile($metaData, $filePath, $cachePath);
 	}
 }
+
+        function generateToken() {
+                return bin2hex(openssl_random_pseudo_bytes(8));
+        }
 
 ?>
