@@ -260,6 +260,7 @@ class Files {
 		   - We only keep the email addresses still in the form submit (intersect)
 		   - For all the new addresses we generate tokens
 		   - We find out now which ones are actually new (diff)
+		   - Send an email invite to all the new addresses
 		   - We add the new ones with their new tokens to the tokens in $info->fileTokens,
 		     while keeping the old tokens if existing
 		*/
@@ -280,8 +281,31 @@ class Files {
 		/* Woah, can this really not be made simpler? */
 	        $isec = array_intersect((array)$info->fileTokens,$newAddresses);
 	        $diff = array_diff($newAddresses,(array)$info->fileTokens);
-		/* FIXME: we need to send an email to all the addresses in $diff */
 	        $info->fileTokens = array_merge($isec,$diff);
+
+		/* Send an email to all new addresses (from diff) */
+                $this->smarty->assign('sender', $this->auth->getUserDisplayName());
+                $this->smarty->assign('fileName', $info->fileName);
+
+		foreach($diff as $token => $address) {
+	                $url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$info->_id&token=$token";
+	                $this->smarty->assign('url', $url);
+        	        $content = $this->smarty->fetch('EmailInvite.tpl');
+	                $message = wordwrap($content, 70);
+
+	                /* send email */
+	                $subject = '[FileTrader] A file has been shared with you!';
+	                $from = getConfig($this->config, 'email_share_sender', FALSE, 'FileTrader <filetrader@' . $_SERVER['HTTP_HOST'] . '>');
+	                $headers = "From: $from\r\n" .
+	                "Reply-To: $from\r\n" .
+	                "X-Mailer: PHP/" . phpversion();
+	                $status = mail($address, $subject, $message, $headers);
+
+	                if ($status !== TRUE)
+	                        logHandler("Sending mail to $address failed!");
+	                else
+	                        logHandler("User '" . $this->auth->getUserID() . "' is sharing file '" . $info->fileName . "' with '" . $address . "'");
+		}
 
 		/* Description */
 		$info->fileDescription = trim(htmlspecialchars($fileDescription));
@@ -312,17 +336,22 @@ class Files {
 
         function downloadFile() {
                 $id = getRequest("id", TRUE);
+		$token = getRequest("token", FALSE, NULL);
+
                 $info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic) 
+                if($info->fileOwner !== $this->auth->getUserId() &&
+		   $this->auth->memberOfGroups($info->fileGroups) === FALSE &&
+		   !$info->filePublic &&
+		   ($token == NULL || !array_key_exists($token, $info->fileTokens))) 
                         throw new Exception("access denied");
 
-                        $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+                $filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 
-                        if (!is_file($filePath))
-                                throw new Exception("file does not exist on file system");
+                if (!is_file($filePath))
+	              throw new Exception("file does not exist on file system");
 
-                        logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
+                logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
 
                         set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
                         require_once ('HTTP/Download.php');
