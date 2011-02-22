@@ -22,47 +22,47 @@ require_once ('ext/oauth/OAuth.php');
 
 class OAuth {
 
-        var $config;
+	var $config;
 	var $consumer_key;
 	var $isValidRequest;
 
-        function __construct($config) {
-                if (!is_array($config))
-                        throw new Exception("config parameter should be array");
-                $this->config = $config;
+	function __construct($config) {
+		if (!is_array($config))
+			throw new Exception("config parameter should be array");
+		$this->config = $config;
 		$this->isValidRequest = FALSE;
-        }
+	}
 
 	function isLoggedIn() {
 		return $this->isValidRequest;
 	}
 
 	function getUserId() {
-                if ($this->isLoggedIn())
-                        return "oauth_" . $this->consumer_key;
-                else
-                        throw new Exception("not logged in");
+		if ($this->isLoggedIn())
+			return "oauth_" . $this->consumer_key;
+		else
+			throw new Exception("not logged in");
 	}
 
 	function getUserDisplayName() {
-                if ($this->isLoggedIn())
-                        return "OAuth Consumer";
-                else
-                        throw new Exception("not logged in");
+		if ($this->isLoggedIn())
+			return "OAuth Consumer";
+		else
+			throw new Exception("not logged in");
 	}
 
 	function getUserInfo() {
-                if ($this->isLoggedIn())
-                        return array();
-                else
-                        throw new Exception("not logged in");
+		if ($this->isLoggedIn())
+			return array ();
+		else
+			throw new Exception("not logged in");
 	}
-	
+
 	function memberOfGroups($groups) {
 		return $this->isValidRequest;
 	}
 
-	function login() { 
+	function login() {
 		/* if no attempt to use OAuth stop */
 		if (!isset ($_GET['oauth_signature']))
 			return FALSE;

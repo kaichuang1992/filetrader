@@ -25,7 +25,7 @@ abstract class Auth {
 		if (!is_array($config))
 			throw new Exception("config parameter should be array");
 		$this->config = $config;
-		if(!isset($_SESSION))
+		if (!isset ($_SESSION))
 			session_start();
 	}
 
@@ -61,9 +61,9 @@ abstract class Auth {
 
 	/**
 	 * Function returns the groups a user is a member of
-         *
+	     *
 	 * WARNING: MAKE SURE THAT THE KEY OF THE ARRAY IS NOT A NUMBER!
-         *
+	     *
 	 * Example: return array('grp133' => 'My Group', 'grp123' => 'Other Group');
 	 */
 	function getUserGroups() {
@@ -83,11 +83,11 @@ abstract class Auth {
 				throw new Exception("groups should be specified as array");
 			}
 			if (empty ($groups)) {
-				return array();
+				return array ();
 			}
 			$userGroups = $this->getUserGroups();
 			$intersect = array_intersect(array_keys($userGroups), $groups);
-			if(empty($intersect))
+			if (empty ($intersect))
 				return FALSE;
 			return array_values($intersect);
 		} else {
@@ -95,16 +95,16 @@ abstract class Auth {
 		}
 	}
 
-        function logout($url = NULL) {
-                if ($this->isLoggedIn()) {
-                        unset ($_SESSION['userId']);
-                        unset ($_SESSION['userAttr']);
-                        unset ($_SESSION['userDisplayName']);
-                        if($url !== NULL)
-                                header("Location: $url");
-                } else {
-                        throw new Exception("not logged in");
-                }
-        }
+	function logout($url = NULL) {
+		if ($this->isLoggedIn()) {
+			unset ($_SESSION['userId']);
+			unset ($_SESSION['userAttr']);
+			unset ($_SESSION['userDisplayName']);
+			if ($url !== NULL)
+				header("Location: $url");
+		} else {
+			throw new Exception("not logged in");
+		}
+	}
 }
 ?>
