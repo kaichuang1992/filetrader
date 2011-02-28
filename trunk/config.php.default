@@ -3,14 +3,23 @@ $config = array ();
 
 $config['time_zone'] = 'Europe/Amsterdam';
 
+// Name of database in CouchDB
+$config['db_name'] = 'filetrader';
+
+// Wheter or not to allow only SSL connections
+$config['ssl_only'] = FALSE;
+
 // Files/Media per page
 $config['objects_per_page'] = 10;
 
+// Location to directory where to store uploaded files
+$config['file_storage_dir'] = 'data/files';
+
+// Location for cache (e.g. thumbnails, transcodes)
+$config['cache_dir'] = 'data/cache';
+
 // use system wide PEAR installation
 // $config['pear_path'] = '/usr/share/pear';
-
-// use local PEAR 
-$config['pear_path'] = __DIR__."/ext/pear/php";
 
 // NullAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
@@ -21,27 +30,14 @@ $config['ssp_sp'] = 'default-sp';
 $config['ssp_uid_attr'] = 'uid';
 $config['ssp_dn_attr'] = 'cn';
 
+// use local PEAR
+$config['pear_path'] = __DIR__."/ext/pear/php";
+
 // Allow users to share files through email invites
 $config['email_share'] = FALSE;
 
 // Override the default sender of the email invites
 // $config['email_share_sender'] = 'FileTrader <filetrader@example.com>';
-
-// Allow users to share files through groups
-// (This requires support in authentication backend!)
-$config['group_share'] = FALSE;
-
-// Name of database in CouchDB
-$config['db_name'] = 'filetrader';
-
-// Wheter or not to allow only SSL connections
-$config['ssl_only'] = FALSE;
-
-// Location to directory where to store uploaded files
-$config['file_storage_dir'] = 'data/files';
-
-// Location for cache (e.g. thumbnails, transcodes)
-$config['cache_dir'] = 'data/cache';
 
 // Allow OAuth consumers
 $config['allow_oauth'] = FALSE;
@@ -51,5 +47,13 @@ $config['oauth_consumers'] = array (
 	'12345' => '54321',
 	'abcde' => 'edcba',
 );
+
+// Allow users to share files through groups
+// (This requires support in authentication backend!)
+$config['group_share'] = FALSE;
+
+// Access SURFconext for accessing group membership using these OAuth credentials
+$config['conext_key']    = '12345';
+$config['conext_secret'] = '54321';
 
 ?>
