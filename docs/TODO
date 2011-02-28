@@ -1,24 +1,16 @@
 Things still to do:
 
 == 1.0 ==
-- write installation manual
-- fix all the FIXMEs
-- refresh after uploads complete
-- deal with upload of files with the same name
+- make that is there now actually work
 
 == 2.0 ==
-- make it possible to see whether or not the invited user actually downloaded the file (share)
-- make it possible to expire tokens (share)
+- make it possible to see whether or not the invited user actually downloaded the file (email share)
+- make it possible to expire tokens (email share)
 - implement automatic class loader
   - add library.config.php file or something to point to (external) PHP/JS
     libraries
-- implement OpenSocial auth, allow iGoogle access
-- custom css/js for plupload instead of default one
-- separate "FileTrader" from the actual file uploading/downloading processes
+- fix external OAuth access to resources
+- custom CSS/JS for Plupload instead of default
 - don't assume we run on Unix-like systems
-- split out group/team stuff to separate classes?
 - implement 3-legged OAuth
-- implement something like "file collections" to keep files "together"?
-- implement tagging / file collections?
-- make the app work without any javascript as well...
 
