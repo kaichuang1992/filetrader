@@ -1,0 +1,41 @@
+-- SURFconext --
+
+This document explains how to configure this service for use with SURFconext.
+
+First set the values below in the configuration file (config.php), see below 
+an example:
+
+<quote>
+	$config['auth_type'] = 'SSPAuth';
+	$config['ssp_path'] = '/var/www/ssp/sp';
+	$config['ssp_sp'] = 'bigbluebutton';
+	$config['ssp_uid_attr'] = 'nameid';
+	$config['ssp_dn_attr'] = 'urn:mace:dir:attribute-def:displayName';
+
+	$config['conext_key']    = '12345';
+	$config['conext_secret'] = '54321';
+</quote>
+
+Set the conext_key and conext_secret to the OAuth information you obtained, 
+make sure the ssp_sp value matches with the value in the simpleSAMLphp config 
+as shown below. Also set the path to the path where you installed 
+simpleSAMLphp.
+
+This is part of the configuration of simpleSAMLphp (in SP configuration 
+config/authsources.php). You still need to establish the IDP/SP configuration,
+which is out of scope in this document:
+
+<quote>
+        'bigbluebutton' => array(
+                'saml:SP',
+                'idp' => 'https://engine.surfconext.nl/authentication/idp/metadata',
+                'authproc' => array(
+                        20 => array(
+                                'class' => 'saml:NameIDAttribute',
+                                'format' => '%V',
+                        ),
+                ),
+        ),
+
+</quote>
+
