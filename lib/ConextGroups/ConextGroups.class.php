@@ -21,33 +21,31 @@
 require_once ('ext/opensocial-php-client/osapi/osapi.php');
 require_once ('lib/ConextGroups/osapiConextProvider.php');
 
-class ConextGroups {
-	var $osapi;
-	var $userId;
+class ConextGroups extends Groups {
+	var $osapi; 
 
-	function __construct($config = array(), $userId = NULL) {
-		if($userId == NULL || empty($userId))
-			throw new Exception("specify user id");
-		$this->userId = $userId;
+        function __construct($config, $auth = NULL) {
+		parent::__construct($config, $auth);
 
 		osapiLogger::setLevel(osapiLogger::INFO);
 		osapiLogger::setAppender(new osapiFileAppender("data/osapi.log"));
 
 		$provider = new osapiConextProvider();
-		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE), $this->userId);
+		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE), $this->auth->getUserId());
 		$this->osapi = new osapi($provider, $auth);
 	}
 
 	function getUserGroups() {
-		try {
-			$params = array('userId' => $this->userId);
+//		try {
+			$params = array('userId' => $this->auth->getUserId());
 			$request = $this->osapi->people->get($params);
 			$batch = $this->osapi->newBatch();
 			$batch->add($request, 'request_label');
 			$result = $batch->execute();
-		} catch(Exception $e) {
-			echo $e->getMessage();
-		}
+//		} catch(Exception $e) {
+			//echo $e->getMessage();
+//			throw new Exception("SURFconext error");
+//		}
 	}
 }
 ?>

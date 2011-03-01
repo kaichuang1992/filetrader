@@ -29,12 +29,14 @@ class Files {
 	var $config;
 	var $storage;
 	var $auth;
+	var $group;
 	var $smarty;
 
-	function __construct($config, $storage, $auth, $smarty) {
+	function __construct($config, $storage, $auth, $groups, $smarty) {
 		$this->config = $config;
 		$this->storage = $storage;
 		$this->auth = $auth;
+		$this->groups = $groups;
 		$this->smarty = $smarty;
 	}
 
@@ -118,11 +120,11 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', $info);
-		$this->smarty->assign('userGroups', $this->auth->getUserGroups());
+		$this->smarty->assign('userGroups', $this->groups->getUserGroups());
 
 		$this->smarty->assign('view', $view);
 		$this->smarty->assign('group', $group);
@@ -139,7 +141,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', var_export($info, TRUE));
@@ -325,7 +327,7 @@ class Files {
 		$info->fileDescription = trim(htmlspecialchars($fileDescription));
 
 		/* Groups */
-		$info->fileGroups = $this->auth->memberOfGroups($fileGroups);
+		$info->fileGroups = $this->groups->memberOfGroups($fileGroups);
 
 		/* License */
 		if (!array_key_exists($fileLicense, $this->licenses))
@@ -354,7 +356,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
 			throw new Exception("access denied");
 
 		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
@@ -388,7 +390,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->auth->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
 			throw new Exception("access denied");
 
 		if (!in_array($type, $validTypes))

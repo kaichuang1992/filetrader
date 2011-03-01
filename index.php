@@ -42,10 +42,13 @@ try {
 	}
 
 	$authType = getConfig($config, 'auth_type', TRUE);
+	$groupType = getConfig($config, 'group_type', TRUE);
 	$dbName = getConfig($config, 'db_name', TRUE);
 
 	require_once ("lib/Auth/Auth.class.php");
 	require_once ("lib/$authType/$authType.class.php");
+        require_once ("lib/Groups/Groups.class.php");
+        require_once ("lib/$groupType/$groupType.class.php");
 	require_once ("ext/sag/src/Sag.php");
 	require_once ("lib/Files/Files.class.php");
 
@@ -65,6 +68,8 @@ try {
 	if (!$auth->isLoggedIn()) {
 		$auth->login();
 	}
+
+	$groups = new $groupType ($config, $auth);
 
 	$action = getRequest('action', FALSE, 'showFiles');
 
@@ -89,12 +94,25 @@ try {
 			
 		), TRUE))
 		throw new Exception("unregistered action called");
-	$f = new Files($config, $storage, $auth, $smarty);
+	$f = new Files($config, $storage, $auth, $groups, $smarty);
 	$content = $f-> $action ();
 
+	$smarty->assign('action', $action);
+	$smarty->assign('authenticated', $auth->isLoggedIn());
+	$smarty->assign('groups', array (
+	        0 => 'My Files',
+	        1 => 'Public Files',
+	        'Group' => $groups->getUserGroups()
+	));
+	$smarty->assign('group', getRequest("group", FALSE, 0));
+	$smarty->assign('userId', $auth->getUserId());
+	$smarty->assign('userDisplayName', $auth->getUserDisplayName());
+	$smarty->assign('container', $content);
+	$smarty->display('Page.tpl');
 } catch (Exception $e) {
 	$smarty->assign('error', TRUE);
-	$smarty->assign('errorMessage', $e->getMessage());
+	# use htmlentities() to deal better with SURFconext exception html frenzy
+	$smarty->assign('errorMessage', htmlentities($e->getMessage()));
 	$smarty->assign('action', NULL);
 	$smarty->assign('authenticated', FALSE);
 	$smarty->display('Page.tpl');
@@ -102,17 +120,4 @@ try {
 	logHandler("ERROR TRACE: " . $e->getTraceAsString());
 	exit (1);
 }
-
-$smarty->assign('action', $action);
-$smarty->assign('authenticated', $auth->isLoggedIn());
-$smarty->assign('groups', array (
-	0 => 'My Files',
-	1 => 'Public Files',
-	'Group' => $auth->getUserGroups()
-));
-$smarty->assign('group', getRequest("group", FALSE, 0));
-$smarty->assign('userId', $auth->getUserId());
-$smarty->assign('userDisplayName', $auth->getUserDisplayName());
-$smarty->assign('container', $content);
-$smarty->display('Page.tpl');
 ?>

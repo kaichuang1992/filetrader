@@ -59,42 +59,6 @@ abstract class Auth {
 	 */
 	abstract function login();
 
-	/**
-	 * Function returns the groups a user is a member of
-	     *
-	 * WARNING: MAKE SURE THAT THE KEY OF THE ARRAY IS NOT A NUMBER!
-	     *
-	 * Example: return array('grp133' => 'My Group', 'grp123' => 'Other Group');
-	 */
-	function getUserGroups() {
-		if ($this->isLoggedIn())
-			return array ();
-		else
-			throw new Exception("not logged in");
-	}
-
-	/**
-	 * Determines if user is member of one or more of the specified
-	 * groups.
-	 */
-	function memberOfGroups($groups) {
-		if ($this->isLoggedIn()) {
-			if (!is_array($groups)) {
-				throw new Exception("groups should be specified as array");
-			}
-			if (empty ($groups)) {
-				return array ();
-			}
-			$userGroups = $this->getUserGroups();
-			$intersect = array_intersect(array_keys($userGroups), $groups);
-			if (empty ($intersect))
-				return FALSE;
-			return array_values($intersect);
-		} else {
-			throw new Exception("not logged in");
-		}
-	}
-
 	function logout($url = NULL) {
 		if ($this->isLoggedIn()) {
 			unset ($_SESSION['userId']);
