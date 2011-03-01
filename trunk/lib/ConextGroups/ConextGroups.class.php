@@ -23,30 +23,28 @@ require_once ('lib/ConextGroups/osapiConextProvider.php');
 
 class ConextGroups {
 	var $osapi;
+	var $userId;
 
-	function __construct($config = array()) {
+	function __construct($config = array(), $userId = NULL) {
+		if($userId == NULL || empty($userId))
+			throw new Exception("specify user id");
+		$this->userId = $userId;
+
+		osapiLogger::setLevel(osapiLogger::INFO);
+		osapiLogger::setAppender(new osapiFileAppender("data/osapi.log"));
+
 		$provider = new osapiConextProvider();
-		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE));
+		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE), $this->userId);
 		$this->osapi = new osapi($provider, $auth);
 	}
 
 	function getUserGroups() {
 		try {
-			$params = array('userId' => 'urn:collab:person:surfnet.nl:francois',
-					'groupId' => '@self',
-					'fields' => '@all',
-					'count' => 10,
-					'startIndex' => 0,
-				);
-
+			$params = array('userId' => $this->userId);
 			$request = $this->osapi->people->get($params);
-	
 			$batch = $this->osapi->newBatch();
 			$batch->add($request, 'request_label');
 			$result = $batch->execute();
-	
-			var_dump($result);
-
 		} catch(Exception $e) {
 			echo $e->getMessage();
 		}
