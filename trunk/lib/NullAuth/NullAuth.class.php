@@ -28,19 +28,5 @@ class NullAuth extends Auth {
 		$_SESSION['userDisplayName'] = 'Anonymous Coward';
 		return;
 	}
-
-	function getUserGroups() {
-		if ($this->isLoggedIn())
-			return array (
-				'A' => 'Alpha',
-				'B' => 'Bravo',
-				'C' => 'Charlie',
-				'D' => 'Delta',
-				'E' => 'Echo',
-				
-			);
-		else
-			throw new Exception("not logged in");
-	}
 }
 ?>

@@ -24,6 +24,9 @@ $config['cache_dir'] = 'data/cache';
 // NullAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
+// NullGroups, ConextGroups
+$config['group_type'] = 'NullGroups';
+
 // simpleSAMLphp configuration (SSPAuth)
 $config['ssp_path'] = '/var/simplesamlphp';
 $config['ssp_sp'] = 'default-sp';
