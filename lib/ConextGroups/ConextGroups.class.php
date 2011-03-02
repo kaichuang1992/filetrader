@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once ('ext/opensocial-php-client/osapi/osapi.php');
+require_once ('ext/opensocial-php-client/src/osapi/osapi.php');
 require_once ('lib/ConextGroups/osapiConextProvider.php');
 
 class ConextGroups extends Groups {
@@ -30,6 +30,9 @@ class ConextGroups extends Groups {
 		osapiLogger::setLevel(osapiLogger::INFO);
 		osapiLogger::setAppender(new osapiFileAppender("data/osapi.log"));
 
+		/* Applied a patch against opensocial-php-client that can be found
+		 * in issue 79 @ http://code.google.com/p/opensocial-php-client/issues/detail?id=79
+		 */
 		$provider = new osapiConextProvider();
 		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE), $this->auth->getUserId());
 		$this->osapi = new osapi($provider, $auth);
