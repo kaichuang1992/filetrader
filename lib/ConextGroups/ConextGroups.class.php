@@ -19,7 +19,6 @@
  */
 
 require_once ('ext/opensocial-php-client/src/osapi/osapi.php');
-require_once ('lib/ConextGroups/osapiConextProvider.php');
 
 class ConextGroups extends Groups {
 	var $osapi; 
@@ -30,11 +29,12 @@ class ConextGroups extends Groups {
 		osapiLogger::setLevel(osapiLogger::INFO);
 		osapiLogger::setAppender(new osapiFileAppender("data/osapi.log"));
 
-		/* Applied a patch against opensocial-php-client that can be found
-		 * in issue 79 @ http://code.google.com/p/opensocial-php-client/issues/detail?id=79
-		 */
-		$provider = new osapiConextProvider();
-		$auth = new osapiOAuth2Legged(getConfig($config, 'conext_key', TRUE), getConfig($config, 'conext_secret', TRUE), $this->auth->getUserId());
+		$host = getConfig($config, 'conext_host', TRUE);
+		$key = getConfig($config, 'conext_key', TRUE);
+		$secret = getConfig($config, 'conext_secret', TRUE);
+
+		$provider = new osapiProvider("https://$host/oauth/request_token","https://$host/oauth/authorize","https://$host/oauth/access_token","https://$host/social/rest","https://$host/social/rpc",'SURFconext', TRUE, NULL);
+		$auth = new osapiOAuth2Legged($key, $secret, $this->auth->getUserId());
 		$this->osapi = new osapi($provider, $auth);
 	}
 
