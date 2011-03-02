@@ -36,16 +36,19 @@ class ConextGroups extends Groups {
 	}
 
 	function getUserGroups() {
-//		try {
-			$params = array('userId' => $this->auth->getUserId());
-			$request = $this->osapi->people->get($params);
-			$batch = $this->osapi->newBatch();
-			$batch->add($request, 'request_label');
-			$result = $batch->execute();
-//		} catch(Exception $e) {
-			//echo $e->getMessage();
-//			throw new Exception("SURFconext error");
-//		}
+		$params = array('userId' => $this->auth->getUserId());
+		$batch = $this->osapi->newBatch();
+		// $batch->add($this->osapi->people->get($params), 'getPeople');
+		$batch->add($this->osapi->groups->get($params), 'getGroups');
+		$result = $batch->execute();
+
+		$groups = array();
+		foreach($result['getGroups']['result']['list'] as $group) {
+			$groupId = $group['id']['groupId'];
+			$groupTitle = $group['title'];
+			$groups[$groupId] = $groupTitle;
+		}
+		return $groups;
 	}
 }
 ?>
