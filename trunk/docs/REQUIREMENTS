@@ -21,7 +21,11 @@ simpleSAMLphp	1.7.0		LGPL 2.1	http://simplesamlphp.org/
 
 # If you want to use SURFconext for retrieving group data:
 opensocial-php-client
-		1.1.1		ASL2.0		http://code.google.com/p/opensocial-php-client/
+		svn r212	ASL2.0		http://code.google.com/p/opensocial-php-client/
+************
+*** NOTE ***  applied patch "opensocial-php-client_r79.patch" in this directory
+************  to opensocial-php-client. See for more information:
+	      http://code.google.com/p/opensocial-php-client/issues/detail?id=79 
 
 The following external JS libraries are required:
 
