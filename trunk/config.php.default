@@ -18,9 +18,6 @@ $config['file_storage_dir'] = 'data/files';
 // Location for cache (e.g. thumbnails, transcodes)
 $config['cache_dir'] = 'data/cache';
 
-// use system wide PEAR installation
-// $config['pear_path'] = '/usr/share/pear';
-
 // NullAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
@@ -32,6 +29,9 @@ $config['ssp_path'] = '/var/simplesamlphp';
 $config['ssp_sp'] = 'default-sp';
 $config['ssp_uid_attr'] = 'uid';
 $config['ssp_dn_attr'] = 'cn';
+
+// use system wide PEAR installation
+// $config['pear_path'] = '/usr/share/pear';
 
 // use local PEAR
 $config['pear_path'] = __DIR__."/ext/pear/php";
@@ -51,11 +51,12 @@ $config['oauth_consumers'] = array (
 	'abcde' => 'edcba',
 );
 
-// Allow users to share files through groups
-// (This requires support in authentication backend!)
+// Allow users to share files through groups (NullGroups, ConextGroups)
 $config['group_share'] = FALSE;
 
 // Access SURFconext for accessing group membership using these OAuth credentials
+$config['conext_host']   = 'os.surfconext.nl';
+// $config['conext_host']   = 'gadgets.dev.coin.surf.net';
 $config['conext_key']    = '12345';
 $config['conext_secret'] = '54321';
 
