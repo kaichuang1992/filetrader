@@ -1,7 +1,7 @@
 <?php
 class osapiConextProvider extends osapiProvider {
 	public function __construct(osapiHttpProvider $httpProvider = null) {
-		parent::__construct('https://os.surfconext.nl/oauth/request_token','https://os.surfconext.nl/oauth/authorize','https://os.surfconext.nl/oauth/access_token','https://os.surfconext.nl/social/rest','https://os.surfconext.nl/social/rpc','SURFconext', TRUE, $httpProvider);
+		parent::__construct('https://gadgets.dev.coin.surf.net/oauth/request_token','https://gadgets.dev.coin.surf.net/oauth/authorize','https://gadgets.dev.coin.surf.net/oauth/access_token','https://gadgets.dev.coin.surf.net/social/rest','https://gadgets.dev.coin.surf.net/social/rpc','SURFconext', TRUE, $httpProvider);
 	}
 
 	/**
