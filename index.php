@@ -37,8 +37,14 @@ $smarty->assign('error', FALSE);
 try {
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
 		// only allow SSL connections
-		if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS']))
+		if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS'])) {
 			throw new Exception("only available through secure connection");
+		} else {
+			/* support HTTP Strict Transport Security */
+			if(getConfig($config, 'ssl_hsts', FALSE, FALSE)) {
+				header('Strict-Transport-Security: max-age=3600');
+			}
+		}
 	}
 
 	$authType = getConfig($config, 'auth_type', TRUE);

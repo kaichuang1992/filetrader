@@ -6,8 +6,11 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // Name of database in CouchDB
 $config['db_name'] = 'filetrader';
 
-// Wheter or not to allow only SSL connections
+// Whether or not to allow only SSL connections
 $config['ssl_only'] = FALSE;
+
+// Use HTTP Strict Transport Security
+$config['ssl_hsts'] = TRUE;
 
 // Files/Media per page
 $config['objects_per_page'] = 10;
