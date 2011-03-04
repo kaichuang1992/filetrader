@@ -114,22 +114,25 @@ class Files {
 
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
-		$view = getRequest("view", FALSE, "FileList");
-		$tag = getRequest("tag", FALSE, 0);
-		$group = getRequest("group", FALSE, 0);
+                $info = $this->storage->get($id)->body;
 
-		$info = $this->storage->get($id)->body;
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
+                        throw new Exception("access denied");
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
-			throw new Exception("access denied");
+		$groupShare = getConfig($this->config, 'group_share', FALSE, FALSE);
+                $emailShare = getConfig($this->config, 'email_share', FALSE, FALSE);
+
+		$hasVideo = (!empty($info->video->transcode->{360}) && $info->video->transcodeStatus == 'DONE' && !empty($info->video->thumbnail->{360})) ? TRUE : FALSE;
+		$hasStill = (!empty($info->video->thumbnail->{360})) ? TRUE : FALSE;
 
 		$this->smarty->assign('fileInfo', $info);
+		$this->smarty->assign('groupShare', $groupShare);
+                $this->smarty->assign('emailShare', $emailShare);
+		$this->smarty->assign('isOwner', $info->fileOwner === $this->auth->getUserId());
 		$this->smarty->assign('userGroups', $this->groups->getUserGroups());
-
-		$this->smarty->assign('view', $view);
-		$this->smarty->assign('group', $group);
-		$this->smarty->assign('licenses', $this->licenses);
-
+		$this->smarty->assign('hasVideo', $hasVideo);
+		$this->smarty->assign('hasStill', $hasStill);
+		$this->smarty->assign('allLicenses', $this->licenses);
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
 
@@ -307,7 +310,7 @@ class Files {
 		$this->smarty->assign('fileName', $info->fileName);
 
 		foreach ($diff as $token => $address) {
-			$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&id=$info->_id&token=$token";
+			$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?action=fileInfo&id=$info->_id&token=$token";
 			$this->smarty->assign('url', $url);
 			$content = $this->smarty->fetch('EmailInvite.tpl');
 			$message = wordwrap($content, 70);
