@@ -43,7 +43,6 @@ class Files {
 	function showFiles() {
 		$userId = $this->auth->getUserId();
 
-		$view = getRequest("view", FALSE, "FileList");
 		$tag = getRequest("tag", FALSE, FALSE);
 		$group = getRequest("group", FALSE, 0);
 
@@ -54,12 +53,6 @@ class Files {
 			$group = (int) $group;
 
 		$skip = getRequest("skip", FALSE, 0);
-
-		if (!in_array($view, array (
-				"FileList",
-				"MediaList"
-			)))
-			throw new Exception("invalid view");
 
 		$limit = getConfig($this->config, 'objects_per_page', FALSE, 100);
 
@@ -92,11 +85,6 @@ class Files {
 		$this->smarty->assign('skip', $skip);
 		$this->smarty->assign('limit', $limit);
 		$this->smarty->assign('no_of_files', $noOfFiles);
-		$this->smarty->assign('views', array (
-			'FileList' => 'File',
-			'MediaList' => 'Media'
-		));
-		$this->smarty->assign('view', $view);
 		$this->smarty->assign('tag', $tag);
 		$this->smarty->assign('group', $group);
 		$content = $this->smarty->fetch('FileList.tpl');
@@ -132,7 +120,6 @@ class Files {
 	function rawFileInfo() {
 		$id = getRequest("id", TRUE);
 
-		$view = getRequest("view", FALSE, "FileList");
 		$group = getRequest("group", FALSE, 0);
 
 		$info = $this->storage->get($id)->body;
@@ -141,7 +128,6 @@ class Files {
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', var_export($info, TRUE));
-		$this->smarty->assign('view', $view);
 		$this->smarty->assign('group', $group);
 
 		return $this->smarty->fetch('RawFileInfo.tpl');
