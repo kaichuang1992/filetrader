@@ -53,5 +53,21 @@ class ConextGroups extends Groups {
 		}
 		return $groups;
 	}
+
+	function addActivity($title = NULL, $body = NULL, $groupId = NULL) {
+		if(empty($title)||empty($body)||empty($groupId))
+			throw new Exception("should specify title, body and groupId");
+		$activity = new osapiActivity();
+		$activity->setTitle($title);
+		$activity->setBody($body);
+		$params = array(
+			'userId' => '@me',
+			'groupId' => $groupId,
+			'activity' => $activity,
+		);
+                $batch = $this->osapi->newBatch();
+		$batch->add($this->osapi->activities->create($params), 'addActivity');
+                $result = $batch->execute();
+	}
 }
 ?>
