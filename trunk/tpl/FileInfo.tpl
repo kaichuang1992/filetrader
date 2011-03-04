@@ -60,6 +60,7 @@
                                 <textarea rows="5" cols="55" name="fileTokens">{', '|implode:array_values((array)$fileInfo->fileTokens)}</textarea></td></tr>
 
 			<tr><td colspan="2">
+				<input type="submit" value="Download" name="buttonPressed">
 				<input type="submit" value="Update" name="buttonPressed">
                                 <input type="submit" value="Delete" name="buttonPressed">
 			</td></tr>
