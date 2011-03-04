@@ -1,7 +1,7 @@
 function (doc) {
 	if (doc.type == 'file' && doc.fileTags && doc.fileDate) {
 		doc.fileTags.forEach(function (tag) {
-			emit([doc.fileOwner, tag, doc.fileDate], doc);
+			emit([doc.fileOwner, tag, doc.fileDate], {fileName: doc.fileName, fileDate: doc.fileDate, fileSize: doc.fileSize});
 		});
 	}
 }

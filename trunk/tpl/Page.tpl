@@ -11,12 +11,12 @@
 </head>
 <body>
 	<div id="header">
-	        {if $authenticated}
+	        {if $auth->isLoggedIn()}
 	                <ul>
 				<li><a href="?action=showFiles">Home</a></li>
 				<li><a href="?action=fileUpload">Upload</a></li>
 			</ul>
-		        <span class="right"><span title="{$userId}">{$userDisplayName}</span> | <a href="?action=logout">Logout</a></span>
+		        <span class="right"><span title="{$auth->getUserId()}">{$auth->getUserDisplayName()}</span> | <a href="?action=logout">Logout</a></span>
 		{else}
 			<span class="left">FileTrader</span>
 		{/if}
@@ -24,23 +24,19 @@
 	
 	{if $action == 'showFiles'}
 	<div id="nav">
-                {if $authenticated}
+                {if $auth->isLoggedIn()}
 	                <form method="get" class="change_group left">
 	                        <input type="hidden" name="action" value="showFiles">
-	                        <input type="hidden" name="view" value="{$view}">
 	                        <label>List {html_options name=group class=change_group options=$groups selected=$group}</label>
         	        </form>
 
-	                {if $action == 'showFiles'}
-	                        <form method="get" class="right">
-	                                <input type="hidden" name="action" value="showFiles">
-	                                <input type="hidden" name="view" value="{$view}">
-	                                {if $group}
-	                                        <input type="hidden" name="group" value="{$group}">
-	                                {/if}
-	                                <label>Search <input type="text" name="tag" size="10" /></label>
-	                        </form>
-	                {/if}
+                        <form method="get" class="right">
+                                <input type="hidden" name="action" value="showFiles">
+                                {if $group}
+                                        <input type="hidden" name="group" value="{$group}">
+                                {/if}
+                                <label>Search Tag <input type="text" name="tag" size="10" /></label>
+                        </form>
                 {/if}
 	</div> <!-- /nav -->
 	{/if}

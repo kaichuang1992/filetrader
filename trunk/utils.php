@@ -266,7 +266,6 @@ function analyzeFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 	$metaData['fileTokens'] = array ();
 	$metaData['fileDescription'] = '';
 	$metaData['fileLicense'] = 'none';
-	$metaData['filePublic'] = FALSE;
 	$metaData['fileTags'] = array ();
 
 	/* MIME-Type */
