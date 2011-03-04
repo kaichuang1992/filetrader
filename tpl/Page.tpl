@@ -11,7 +11,7 @@
 </head>
 <body>
 	<div id="header">
-	        {if $auth->isLoggedIn()}
+	        {if isset($auth) && $auth->isLoggedIn()}
 	                <ul>
 				<li><a href="?action=showFiles">Home</a></li>
 				<li><a href="?action=fileUpload">Upload</a></li>
@@ -24,7 +24,7 @@
 	
 	{if $action == 'showFiles'}
 	<div id="nav">
-                {if $auth->isLoggedIn()}
+                {if isset($auth) && $auth->isLoggedIn()}
 	                <form method="get" class="change_group left">
 	                        <input type="hidden" name="action" value="showFiles">
 	                        <label>List {html_options name=group class=change_group options=$groups selected=$group}</label>

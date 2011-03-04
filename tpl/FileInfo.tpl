@@ -91,7 +91,7 @@
 				</td>
 			</tr>
 
-			{if $isOwner && $groupShare}
+			{if $isOwner && $groupShare && !empty($userGroups)}
                         <tr>
 				<th>Group Sharing</th>
 				<td>
