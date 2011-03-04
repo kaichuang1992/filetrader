@@ -54,7 +54,7 @@ do {
 		$storage->put($id, $info);
 	}
 	sleep(10);
-} while (!empty ($transcodingNow));
+} while (TRUE);
 
 function determineProgress($logFile, $videoDuration) {
 	$fp = fopen("data/$logFile", 'r');

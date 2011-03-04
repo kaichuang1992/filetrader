@@ -51,7 +51,7 @@ do {
 		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode-> $videoHeight->file;
 		$newSize = $info->video->transcode-> $videoHeight->width . "x" . $videoHeight;
 		// -vf transpose=1   (for rotating clockwise 90 degrees)
-		$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 1000000 -y $transcodeFileName";
+		$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 524288 -y $transcodeFileName";
 
 		execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
 
@@ -59,5 +59,6 @@ do {
 		$info->video->transcodeStatus = 'DONE';
 		$storage->put($id, $info);
 	}
-} while (!empty ($toTranscode));
+	sleep(10);
+} while (TRUE);
 ?>
