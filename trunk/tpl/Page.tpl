@@ -22,7 +22,7 @@
 		{/if}
         </div> <!-- /header -->
 	
-	{if $action == 'showFiles' || $action == 'updateFileInfo'}
+	{if $action == 'showFiles'}
 	<div id="nav">
                 {if $authenticated}
 	                <form method="get" class="change_group left">

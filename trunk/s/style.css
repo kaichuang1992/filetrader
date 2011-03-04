@@ -111,7 +111,8 @@ td.thumbnail img {
 
 label {
 	display: block;
-	margin: 10px;
+	margin: 0;
+	padding: 0;
 }
 
 a {
@@ -146,3 +147,16 @@ form.change_view {
 	margin-right: -10px;
 	padding: 0;
 }
+
+div.video {
+	float: left;
+}
+
+div.fileInfo {
+	float: left;
+}
+
+.editView {
+	display: none;
+}
+

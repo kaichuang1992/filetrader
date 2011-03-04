@@ -8,7 +8,7 @@ $(document).ready(function() {
         });
 
 	/* Disable the groups if file is public on page load */
-        if($('input.share_public').is(':checked')) {
+/*        if($('input.share_public').is(':checked')) {
    	     $('input.share_group').attr('disabled', 'disabled');
         }
 	
@@ -19,4 +19,11 @@ $(document).ready(function() {
 			$('input.share_group').removeAttr('disabled');
 		}
 	});
+*/
+
+	$("table.fileInfo img").click(function() {
+		$(this).parent().next().children(".showView").toggle();
+		$(this).parent().next().children(".editView").toggle();
+	});
+
 });
