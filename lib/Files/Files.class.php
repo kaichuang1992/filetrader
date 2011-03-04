@@ -68,28 +68,19 @@ class Files {
 		 *        this was a requirement anyway for broken CouchDB? 
 		 *
 		 * $group === 0		--> Private Files
-		 * $group === 1		--> Public Files
 		 */
 		if ($tag !== FALSE && $group === 0) {
 			$query = "_design/files/_view/get_files_tag?descending=true&startkey=[\"$userId\",\"" . strtoupper($tag) . "\",{}]&endkey=[\"$userId\",\"" . strtolower($tag) . "\"]";
-		}
-		elseif ($tag === FALSE && $group === 0) {
+		} elseif ($tag === FALSE && $group === 0) {
 			$query = "_design/files/_view/get_files?descending=true&startkey=[\"$userId\",{}]&endkey=[\"$userId\"]";
-		} else
-			if ($tag !== FALSE && $group === 1) {
-				$query = "_design/files/_view/get_public_files_tag?descending=true&startkey=[\"" . strtoupper($tag) . "\",{}]&endkey=[\"" . strtolower($tag) . "\"]";
-			}
-		elseif ($tag === FALSE && $group === 1) {
-			$query = "_design/files/_view/get_public_files?descending=true";
-		}
-		elseif ($tag !== FALSE) {
+		} elseif ($tag !== FALSE) {
 			$query = "_design/files/_view/get_group_files_tag?descending=true&startkey=[\"$group\",\"" . strtoupper($tag) . "\",{}]&endkey=[\"$group\",\"" . strtolower($tag) . "\"]";
-		}
-		elseif ($tag === FALSE) {
+		} elseif ($tag === FALSE) {
 			$query = "_design/files/_view/get_group_files?descending=true&startkey=[\"$group\",{}]&endkey=[\"$group\"]";
 		} else {
 			throw new Exception("tag, group confusion, does not match a pattern?");
 		}
+
 		$files = $this->storage->get($query . "&limit=$limit&skip=$skip&reduce=false")->body->rows;
 		if (sizeof($files) > 0) {
 			$noOfFiles = $this->storage->get($query)->body->rows[0]->value;
@@ -116,7 +107,7 @@ class Files {
 		$id = getRequest("id", TRUE);
                 $info = $this->storage->get($id)->body;
 
-                if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
+                if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
                         throw new Exception("access denied");
 
 		$groupShare = getConfig($this->config, 'group_share', FALSE, FALSE);
@@ -129,7 +120,9 @@ class Files {
 		$this->smarty->assign('groupShare', $groupShare);
                 $this->smarty->assign('emailShare', $emailShare);
 		$this->smarty->assign('isOwner', $info->fileOwner === $this->auth->getUserId());
-		$this->smarty->assign('userGroups', $this->groups->getUserGroups());
+		if($groupShare) {
+			$this->smarty->assign('userGroups', $this->groups->getUserGroups());
+		}
 		$this->smarty->assign('hasVideo', $hasVideo);
 		$this->smarty->assign('hasStill', $hasStill);
 		$this->smarty->assign('allLicenses', $this->licenses);
@@ -144,7 +137,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE)
 			throw new Exception("access denied");
 
 		$this->smarty->assign('fileInfo', var_export($info, TRUE));
@@ -249,7 +242,6 @@ class Files {
 		$fileDescription = getRequest('fileDescription', FALSE, $info->fileDescription);
 		$fileTags = getRequest('fileTags', FALSE, implode(",", $info->fileTags));
 		$fileLicense = getRequest('fileLicense', FALSE, $info->fileLicense);
-		$filePublic = getRequest('filePublic', FALSE, 'off');
 
 		$fileTokens = getRequest('fileTokens', FALSE, implode(",", array_values((array) $info->fileTokens)));
 		$fileGroups = getRequest('fileGroups', FALSE, array ()); /* not set means everything deselected! */
@@ -340,13 +332,6 @@ class Files {
 			throw new Exception("invalid license specified");
 		$info->fileLicense = $fileLicense;
 
-		/* Public */
-		if ($filePublic === 'on') {
-			$info->filePublic = TRUE;
-		} else {
-			$info->filePublic = FALSE;
-		}
-
 		$this->storage->put($id, $info);
 		return $this->fileInfo();
 	}
@@ -362,7 +347,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
 			throw new Exception("access denied");
 
 		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
@@ -396,7 +381,7 @@ class Files {
 
 		$info = $this->storage->get($id)->body;
 
-		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && !$info->filePublic)
+		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE)
 			throw new Exception("access denied");
 
 		if (!in_array($type, $validTypes))

@@ -50,6 +50,13 @@
 				</td>
 			</tr>
 
+                        <tr>
+                                <th>Date</th>
+                                <td>
+                                        {$fileInfo->fileDate|date_format:"%d %b  %H:%M"}
+                                </td>
+                        </tr>
+
 			<tr>
 				<th>Tags {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
