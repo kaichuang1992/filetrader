@@ -539,7 +539,7 @@ class Files {
                         	'Demo Tag',
 	                        "Length" . strlen(basename($userFile))
 	                );
-	                $metaData->fileDescription = 'Uploaded to FileTrader on ' . strftime("%c", time());
+	                $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
 	                $metaData->fileGroups = array ();
 	                $metaData->fileTokens = array ();
 	                $metaData->fileLicense = 'none';

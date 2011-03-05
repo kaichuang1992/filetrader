@@ -94,7 +94,7 @@ foreach (glob($fileStorageDir . "/*") as $userDir) {
 			'Demo Tag',
 			"Length" . strlen(basename($userFile))
 		);
-		$metaData->fileDescription = 'Imported by FileTrader CLI on ' . strftime("%c", time());
+		$metaData->fileDescription = 'Imported on ' . strftime("%c", time());
 		$metaData->fileGroups = array ();
 		$metaData->fileTokens = array ();
 		$metaData->fileLicense = 'none';
