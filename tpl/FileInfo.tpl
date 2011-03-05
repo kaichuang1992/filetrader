@@ -125,11 +125,12 @@
 
 			<tr>
 				<td colspan="2">
+                                        <input type="submit" value="Download" name="buttonPressed">
 					{if $isOwner}
 		                                <input type="submit" value="Update" name="buttonPressed">
 	                                        <input type="submit" value="Delete" name="buttonPressed">
+						<input type="submit" value="Reexamine" name="buttonPressed">
 					{/if}
-                                        <input type="submit" value="Download" name="buttonPressed">
 				</td>
 			</tr>
 		</table>
