@@ -127,9 +127,9 @@ function execCommand($command, $logFile = NULL, $subject = '') {
 }
 
 function isMediaFile(& $metaData, $filePath) {
-	if (!is_array($metaData) || !array_key_exists('fileName', $metaData))
+	if (!isset($metaData->fileName))
 		throw new Exception("meta data invalid");
-	$file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
+	$file = $filePath . DIRECTORY_SEPARATOR . $metaData->fileName;
 
 	if (!is_file($file) || !is_readable($file))
 		throw new Exception("unable to open file");
@@ -142,9 +142,9 @@ function isMediaFile(& $metaData, $filePath) {
 }
 
 function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
-	if (!is_array($metaData) || !array_key_exists('fileName', $metaData) || !array_key_exists('fileType', $metaData))
+	if (!isset($metaData->fileName) || !isset($metaData->fileType))
 		throw new Exception("meta data invalid");
-	$file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
+	$file = $filePath . DIRECTORY_SEPARATOR . $metaData->fileName;
 
 	if (!is_file($file) || !is_readable($file))
 		throw new Exception("file does not exist");
@@ -152,7 +152,7 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 	if (!is_dir($cachePath))
 		throw new Exception("cache dir does not exist");
 
-	switch ($metaData['fileType']) {
+	switch ($metaData->fileType) {
 		case "video/quicktime" :
 		case "application/ogg" :
 		case "video/mp4" :
@@ -166,18 +166,18 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 			if (isMediaFile($metaData, $filePath)) {
 				$media = new ffmpeg_movie($file, FALSE);
 				if ($media->hasVideo()) {
-					$metaData['video']['codec'] = $media->getVideoCodec();
-					$metaData['video']['width'] = $media->getFrameWidth();
-					$metaData['video']['height'] = $media->getFrameHeight();
-					$metaData['video']['bitrate'] = $media->getVideoBitRate();
-					$metaData['video']['framerate'] = $media->getFrameRate();
-					$metaData['video']['duration'] = $media->getDuration();
+					$metaData->video->codec = $media->getVideoCodec();
+					$metaData->video->width = $media->getFrameWidth();
+					$metaData->video->height = $media->getFrameHeight();
+					$metaData->video->bitrate = $media->getVideoBitRate();
+					$metaData->video->framerate = $media->getFrameRate();
+					$metaData->video->duration = $media->getDuration();
 				}
 				if ($media->hasAudio()) {
-					$metaData['audio']['codec'] = $media->getAudioCodec();
-					$metaData['audio']['bitrate'] = $media->getAudioBitRate();
-					$metaData['audio']['samplerate'] = $media->getAudioSampleRate();
-					$metaData['audio']['duration'] = $media->getDuration();
+					$metaData->audio->codec = $media->getAudioCodec();
+					$metaData->audio->bitrate = $media->getAudioBitRate();
+					$metaData->audio->samplerate = $media->getAudioSampleRate();
+					$metaData->audio->duration = $media->getDuration();
 				}
 
 				// Thumbnails
@@ -211,10 +211,8 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 								), $tS);
 								$f->resize($sV['width'], $sV['height']);
 								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
-								$metaData['video']['thumbnail'][$tS] = array (
-									'file' => basename($thumbFile),
-									'width' => $sV['width']
-								);
+								$metaData->video->thumbnail->$tS->file = basename($thumbFile);
+								$metaData->video->thumbnail->$tS->width = $sV['width'];
 								imagepng($f->toGDImage(), $thumbFile);
 								break;
 							}
@@ -227,8 +225,8 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 				);
 				// Schedule for transcoding to WebM
 				if ($media->hasVideo()) {
-					$metaData['video']['transcodeStatus'] = 'WAITING';
-					$metaData['video']['transcodeProgress'] = 0;
+					$metaData->video->transcodeStatus = 'WAITING';
+					$metaData->video->transcodeProgress = 0;
 
 					foreach ($transcodeSizes as $tS) {
 						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
@@ -236,10 +234,8 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 							$media->getFrameWidth(),
 							$media->getFrameHeight()
 						), $tS);
-						$metaData['video']['transcode'][$tS] = array (
-							'file' => basename($transcodeFile),
-							'width' => $sV['width']
-						);
+						$metaData->video->transcode->$tS->file = basename($transcodeFile);
+						$metaData->video->transcode->$tS->width = $sV['width'];
 					}
 				}
 			} else {
@@ -253,25 +249,20 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 }
 
 function analyzeFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
-	if (!is_array($metaData) || !array_key_exists('fileName', $metaData))
+	if(!isset($metaData->fileName))
 		throw new Exception("meta data invalid");
-	$file = $filePath . DIRECTORY_SEPARATOR . $metaData['fileName'];
 
+	$file = $filePath . DIRECTORY_SEPARATOR . $metaData->fileName;
 	if (!is_file($file) || !is_readable($file))
 		throw new Exception("file does not exist");
 
-	$metaData['type'] = "file";
-	$metaData['fileSize'] = filesize($file);
-	$metaData['fileDate'] = filemtime($file);
-	$metaData['fileGroups'] = array ();
-	$metaData['fileTokens'] = array ();
-	$metaData['fileDescription'] = '';
-	$metaData['fileLicense'] = 'none';
-	$metaData['fileTags'] = array ();
+	$metaData->type = "file";
+	$metaData->fileSize = filesize($file);
+	$metaData->fileDate = filemtime($file);
 
 	/* MIME-Type */
 	$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
-	$metaData['fileType'] = $finfo->file($file);
+	$metaData->fileType = $finfo->file($file);
 
 	if (isMediaFile($metaData, $filePath)) {
 		analyzeMediaFile($metaData, $filePath, $cachePath);

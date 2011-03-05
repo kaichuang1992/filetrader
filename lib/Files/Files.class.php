@@ -128,18 +128,11 @@ class Files {
                 $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
                 $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
-		$metaData = (array)$info;
-		/* FIXME: we should really consider forgetting about
-		   arrays everywhere and just use stdClass! */
-		/* FIXME2: we should throw away any existing transcodes
-		   and stills/thumbnails! */
-		if(isset($metaData['video']))
-			unset($metaData['video']);
-		if(isset($metaData['audio']))
-			unset($metaData['audio']);
-		
-		analyzeFile($metaData, $targetDir, $cachePath);
-                $this->storage->put($id, $metaData);
+		/* remove thumbnails and transcodes of this file if they exist */
+		$this->deleteCacheObjects($info);
+
+		analyzeFile($info, $targetDir, $cachePath);
+                $this->storage->put($id, $info);
 		return $this->fileInfo();
 	}
 
@@ -173,25 +166,27 @@ class Files {
 			$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($info->fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
 			if (is_file($filePath))
 				unlink($filePath);
-
-			/* delete the cache objects belonging to this file from the file system */
-			$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-			if (isset ($info->video->transcode)) {
-				foreach ($info->video->transcode as $k => $v) {
-					if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
-						unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
-				}
-			}
-			if (isset ($info->video->thumbnail)) {
-				foreach ($info->video->thumbnail as $k => $v) {
-					if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
-						unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
-				}
-			}
-
+			$this->deleteCacheObjects($info);
 			$this->storage->delete($id, $info->_rev);
 		}
 		return $this->showFiles();
+	}
+
+	function deleteCacheObjects($info) {
+		/* delete the cache objects belonging to this file from the file system */
+		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+		if (isset ($info->video->transcode)) {
+        		foreach ($info->video->transcode as $k => $v) {
+				if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+                        		unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+                	}
+		}
+		if (isset ($info->video->thumbnail)) {
+ 	        	foreach ($info->video->thumbnail as $k => $v) {
+                        	if (is_file($cachePath . DIRECTORY_SEPARATOR . $v->file))
+               	                	unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
+                	}
+		}
 	}
 
 	function confirmDelete($filesToDelete = NULL) {
@@ -536,11 +531,21 @@ class Files {
 
 		/* only add entry to the database after receiving the last block */
 		if ($chunk == $chunks -1 || $chunks === 0) {
-			$metaData['fileOwner'] = $this->auth->getUserId();
-			$metaData['fileName'] = $fileName;
+			$metaData = new stdClass();
+			$metaData->fileName = $fileName;
 			analyzeFile($metaData, $targetDir, $cachePath);
+                        $metaData->fileOwner = $this->auth->getUserId();
+			$metaData->fileTags = array (
+                        	'Demo Tag',
+	                        "Length" . strlen(basename($userFile))
+	                );
+	                $metaData->fileDescription = 'Uploaded to FileTrader on ' . strftime("%c", time());
+	                $metaData->fileGroups = array ();
+	                $metaData->fileTokens = array ();
+	                $metaData->fileLicense = 'none';
+	                $metaData->fileTags = array ();
 			$this->storage->post($metaData);
-			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData['fileName'] . "'");
+			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");
 		}
 
 		// Return JSON-RPC response
