@@ -117,6 +117,23 @@ class Files {
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
 
+	function reExamineFile() {
+                $id = getRequest("id", TRUE);
+                $info = $this->storage->get($id)->body;
+
+                if ($info->fileOwner !== $this->auth->getUserId())
+ 	               throw new Exception("access denied");
+
+                $ownerDir = base64_encode($this->auth->getUserId());
+                $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
+                $cachePath = getConfig($this->config, 'cache_dir', TRUE);
+
+		$metaData = (array)$info;
+		analyzeFile($metaData, $targetDir, $cachePath);
+                $this->storage->put($id, $metaData);
+		return $this->fileInfo();
+	}
+
 	function rawFileInfo() {
 		$id = getRequest("id", TRUE);
 
@@ -214,6 +231,10 @@ class Files {
 			case "Update" :
 				/* continue with the rest of the function */
 				break;
+
+			case "Reexamine" :
+				$id = getRequest("id", TRUE);
+				return $this->reExamineFile($id);
 
 			default :
 				throw new Exception("invalid button type");

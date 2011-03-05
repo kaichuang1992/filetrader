@@ -160,6 +160,7 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 		case "video/ogg" :
 		case "video/webm" :
 		case "video/x-ms-asf" :
+		case "video/x-flv" :
 		case "application/octet-stream" :
 			/* determine width, height, codecs */
 			if (isMediaFile($metaData, $filePath)) {
