@@ -77,7 +77,9 @@
 							<em>No License Specified</em>
                                         	{/if}
 					</span>
-					{html_options class="editView" name='fileLicense' options=$allLicenses selected=$fileInfo->fileLicense}
+					<span class="editView">
+						{html_options name='fileLicense' options=$allLicenses selected=$fileInfo->fileLicense}
+					</span>
 				</td>
 			</tr>
 
@@ -88,6 +90,19 @@
 					<textarea class="editView" name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea>
 				</td>
 			</tr>
+
+			{if isset($fileInfo->video) && $fileInfo->video->transcodeStatus != 'DONE'}
+		        <tr>
+                    		<th>Transcode</th>
+                        	<td>
+                                        {if $fileInfo->video->transcodeStatus == 'PROGRESS'}
+                                                <em>{$fileInfo->video->transcodeProgress}%</em>
+					{elseif $fileInfo->video->transcodeStatus == 'WAITING'}
+						<em>Waiting</em>
+                                        {/if}
+	                        </td>
+        	        </tr>
+			{/if}   
 
 			{if $isOwner && $groupShare && !empty($userGroups)}
                         <tr>
