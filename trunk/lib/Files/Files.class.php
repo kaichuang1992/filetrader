@@ -129,6 +129,13 @@ class Files {
                 $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
 		$metaData = (array)$info;
+		/* FIXME: we should really consider forgetting about
+		   arrays everywhere and just use stdClass! */
+		if(isset($metaData['video']))
+			unset($metaData['video']);
+		if(isset($metaData['audio']))
+			unset($metaData['audio']);
+		
 		analyzeFile($metaData, $targetDir, $cachePath);
                 $this->storage->put($id, $metaData);
 		return $this->fileInfo();
