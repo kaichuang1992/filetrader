@@ -1,5 +1,3 @@
-<h1>{$fileInfo->fileName}</h1>
-
 {if $hasVideo}
 <script type="text/javascript" src="ext/video-js/video.js"></script>
 <script type="text/javascript">
