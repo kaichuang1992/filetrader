@@ -131,6 +131,8 @@ class Files {
 		$metaData = (array)$info;
 		/* FIXME: we should really consider forgetting about
 		   arrays everywhere and just use stdClass! */
+		/* FIXME2: we should throw away any existing transcodes
+		   and stills/thumbnails! */
 		if(isset($metaData['video']))
 			unset($metaData['video']);
 		if(isset($metaData['audio']))
