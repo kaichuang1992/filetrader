@@ -81,22 +81,25 @@ foreach (glob($cachePath . "/*") as $cacheEntry) {
 // Import all new entries
 foreach (glob($fileStorageDir . "/*") as $userDir) {
 	$userName = trim(base64_decode(basename($userDir)));
-	echo "**** $userName\n";
 	foreach (glob($userDir . "/*") as $userFile) {
 		if (!is_file($userFile))
 			continue;
 		echo "[$userName] Analyzing: " . basename($userFile) . "\n";
-		$metaData = array ();
-		$metaData['fileName'] = basename($userFile);
+
+		$metaData = new stdClass();
+		$metaData->fileName = basename($userFile);
 		analyzeFile($metaData, dirname($userFile), $cachePath);
-		$metaData['fileOwner'] = $userName;
-		$metaData['fileTags'] = array (
+		$metaData->fileOwner = $userName;
+		$metaData->fileTags = array (
 			'Demo Tag',
 			"Length" . strlen(basename($userFile))
 		);
-		$metaData['fileDescription'] = 'Imported by FileTrader CLI on ' . strftime("%c", time());
+		$metaData->fileDescription = 'Imported by FileTrader CLI on ' . strftime("%c", time());
+		$metaData->fileGroups = array ();
+		$metaData->fileTokens = array ();
+		$metaData->fileLicense = 'none';
+		$metaData->fileTags = array ();
 		$s->post($metaData);
-		echo "[$userName] Imported:  " . basename($userFile) . "\n";
 	}
 }
 ?>
