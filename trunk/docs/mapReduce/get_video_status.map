@@ -1,5 +1,0 @@
-function (doc) {
-        if (doc.type == 'file' && doc.video.transcodeStatus) {
-        	emit([doc.video.transcodeStatus, doc.fileDate], null);
-	}
-}

@@ -101,8 +101,9 @@ class Files {
 		$groupShare = getConfig($this->config, 'group_share', FALSE, FALSE);
                 $emailShare = getConfig($this->config, 'email_share', FALSE, FALSE);
 
-		$hasVideo = (!empty($info->video->transcode->{360}) && $info->video->transcodeStatus == 'DONE' && !empty($info->video->thumbnail->{360})) ? TRUE : FALSE;
-		$hasStill = (!empty($info->video->thumbnail->{360})) ? TRUE : FALSE;
+		$hasVideo = (isset($info->video) && $info->transcodeStatus == 'DONE') ? TRUE : FALSE;
+		$hasAudio = (isset($info->audio) && $info->transcodeStatus == 'DONE') ? TRUE : FALSE;
+		$hasStill = (isset($info->video)) ? TRUE : FALSE;
 
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('groupShare', $groupShare);
@@ -112,6 +113,7 @@ class Files {
 			$this->smarty->assign('userGroups', $this->groups->getUserGroups());
 		}
 		$this->smarty->assign('hasVideo', $hasVideo);
+                $this->smarty->assign('hasAudio', $hasAudio);
 		$this->smarty->assign('hasStill', $hasStill);
 		$this->smarty->assign('allLicenses', $this->licenses);
 		return $this->smarty->fetch('FileInfo.tpl');
@@ -384,10 +386,11 @@ class Files {
 		$type = getRequest("type", TRUE);
 
 		$validTypes = array (
-			'thumbnail_90',
-			'thumbnail_180',
-			'thumbnail_360',
-			'transcode_360'
+			'video_thumbnail_90',
+			'video_thumbnail_180',
+			'video_thumbnail_360',
+			'video_transcode_360',
+			'audio_transcode',
 		);
 
 		$info = $this->storage->get($id)->body;
@@ -398,10 +401,13 @@ class Files {
 		if (!in_array($type, $validTypes))
 			throw new Exception("invalid cache type");
 
-		list ($t, $subT) = explode("_", $type);
+		list ($mediaType, $t, $subT) = explode("_", $type);
 
 		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
-		$file = $cachePath . DIRECTORY_SEPARATOR . $info->video-> $t-> $subT->file;
+		if($mediaType == 'video')
+			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t-> $subT->file;
+		elseif($mediaType == 'audio')
+                        $file = $cachePath . DIRECTORY_SEPARATOR . $info->audio->$t->file;
 
 		if (!is_file($file))
 			throw new Exception("file does not exist on file system");
