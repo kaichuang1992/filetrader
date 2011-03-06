@@ -225,8 +225,9 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 				);
 				// Schedule for transcoding to WebM
 				if ($media->hasVideo()) {
-					$metaData->video->transcodeStatus = 'WAITING';
-					$metaData->video->transcodeProgress = 0;
+					$metaData->transcodeStatus = 'WAITING';
+
+					$metaData->transcodeProgress = 0;
 
 					foreach ($transcodeSizes as $tS) {
 						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
@@ -237,6 +238,12 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 						$metaData->video->transcode->$tS->file = basename($transcodeFile);
 						$metaData->video->transcode->$tS->width = $sV['width'];
 					}
+				} elseif ($media->hasAudio()) {
+                                        $metaData->transcodeStatus = 'WAITING';
+                                        $metaData->transcodeProgress = 0;
+
+                                        $transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".ogg";
+                                        $metaData->audio->transcode->file = basename($transcodeFile);
 				}
 			} else {
 				// not a media file?!

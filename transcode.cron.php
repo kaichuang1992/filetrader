@@ -36,27 +36,32 @@ $storage = new Sag();
 $storage->setDatabase($dbName);
 
 do {
-	$toTranscode = $storage->get("_design/files/_view/get_video_status?limit=1&startkey=[\"WAITING\"]&endkey=[\"WAITING\",{}]")->body->rows;
+	$toTranscode = $storage->get("_design/files/_view/get_media_status?limit=1&startkey=[\"WAITING\"]&endkey=[\"WAITING\",{}]")->body->rows;
 
 	if (!empty ($toTranscode)) {
 		$t = $toTranscode[0];
 		$id = $t->id;
 
 		$info = $storage->get($id)->body;
-		$info->video->transcodeStatus = 'PROGRESS';
+		$info->transcodeStatus = 'PROGRESS';
 		$storage->put($id, $info);
 
 		$fileOwner = $info->fileOwner;
 		$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
-		$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode-> $videoHeight->file;
-		$newSize = $info->video->transcode-> $videoHeight->width . "x" . $videoHeight;
-		// -vf transpose=1   (for rotating clockwise 90 degrees)
-		$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 524288 -y $transcodeFileName";
+		if(isset($info->video)) {
+			$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
+			$newSize = $info->video->transcode-> $videoHeight->width . "x" . $videoHeight;
+			// -vf transpose=1   (for rotating clockwise 90 degrees)
+			$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 524288 -y $transcodeFileName";
+		}elseif(isset($info->audio)) {
+                        $transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->audio->transcode->file;
+                        $cmd = "ffmpeg -i \"$fileName\" -threads 2 -f ogg -acodec libvorbis -ab 96000 -y $transcodeFileName";
+		}
 
 		execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
 
 		$info = $storage->get($id)->body;
-		$info->video->transcodeStatus = 'DONE';
+		$info->transcodeStatus = 'DONE';
 		$storage->put($id, $info);
 	}
 	sleep(10);

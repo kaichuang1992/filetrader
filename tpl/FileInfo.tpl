@@ -12,19 +12,23 @@
 <!-- Begin VideoJS -->
 <div class="video-js-box">
 	<!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-        <video id="video_1" class="video-js" width="{$fileInfo->video->transcode->{360}->width}" height="360" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=thumbnail_360">
-        	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=transcode_360" type='video/webm; codecs="vp8, vorbis"' />
+        <video id="video_1" class="video-js" width="{$fileInfo->video->transcode->{360}->width}" height="360" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360">
+        	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_transcode_360" type='video/webm; codecs="vp8, vorbis"' />
         </video>
         <!-- Download links provided for devices that can't play video in the browser. -->
         <p class="vjs-no-video"><strong>Download Video:</strong>
-        	<a href="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=transcode_360">WebM</a>,
+        	<a href="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_transcode_360">WebM</a>,
                 <!-- Support VideoJS by keeping this link. -->
                 <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS
         </p>
 </div>
 <!-- End VideoJS -->
 {elseif $hasStill}
-	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=thumbnail_360" alt="Video Still" title="Video Still">
+	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360" alt="Video Still" title="Video Still">
+{elseif $hasAudio}
+<audio controls="controls" preload="auto">
+	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=audio_transcode" type='audio/ogg; codecs="vorbis"' />
+</audio>
 {/if}
 
 <div id="fileInfo">
@@ -40,6 +44,18 @@
 					<input class="editView" type="text" size="50" name="fileName" value="{$fileInfo->fileName}"/>
 				</td>
 			</tr>
+
+                        {if isset($fileInfo->video)}
+			<tr>
+				<th>Duration</th>
+				<td>{$fileInfo->video->duration|to_duration}</td>
+			</tr>
+			{elseif isset($fileInfo->audio)}
+                        <tr>
+                                <th>Duration</th>
+                                <td>{$fileInfo->audio->duration|to_duration}</td>
+                        </tr>
+			{/if}
 
 			<tr>
 				<th>Size</th>
@@ -91,13 +107,13 @@
 				</td>
 			</tr>
 
-			{if isset($fileInfo->video) && $fileInfo->video->transcodeStatus != 'DONE'}
+			{if (isset($fileInfo->video) || isset($fileInfo->audio)) && $fileInfo->transcodeStatus != 'DONE'}
 		        <tr>
                     		<th>Transcode</th>
                         	<td>
-                                        {if $fileInfo->video->transcodeStatus == 'PROGRESS'}
-                                                <em>{$fileInfo->video->transcodeProgress}%</em>
-					{elseif $fileInfo->video->transcodeStatus == 'WAITING'}
+                                        {if $fileInfo->transcodeStatus == 'PROGRESS'}
+                                                <em>{$fileInfo->transcodeProgress}%</em>
+					{elseif $fileInfo->transcodeStatus == 'WAITING'}
 						<em>Waiting</em>
                                         {/if}
 	                        </td>

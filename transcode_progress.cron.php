@@ -36,21 +36,33 @@ $storage = new Sag();
 $storage->setDatabase($dbName);
 
 do {
-	$transcodingNow = $storage->get("_design/files/_view/get_video_status?limit=1&startkey=[\"PROGRESS\"]&endkey=[\"PROGRESS\",{}]")->body->rows;
+	$transcodingNow = $storage->get("_design/files/_view/get_media_status?limit=1&startkey=[\"PROGRESS\"]&endkey=[\"PROGRESS\",{}]")->body->rows;
 
 	if (!empty ($transcodingNow)) {
 		$t = $transcodingNow[0];
 		$id = $t->id;
 		$info = $storage->get($id)->body;
 
-		$progress = determineProgress($info->video->transcode->$videoHeight->file . ".log", $info->video->duration);
-		$info->video->transcodeProgress = $progress;
+                if(isset($info->video)) {
+			$progress = determineProgress($info->video->transcode->$videoHeight->file . ".log", $info->video->duration);
+		} elseif(isset($info->audio)) {
+                        $progress = determineProgress($info->audio->transcode->file . ".log", $info->audio->duration);
+		}
+
+		$info->transcodeProgress = $progress;
 		$storage->put($id, $info);
 	}
 	sleep(10);
 } while (TRUE);
 
-function determineProgress($logFile, $videoDuration) {
+function determineProgress($logFile, $mediaDuration) {
+	/* FFmpeg transcoding output when transcoding a video and audio file:
+
+	   video: 
+		frame=  514 fps= 13 q=0.0 size=    1807kB time=20.56 bitrate= 720.1kbits/s 
+	   audio: 
+		size=     982kB time=105.57 bitrate=  76.2kbits/s    
+	 */
 	$fp = fopen("data/$logFile", 'r');
 
 	$pos = -1;
@@ -60,12 +72,12 @@ function determineProgress($logFile, $videoDuration) {
 		$line = $c . $line;
 		fseek($fp, $pos--, SEEK_END);
 		$c = fgetc($fp);
-	} while (strpos($line, 'frame') === FALSE);
+	} while (strpos($line, 'time') === FALSE);
 
 	preg_match("/time=([0-9]+\.[0-9]+)/s", $line, $matches);
 
 	$elapsedTime = (int) $matches[1];
-	$progress = (int) ($elapsedTime / $videoDuration * 100);
+	$progress = (int) ($elapsedTime / $mediaDuration * 100);
 	fclose($fp);
 	return $progress;
 }
