@@ -31,6 +31,7 @@ class Files {
 	var $auth;
 	var $group;
 	var $smarty;
+	var $useRest;
 
 	function __construct($config, $storage, $auth, $groups, $smarty) {
 		$this->config = $config;
@@ -38,6 +39,10 @@ class Files {
 		$this->auth = $auth;
 		$this->groups = $groups;
 		$this->smarty = $smarty;
+	}
+
+	function setRest($useRest = FALSE) {
+		$this->useRest = $useRest;
 	}
 
 	function showFiles() {
@@ -81,14 +86,18 @@ class Files {
 			$noOfFiles = 0;
 		}
 
-		$this->smarty->assign('files', $files);
-		$this->smarty->assign('skip', $skip);
-		$this->smarty->assign('limit', $limit);
-		$this->smarty->assign('no_of_files', $noOfFiles);
-		$this->smarty->assign('tag', $tag);
-		$this->smarty->assign('group', $group);
-		$content = $this->smarty->fetch('FileList.tpl');
-		return $content;
+		if($this->useRest) {
+			return json_encode($files);
+		} else {
+			$this->smarty->assign('files', $files);
+			$this->smarty->assign('skip', $skip);
+			$this->smarty->assign('limit', $limit);
+			$this->smarty->assign('no_of_files', $noOfFiles);
+			$this->smarty->assign('tag', $tag);
+			$this->smarty->assign('group', $group);
+			$content = $this->smarty->fetch('FileList.tpl');
+			return $content;
+		}
 	}
 
 	function fileInfo() {
