@@ -100,7 +100,7 @@ try {
                 $f = new Files($config, $storage, $auth, $groups, NULL);
                 $f->setRest(TRUE);
                 $content = $f-> $action ();
-                header("Content-Type: application/json");
+		header("Content-Type: application/json;charset=UTF-8");
 		header('Content-Disposition: attachment; filename="response.json"');
 		die($content);
 	} else {
