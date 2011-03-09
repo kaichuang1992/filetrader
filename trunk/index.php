@@ -26,14 +26,6 @@ if (!isset ($config) || !is_array($config))
 
 date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
-require_once ("ext/smarty/libs/Smarty.class.php");
-
-$smarty = new Smarty();
-$smarty->template_dir = 'tpl';
-$smarty->compile_dir = 'tpl_c';
-$smarty->plugins_dir[] = 'smarty_plugins';
-$smarty->assign('error', FALSE);
-
 try {
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
 		// only allow SSL connections
@@ -61,14 +53,12 @@ try {
 	require_once ("ext/sag/src/Sag.php");
 	require_once ("lib/Files/Files.class.php");
 
-	/*
-	if (getConfig($config, 'allow_oauth', FALSE, FALSE)) {
+	if (getConfig($config, 'allow_oauth', FALSE, FALSE) && getRequest('oauth_signature', FALSE, FALSE)) {
 		// try OAuth authentication
 		require_once ("lib/OAuth/OAuth.class.php");
 		$auth = new OAuth($config);
 		$auth->login();
 	}
-	*/
 
 	if (!isset ($auth) || empty ($auth)) {
 		$auth = new $authType ($config);
@@ -85,6 +75,7 @@ try {
 	}
 
 	$action = getRequest('action', FALSE, 'showFiles');
+	$useRest = getRequest('useRest', FALSE, FALSE);
 
 	$storage = new Sag();
 	$storage->setDatabase($dbName);
@@ -104,23 +95,43 @@ try {
 			'rawFileInfo',
 			'updateFileInfo'), TRUE))
 		throw new Exception("unregistered action called");
-	$f = new Files($config, $storage, $auth, $groups, $smarty);
-	$content = $f-> $action ();
 
-	$smarty->assign('action', $action);
-        $smarty->assign('groupShare', $groupShare);
-
-	if($groupShare) {	
-		$smarty->assign('groups', array (0 => $auth->getUserDisplayName(), 'Groups' => $groups->getUserGroups()));
-	        $smarty->assign('group', getRequest("group", FALSE, 0));
+	if($useRest) {
+                $f = new Files($config, $storage, $auth, $groups, NULL);
+                $f->setRest(TRUE);
+                $content = $f-> $action ();
+                header("Content-Type: application/json");
+		header('Content-Disposition: attachment; filename="response.json"');
+		die($content);
 	} else {
-                $smarty->assign('groups', array (0 => $auth->getUserDisplayName()));
+                require_once ("ext/smarty/libs/Smarty.class.php");
+                $smarty = new Smarty();
+                $smarty->template_dir = 'tpl';
+                $smarty->compile_dir = 'tpl_c';
+                $smarty->plugins_dir[] = 'smarty_plugins';
+                
+		$f = new Files($config, $storage, $auth, $groups, $smarty);
+	        $content = $f-> $action ();
+	
+		$smarty->assign('error', FALSE);
+	        $smarty->assign('action', $action);
+	        $smarty->assign('groupShare', $groupShare);
+	        if($groupShare) {       
+	                $smarty->assign('groups', array (0 => $auth->getUserDisplayName(), 'Groups' => $groups->getUserGroups()));
+	                $smarty->assign('group', getRequest("group", FALSE, 0));
+	        } else {
+	                $smarty->assign('groups', array (0 => $auth->getUserDisplayName()));
+	        }
+	        $smarty->assign('auth', $auth);
+	        $smarty->assign('container', $content);
+	        $smarty->display('Page.tpl');
 	}
-	$smarty->assign('auth', $auth);
-	$smarty->assign('container', $content);
-	$smarty->display('Page.tpl');
-
 } catch (Exception $e) {
+        require_once ("ext/smarty/libs/Smarty.class.php");
+        $smarty = new Smarty();
+        $smarty->template_dir = 'tpl';
+        $smarty->compile_dir = 'tpl_c';
+        $smarty->plugins_dir[] = 'smarty_plugins';
 	$smarty->assign('error', TRUE);
 	# use htmlentities() to deal better with SURFconext exception html frenzy
 	$smarty->assign('errorMessage', htmlentities($e->getMessage()));

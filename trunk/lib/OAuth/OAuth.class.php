@@ -23,8 +23,7 @@ require_once ('ext/oauth/OAuth.php');
 class OAuth {
 
 	var $config;
-	var $consumer_key;
-	var $isValidRequest;
+	var $userId;
 
 	function __construct($config) {
 		if (!is_array($config))
@@ -34,12 +33,12 @@ class OAuth {
 	}
 
 	function isLoggedIn() {
-		return $this->isValidRequest;
+		return !empty($this->userId);
 	}
 
 	function getUserId() {
 		if ($this->isLoggedIn())
-			return "oauth_" . $this->consumer_key;
+			return $this->userId;
 		else
 			throw new Exception("not logged in");
 	}
@@ -51,53 +50,27 @@ class OAuth {
 			throw new Exception("not logged in");
 	}
 
-	function getUserInfo() {
-		if ($this->isLoggedIn())
-			return array ();
-		else
-			throw new Exception("not logged in");
-	}
-
-	function memberOfGroups($groups) {
-		return $this->isValidRequest;
-	}
-
 	function login() {
-		/* if no attempt to use OAuth stop */
-		if (!isset ($_GET['oauth_signature']))
-			return FALSE;
+		/* See: http://developer.yahoo.com/blogs/ydn/posts/2010/04/a_twolegged_oauth_serverclient_example/ */
 
-		/* Idea taken from: 
-		 * http://developer.yahoo.com/blogs/ydn/posts/2010/04/a_twolegged_oauth_serverclient_example/
-		 */
+                $sig = getRequest('oauth_signature', TRUE);
+                $key = getRequest('oauth_consumer_key', TRUE);
 		$sig_method = new OAuthSignatureMethod_HMAC_SHA1;
+		$req_method = $_SERVER['REQUEST_METHOD'];
+		$url = getProtocol() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-		$method = $_SERVER['REQUEST_METHOD']; // POST or GET
-		/* we show determine whether http or https should be used, depends party on
-		   configuration setting and current request mode */
-		$uri = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-		$sig = $_GET['oauth_signature'];
-		$key = $_GET['oauth_consumer_key'];
-
-		/* check if key exists */
+		/* check if consumer key is in list of consumers */
 		$consumers = getConfig($this->config, 'oauth_consumers', TRUE);
 		if (!array_key_exists($key, $consumers))
-			throw new Exception("OAuth consumer not registered");
+			throw new Exception("oauth consumer key not registered");
 		$consumer = new OAuthConsumer($key, $consumers[$key]);
 
-		$req = new OAuthRequest($method, $uri);
-		//token is null because we're doing 2-leg
+		$req = new OAuthRequest($req_method, $url);
 		$valid = $sig_method->check_signature($req, $consumer, NULL, $sig);
 		if (!$valid)
-			throw new Exception('invalid OAuth signature');
+			throw new Exception('invalid oauth signature');
 
-		/* FIXME: userId should be actual user the oAuth client is acting on behalf of. 
-		   We now have a hack that OAuth is a member of all groups. This is another bug
-		   if groups support is disabled! */
-
-		$this->consumer_key = $key;
-		$this->isValidRequest = TRUE;
-		return;
+                $this->userId = getRequest('userId', TRUE);
 	}
 }
 ?>

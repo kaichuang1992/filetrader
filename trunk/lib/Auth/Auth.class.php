@@ -33,13 +33,6 @@ abstract class Auth {
 		return (isset ($_SESSION['userId']) && isset ($_SESSION['userAttr']) && isset ($_SESSION['userDisplayName']));
 	}
 
-	function getUserInfo() {
-		if ($this->isLoggedIn())
-			return $_SESSION['userAttr'];
-		else
-			throw new Exception("not logged in");
-	}
-
 	function getUserId() {
 		if ($this->isLoggedIn())
 			return $_SESSION['userId'];
