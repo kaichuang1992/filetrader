@@ -19,7 +19,8 @@ Sag PHP		0.3.0		ASL2.0		http://www.saggingcouch.com/
 # If you want to use the authentication backend:
 simpleSAMLphp	1.7.0		LGPL 2.1	http://simplesamlphp.org/
 
-# If you want to use SURFconext for retrieving group data:
+# If you want to use SURFconext for retrieving group data or use (remote) OAuth to 
+# access the data from FileTrader:
 opensocial-php-client
 		svn r212	ASL2.0		http://code.google.com/p/opensocial-php-client/
 ************
