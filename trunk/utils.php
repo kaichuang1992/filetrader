@@ -73,6 +73,8 @@ function return_bytes($val) {
 }
 
 function getProtocol() {
+	if(!isset($_SERVER['SERVER_NAME']))
+		return FALSE;
 	return (isset ($_SERVER['HTTPS']) && !empty ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
 }
 

@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once ('ext/oauth/OAuth.php');
+require_once ('ext/opensocial-php-client/src/osapi/external/OAuth.php');
 
 class OAuth {
 
