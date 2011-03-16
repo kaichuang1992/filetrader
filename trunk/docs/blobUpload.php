@@ -26,7 +26,8 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 <title>FileAPI</title>
 </head>
 <body>
-Files to upload: <input id="inputFiles" type="file" onchange="handleFiles(this.files)" multiple>
+<p>Files to upload: <input id="inputFiles" type="file" onchange="handleFiles(this.files)" multiple></p>
+<p>Progress: <span id="progress">0</span>%</p>
 <script>
         function handleFiles(files) {
                 for (var i = 0; i < files.length; i++) {
@@ -36,6 +37,12 @@ Files to upload: <input id="inputFiles" type="file" onchange="handleFiles(this.f
 
         function upload(file) {
 		var xhr = new XMLHttpRequest();
+		xhr.upload.addEventListener("progress", function(evt) { 
+	                if (evt.lengthComputable) {
+	                        var percentComplete = evt.loaded / evt.total;
+	                        document.getElementById("progress").textContent = "(" + file.name + "):" + Math.round((evt.loaded * 100) / evt.total);
+	                }
+		}, false);
                 xhr.open("POST", '<?php echo $_SERVER['SCRIPT_NAME']; ?>?action=upload&fileName='+file.name, true);
                	xhr.send(file);
 	}
