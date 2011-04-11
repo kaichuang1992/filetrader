@@ -23,10 +23,11 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 <!DOCTYPE html>
 <head>
 <meta charset="utf-8">
-<title>FileAPI</title>
+<title>File Upload</title>
 </head>
 <body>
-<h1>FileAPI File Uploader</h1>
+<h1>File Upload</h1>
+<p>Select one or more files to upload...</p>
 <input id="inputFiles" type="file" onchange="handleFiles(this.files)" multiple>
 <button id="startButton" onclick="startUpload()" disabled>Start Upload</button>
 <button id="stopButton" onclick="stopUpload()" disabled>Stop Upload</button>
