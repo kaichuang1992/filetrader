@@ -1,7 +1,10 @@
 <?php
-if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
-	$path = sys_get_temp_dir();
-	$fileName = (isset($_REQUEST['fileName'])) ? $_REQUEST['fileName'] : 'file.dat';
+$httpHeaders = getallheaders();
+if(array_key_exists('X-Request-With', $httpHeaders) &&
+   $httpHeaders['X-Requested-With'] === "XMLHttpRequest" &&
+   array_key_exists('X-File-Name', $httpHeaders)) {
+        $fileName = basename($httpHeaders['X-File-Name']);
+        $path = sys_get_temp_dir();
         $out = fopen($path . DIRECTORY_SEPARATOR . $fileName, "wb");
         if ($out) {
                 $in = fopen("php://input", "rb");
@@ -17,7 +20,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
         } else {
                 // failed to open output stream
         }
-	exit(0);
+        exit(0);
 }
 ?>
 <!DOCTYPE html>
@@ -25,8 +28,12 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 <meta charset="utf-8">
 <title>File Upload</title>
 <style type="text/css">
+	body { 
+		font-size: 85%;
+	}
+
 	table { 
-		width: 100%;
+		/* width: 100%; */
 		border: 1px solid #000; 
 	}
 	
@@ -39,15 +46,15 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 		text-align: left;
 	}
 	
-	td.noFiles {
-		text-align: center;
+	td {
 		font-size: 85%;
-		font-style: italic;
 	}
+
 	span.done {
 		color: green;
 	}
-	span.cancelled {
+
+	span.aborted {
 		color: blue;
 	}
 </style>
@@ -59,15 +66,15 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 		<tr><th>File Name</th><th>File Size</th><th>Progress</th></tr>
 	</thead>
 	<tbody id="fileList">
-		<tr><td class="noFiles" colspan="3">No files selected yet...</td></tr>
+		<tr><td colspan="3">No files selected yet...</td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td colspan="2">
-			<input id="inputFiles" type="file" onchange="handleFiles(this.files)" multiple>
+			<input id="inputFiles" type="file" onchange="listFiles(this.files)" multiple>
 			<button id="startButton" onclick="startUpload()" disabled>Start Upload</button>
-			<button id="stopButton" onclick="stopUpload()" disabled>Stop Upload</button>
+			<button id="abortButton" onclick="abortUpload()" disabled>Abort Upload</button>
 		</td>
-		<td><span id="result"></span></td>
+		<td><span id="uploadStatus"></span></td>
 		</tr>
 	</tfoot>
 </table>
@@ -76,14 +83,14 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 	var files; /* keep track of the files to upload */
 	var xhrs; /* keep track of all xhrs to be able to stop them */
 	var done; /* keep track of the number of files done uploading */
-	var startTime;
 
 	/* add the files to the upload list */
-        function handleFiles(f) {
+        function listFiles(f) {
 		files = f;
+                document.getElementById('uploadStatus').textContent = '';
                 var fileList = document.getElementById('fileList');
-		document.getElementById('result').textContent = '';
 		fileList.innerHTML = '';
+
 		for (var i = 0; i < files.length; i++) {
 			var tr = document.createElement('tr');
 			tr.innerHTML = '<td>' + files[i].name + '</td><td>' + files[i].size + '</td><td><span id="file_progress_' + i + '"></span></td>';
@@ -95,34 +102,31 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 	}
 
 	function startUpload() {
-		startTime = new Date().getTime();
 		xhrs = new Array();
 		done = 0;
 		if(files != null) {
                         document.getElementById('startButton').setAttribute('disabled','disabled');
-                        document.getElementById('stopButton').removeAttribute('disabled');
-
+                        document.getElementById('abortButton').removeAttribute('disabled');
 	                for (var i = 0; i < files.length; i++) {
-	                        upload(i,files[i]);
+	                        uploadFile(i,files[i]);
 	                }
 		}
         }
 
-	function stopUpload() {
+	function abortUpload() {
 		for(var i = 0; i < xhrs.length; i++) {
 			xhrs[i].abort();
 		}
-                document.getElementById('stopButton').setAttribute('disabled','disabled');
-                document.getElementById('result').textContent = "Canceled";
-                document.getElementById('result').setAttribute('class', 'cancelled');
-
+                document.getElementById('abortButton').setAttribute('disabled','disabled');
+                document.getElementById('uploadStatus').textContent = "Aborted";
+                document.getElementById('uploadStatus').setAttribute('class', 'aborted');
 	}
 
-        function upload(index,file) {
+        function uploadFile(index,file) {
 		var xhr = new XMLHttpRequest();
 		xhrs.push(xhr);
 
-		/* during upload */
+		/* progress information during upload */
 		xhr.upload.addEventListener("progress", function(evt) { 
 	                if (evt.lengthComputable) {
 	                        var percentComplete = evt.loaded / evt.total;
@@ -130,20 +134,22 @@ if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'upload') {
 	                }
 		}, false);
 
-		/* when upload is complete */
+		/* when upload of a file is complete */
 		xhr.upload.addEventListener("load", function(evt) {
 			document.getElementById('file_progress_'+index).textContent = "Done";
 			document.getElementById('file_progress_'+index).setAttribute('class', 'done');
-			/* if this was the last file, disable stop button */
+			/* if this was the last file, disable abort button */
 			if(++done == files.length) {
-		                document.getElementById('stopButton').setAttribute('disabled','disabled');
-				document.getElementById('result').textContent = "Done";
-	                        document.getElementById('result').setAttribute('class', 'done');
+		                document.getElementById('abortButton').setAttribute('disabled','disabled');
+				document.getElementById('uploadStatus').textContent = "Done";
+	                        document.getElementById('uploadStatus').setAttribute('class', 'done');
 			}
 		}, false);
 
-                xhr.open("POST", '<?php echo $_SERVER['SCRIPT_NAME']; ?>?action=upload&fileName='+file.name, true);
-               	xhr.send(file);
+                xhr.open("POST", '<?php echo $_SERVER['SCRIPT_NAME']; ?>', true);
+                xhr.setRequestHeader("X-File-Name", file.name);
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                xhr.send(file);
 	}
 </script>
 </body>
