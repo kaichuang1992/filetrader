@@ -17,10 +17,10 @@
 	        {foreach $files as $f}
 			<tr>
 				<td><input type="checkbox" name="markedFiles[]" value="{$f->id}" /></td>
-				<td><a href="?action=downloadFile&amp;id={$f->id}">{$f->value->fileName}</a></td>
+                                <td><a href="?action=fileInfo&amp;id={$f->id}&amp;group={$group}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
+				<td><a href="?action=downloadFile&amp;id={$f->id}" title="{$f->value->fileName}">{$f->value->fileName|truncate:40:'...':true:true}</a></td>
 				<td>{$f->value->fileSize|to_human_size}</td>
 				<td>{$f->value->fileDate|date_format:"%d %b  %H:%M"}</td>
-				<td><a href="?action=fileInfo&amp;id={$f->id}&amp;group={$group}"><img src="i/information.png" alt="File Info" title="File Info"></a></td>
 			</tr>
 		{/foreach}
 		</table>

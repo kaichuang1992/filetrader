@@ -1,0 +1,12 @@
+diff -urN sag-0.4.0.orig/src/Sag.php sag-0.4.0/src/Sag.php
+--- sag-0.4.0.orig/src/Sag.php	2011-04-01 17:13:27.000000000 +0200
++++ sag-0.4.0/src/Sag.php	2011-04-20 19:55:57.901542651 +0200
+@@ -163,7 +163,7 @@
+ 
+     //Not caching, or we are caching but there's nothing cached yet, or our
+     //cached item is no longer good.
+-    if(!$response)
++    if(!isset($response) || !$response)
+       $response = $this->procPacket('GET', $url);
+ 
+     if($this->cache)
