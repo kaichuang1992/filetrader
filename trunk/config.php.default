@@ -28,6 +28,7 @@ $config['auth_type'] = 'NullAuth';
 $config['group_type'] = 'NullGroups';
 
 // simpleSAMLphp configuration (SSPAuth)
+$config['ssp_sp_dn'] = 'SAML authentication';
 $config['ssp_path'] = '/var/simplesamlphp';
 $config['ssp_sp'] = 'default-sp';
 $config['ssp_uid_attr'] = 'uid';
