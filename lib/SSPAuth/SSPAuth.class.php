@@ -47,8 +47,10 @@ class SSPAuth extends Auth {
 		$smarty = new Smarty();
 		$smarty->template_dir = 'tpl';
 		$smarty->compile_dir = 'tpl_c';
+                $smarty->assign('sp_dn', getConfig($this->config, 'ssp_sp_dn', FALSE, 'SAML authentication'));
+		$output = $smarty->fetch('SSPAuth.tpl');
 		$smarty->assign('error', FALSE);
-		$smarty->assign('container', $smarty->fetch('SSPAuth.tpl'));
+		$smarty->assign('container', $output);
 		$smarty->assign('action', NULL);
 		$smarty->display('Page.tpl');
 		exit (0);
