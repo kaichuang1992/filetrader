@@ -1,10 +1,10 @@
 <style type="text/css">
-        @import url("ext/plupload/examples/css/plupload.queue.css");
+        @import url("ext/plupload/js/jquery.plupload.queue/css/jquery.plupload.queue.css");
 </style>
 
 <!-- Load plupload and all it's runtimes and finally the jQuery queue widget -->
-<script type="text/javascript" src="ext/plupload/js/plupload.full.min.js"></script>
-<script type="text/javascript" src="ext/plupload/js/jquery.plupload.queue.min.js"></script>
+<script type="text/javascript" src="ext/plupload/js/plupload.full.js"></script>
+<script type="text/javascript" src="ext/plupload/js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
 
 <script type="text/javascript">
 $(function() {
