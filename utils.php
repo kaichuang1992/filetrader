@@ -78,24 +78,24 @@ function getProtocol() {
 	return (isset ($_SERVER['HTTPS']) && !empty ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
 }
 
-/**
- * Returns the required scaling depending on the input width/height ratio.
- */
-function scaleVideo($size, $newHeight = 360) {
-	if (!is_array($size) && !(sizeof($size) == 2))
-		throw new Exception("size should be array containing width,height");
+function scaleVideo($width_orig = 640, $height_orig = 480, $max_size = 360) {
+        $width = $max_size;
+        $height = $max_size;
 
-	$width = $size[0];
-	$height = $size[1];
+        $ratio_orig = $width_orig/$height_orig;
+        if ($width/$height > $ratio_orig) {
+                $width = (int)($height*$ratio_orig);
+        } else {
+                $height = (int)($width/$ratio_orig);
+        }
 
-	$factor = $height / $newHeight;
-	$newWidth = $width / $factor;
-	if ($newWidth % 2 == 1)
-		$newWidth++;
-	return array (
-		'width' => (int) $newWidth,
-		'height' => (int) $newHeight
-	);
+	/* make width and height an even number */
+        if ($width % 2 == 1)
+                $width++;
+        if ($height % 2 == 1)
+                $height++;
+
+	return array($width, $height);
 }
 
 /**
@@ -164,9 +164,12 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 		case "video/x-ms-asf" :
 		case "video/x-flv" :
 		case "application/octet-stream" :
-			/* determine width, height, codecs */
 			if (isMediaFile($metaData, $filePath)) {
 				$media = new ffmpeg_movie($file, FALSE);
+
+				/****************************************************
+				 * VIDEO
+				 ****************************************************/
 				if ($media->hasVideo()) {
 					$metaData->video->codec = $media->getVideoCodec();
 					$metaData->video->width = $media->getFrameWidth();
@@ -174,73 +177,56 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 					$metaData->video->bitrate = $media->getVideoBitRate();
 					$metaData->video->framerate = $media->getFrameRate();
 					$metaData->video->duration = $media->getDuration();
+
+                                        /* Video Still */
+                                        $stillFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
+
+                                        $fc = (int) ($media->getFrameCount() / 32);
+                                        /* frame count is not necessarily reliable! */
+                                        foreach (array ( $fc, 100, 10, 1) as $fno) {
+                                                if ($fno == 0)
+                                                        continue;
+                                                $f = $media->getFrame($fno);
+                                                if($f !== FALSE) {
+                                                        imagepng($f->toGDImage(), $stillFile);
+                                                        $metaData->video->still = basename($stillFile);
+                                                        break;
+                                                }
+                                        }
+
+                                        /* Video Thumbnails */
+                                        $thumbSizes = array(90, 180, 360);
+                                        foreach($thumbSizes as $tS) {
+                                                $thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
+                                                list($thumb_width, $thumb_height) = generateThumbnail($stillFile, $thumbFile, $tS);
+                                                $metaData->video->thumbnail->$tS->file = basename($thumbFile);
+                                                $metaData->video->thumbnail->$tS->width = $thumb_width;
+                                                $metaData->video->thumbnail->$tS->height = $thumb_height;
+                                        }
+
+					/* Schedule for transcoding */
+	                                $transcodeSizes = array (360);
+                                        $metaData->transcodeStatus = 'WAITING';
+                                        $metaData->transcodeProgress = 0;
+	
+	                                foreach ($transcodeSizes as $tS) {
+	                                	$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
+	                                        list($width, $height) = scaleVideo($media->getFrameWidth(), $media->getFrameHeight(), $tS);
+	                                        $metaData->video->transcode->$tS->file = basename($transcodeFile);
+	                                        $metaData->video->transcode->$tS->width = $width;
+                                                $metaData->video->transcode->$tS->height = $height;
+	                                }
 				}
+
+                                /****************************************************
+                                 * AUDIO
+                                 ****************************************************/
 				if ($media->hasAudio()) {
 					$metaData->audio->codec = $media->getAudioCodec();
 					$metaData->audio->bitrate = $media->getAudioBitRate();
 					$metaData->audio->samplerate = $media->getAudioSampleRate();
 					$metaData->audio->duration = $media->getDuration();
-				}
 
-				// Thumbnails
-
-				// FIXME: this should be fixed by generating a still and resizing that to
-				// wanted sizes instead of accessing the thrice! BUG in php-ffmpeg
-				// because you can't call $f->resize twice on the same object as the
-				// image corrupts...
-				$thumbSizes = array (
-					90,
-					180,
-					360
-				);
-				if ($media->hasVideo()) {
-					foreach ($thumbSizes as $tS) {
-						$fc = (int) ($media->getFrameCount() / 32);
-						/* frame count is not necessarily reliable! */
-						foreach (array (
-								$fc,
-								100,
-								10,
-								1
-							) as $fno) {
-							if ($fno == 0)
-								continue;
-							$f = $media->getFrame($fno);
-							if ($f !== FALSE) {
-								$sV = scaleVideo(array (
-									$media->getFrameWidth(),
-									$media->getFrameHeight()
-								), $tS);
-								$f->resize($sV['width'], $sV['height']);
-								$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
-								$metaData->video->thumbnail->$tS->file = basename($thumbFile);
-								$metaData->video->thumbnail->$tS->width = $sV['width'];
-								imagepng($f->toGDImage(), $thumbFile);
-								break;
-							}
-						}
-					}
-				}
-
-				$transcodeSizes = array (
-					360
-				);
-				// Schedule for transcoding to WebM
-				if ($media->hasVideo()) {
-					$metaData->transcodeStatus = 'WAITING';
-
-					$metaData->transcodeProgress = 0;
-
-					foreach ($transcodeSizes as $tS) {
-						$transcodeFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".webm";
-						$sV = scaleVideo(array (
-							$media->getFrameWidth(),
-							$media->getFrameHeight()
-						), $tS);
-						$metaData->video->transcode->$tS->file = basename($transcodeFile);
-						$metaData->video->transcode->$tS->width = $sV['width'];
-					}
-				} elseif ($media->hasAudio()) {
                                         $metaData->transcodeStatus = 'WAITING';
                                         $metaData->transcodeProgress = 0;
 
@@ -248,7 +234,7 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
                                         $metaData->audio->transcode->file = basename($transcodeFile);
 				}
 			} else {
-				// not a media file?!
+				/* No media? */
 			}
 			break;
 
