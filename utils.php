@@ -252,6 +252,20 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 			}
 			break;
 
+		case "image/jpeg":
+		case "image/png":
+		case "image/gif":
+		case "image/bmp":
+                        list($width, $height) = getimagesize($file);
+                        $metaData->image->width = $width;
+                        $metaData->image->height = $height;
+			$thumbFile = $cachePath . DIRECTORY_SEPARATOR . uniqid("ft_") . ".png";
+			list($thumb_width, $thumb_height) = generateThumbnail($file, $thumbFile, 360);
+			$metaData->image->thumbnail->{360}->file = basename($thumbFile);
+			$metaData->image->thumbnail->{360}->width = $thumb_width;
+                        $metaData->image->thumbnail->{360}->height = $thumb_height;
+			break;
+
 		default :
 			/* no idea about this file, let it go... */
 	}
@@ -281,4 +295,24 @@ function analyzeFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 function generateToken() {
 	return bin2hex(openssl_random_pseudo_bytes(8));
 }
+
+function generateThumbnail($in_file = NULL, $out_file = NULL, $max_size = 360) {
+	list($width_orig, $height_orig) = getimagesize($in_file);
+
+	$width = $max_size;
+	$height = $max_size;
+
+	$ratio_orig = $width_orig/$height_orig;
+	if ($width/$height > $ratio_orig) {
+		$width = (int)($height*$ratio_orig);
+	} else {
+		$height = (int)($width/$ratio_orig);
+	}
+	$image_p = imagecreatetruecolor($width, $height);
+	$image = imagecreatefromstring(file_get_contents($in_file));
+	imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+	imagepng($image_p, $out_file);
+	return array($width, $height);
+}
+
 ?>
