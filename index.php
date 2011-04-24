@@ -122,6 +122,7 @@ try {
 	        } else {
 	                $smarty->assign('groups', array (0 => $auth->getUserDisplayName()));
 	        }
+		$smarty->assign('search_tag', getRequest('tag', FALSE, ''));
 	        $smarty->assign('auth', $auth);
 	        $smarty->assign('container', $content);
 	        $smarty->display('Page.tpl');
