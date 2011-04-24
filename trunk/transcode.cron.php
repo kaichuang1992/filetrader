@@ -50,7 +50,7 @@ do {
 		$fileName = getConfig($config, 'file_storage_dir', TRUE) . DIRECTORY_SEPARATOR . base64_encode($fileOwner) . DIRECTORY_SEPARATOR . $info->fileName;
 		if(isset($info->video)) {
 			$transcodeFileName = getConfig($config, 'cache_dir', TRUE) . DIRECTORY_SEPARATOR . $info->video->transcode->$videoHeight->file;
-			$newSize = $info->video->transcode-> $videoHeight->width . "x" . $videoHeight;
+			$newSize = $info->video->transcode-> $videoHeight->width . "x" . $info->video->transcode-> $videoHeight->height;
 			// -vf transpose=1   (for rotating clockwise 90 degrees)
 			$cmd = "ffmpeg -i \"$fileName\" -threads 2 -f webm -acodec libvorbis -vcodec libvpx -s $newSize -b 524288 -y $transcodeFileName";
 		}elseif(isset($info->audio)) {

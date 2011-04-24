@@ -16,7 +16,7 @@
 <!-- Begin VideoJS -->
 <div class="video-js-box">
 	<!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-        <video id="video_1" class="video-js" width="{$fileInfo->video->transcode->{360}->width}" height="360" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360">
+        <video id="video_1" class="video-js" width="{$fileInfo->video->transcode->{360}->width}" height="{$fileInfo->video->transcode->{360}->height}" controls="controls" preload="auto" poster="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360">
         	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_transcode_360" type='video/webm; codecs="vp8, vorbis"' />
         </video>
         <!-- Download links provided for devices that can't play video in the browser. -->
@@ -28,7 +28,7 @@
 </div>
 <!-- End VideoJS -->
 {elseif $hasStill}
-	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360" alt="Video Still of {$fileInfo->fileName}">
+	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="{$fileInfo->video->thumbnail->{360}->height}" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360" alt="Still of {$fileInfo->fileName}">
 {elseif $hasAudio}
 <audio controls="controls" preload="auto">
 	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=audio_transcode" type='audio/ogg; codecs="vorbis"' />
