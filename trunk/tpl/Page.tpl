@@ -35,7 +35,7 @@
                                 {if $group}
                                         <input type="hidden" name="group" value="{$group}">
                                 {/if}
-                                <label>Search Tag <input type="text" name="tag" size="10" /></label>
+                                <label>Search Tag <input type="text" name="tag" size="10" value="{$search_tag}" /></label>
                         </form>
                 {/if}
 	</div> <!-- /nav -->
