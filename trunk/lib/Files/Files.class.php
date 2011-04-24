@@ -113,6 +113,7 @@ class Files {
 		$hasVideo = (isset($info->video) && $info->transcodeStatus == 'DONE') ? TRUE : FALSE;
 		$hasAudio = (isset($info->audio) && $info->transcodeStatus == 'DONE') ? TRUE : FALSE;
 		$hasStill = (isset($info->video)) ? TRUE : FALSE;
+		$hasThumb = (isset($info->image)) ? TRUE : FALSE;
 
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('groupShare', $groupShare);
@@ -124,6 +125,8 @@ class Files {
 		$this->smarty->assign('hasVideo', $hasVideo);
                 $this->smarty->assign('hasAudio', $hasAudio);
 		$this->smarty->assign('hasStill', $hasStill);
+		$this->smarty->assign('hasThumb', $hasThumb);
+
 		$this->smarty->assign('allLicenses', $this->licenses);
 		return $this->smarty->fetch('FileInfo.tpl');
 	}
@@ -400,6 +403,7 @@ class Files {
 			'video_thumbnail_360',
 			'video_transcode_360',
 			'audio_transcode',
+			'image_thumbnail_360',
 		);
 
 		$info = $this->storage->get($id)->body;
@@ -417,6 +421,8 @@ class Files {
 			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t-> $subT->file;
 		elseif($mediaType == 'audio')
                         $file = $cachePath . DIRECTORY_SEPARATOR . $info->audio->$t->file;
+		elseif($mediaType == 'image')
+			$file = $cachePath . DIRECTORY_SEPARATOR . $info->image->$t-> $subT->file;
 
 		if (!is_file($file))
 			throw new Exception("file does not exist on file system");

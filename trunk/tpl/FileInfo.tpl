@@ -1,3 +1,7 @@
+{if $hasThumb}
+	<img width="{$fileInfo->image->thumbnail->{360}->width}" height="{$fileInfo->image->thumbnail->{360}->height}" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=image_thumbnail_360" alt="Thumbnail of {$fileInfo->fileName}"/>
+{/if}
+
 {if $hasVideo}
 <script type="text/javascript" src="ext/video-js/video.js"></script>
 <script type="text/javascript">
@@ -24,7 +28,7 @@
 </div>
 <!-- End VideoJS -->
 {elseif $hasStill}
-	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360" alt="Video Still" title="Video Still">
+	<img width="{$fileInfo->video->thumbnail->{360}->width}" height="360" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=video_thumbnail_360" alt="Video Still of {$fileInfo->fileName}">
 {elseif $hasAudio}
 <audio controls="controls" preload="auto">
 	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=audio_transcode" type='audio/ogg; codecs="vorbis"' />
