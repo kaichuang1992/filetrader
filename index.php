@@ -114,15 +114,6 @@ try {
 	        $content = $f-> $action ();
 	
 		$smarty->assign('error', FALSE);
-	        $smarty->assign('action', $action);
-	        $smarty->assign('groupShare', $groupShare);
-	        if($groupShare) {       
-	                $smarty->assign('groups', array (0 => $auth->getUserDisplayName(), 'Groups' => $groups->getUserGroups()));
-	                $smarty->assign('group', getRequest("group", FALSE, 0));
-	        } else {
-	                $smarty->assign('groups', array (0 => $auth->getUserDisplayName()));
-	        }
-		$smarty->assign('search_tag', getRequest('tag', FALSE, ''));
 	        $smarty->assign('auth', $auth);
 	        $smarty->assign('container', $content);
 	        $smarty->display('Page.tpl');
