@@ -2,7 +2,7 @@ function (doc) {
 	if (doc.type == 'file' && doc.fileGroups && doc.fileDate && doc.fileTags) {
 		doc.fileTags.forEach(function(tag) { 
 	                for(var idx in doc.fileGroups) {
-	                        emit([doc.fileGroups[idx], tag, doc.fileDate], {fileName: doc.fileName, fileDate: doc.fileDate, fileSize: doc.fileSize});
+	                        emit([doc.fileGroups[idx], tag, doc.fileDate], {fileName: doc.fileName, fileGroups: doc.fileGroups, fileTags: doc.fileTags, fileDate: doc.fileDate, fileSize: doc.fileSize});
 	                }
 		});
 	}

@@ -48,6 +48,8 @@ class Files {
 	function showFiles() {
 		$userId = $this->auth->getUserId();
 
+		$groupShare = getConfig($this->config, 'group_share', FALSE, FALSE);
+
 		$tag = getRequest("tag", FALSE, FALSE);
 		$group = getRequest("group", FALSE, 0);
 
@@ -95,6 +97,14 @@ class Files {
 			$this->smarty->assign('no_of_files', $noOfFiles);
 			$this->smarty->assign('tag', $tag);
 			$this->smarty->assign('group', $group);
+
+                	if($groupShare) {       
+                		$this->smarty->assign('groups', array (0 => $this->auth->getUserDisplayName(), 'Groups' => $this->groups->getUserGroups()));
+                	} else {
+                		$this->smarty->assign('groups', array (0 => $this->auth->getUserDisplayName()));
+			}
+
+			$this->smarty->assign('myGroups', $this->groups->getUserGroups());
 			$content = $this->smarty->fetch('FileList.tpl');
 			return $content;
 		}

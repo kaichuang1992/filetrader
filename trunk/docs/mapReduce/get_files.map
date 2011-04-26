@@ -1,5 +1,5 @@
 function (doc) {
 	if (doc.type == 'file' && doc.fileDate) {
-		emit([doc.fileOwner, doc.fileDate], {fileName: doc.fileName, fileDate: doc.fileDate, fileSize: doc.fileSize});
+		emit([doc.fileOwner, doc.fileDate], {fileName: doc.fileName, fileTags: doc.fileTags, fileGroups: doc.fileGroups, fileDate: doc.fileDate, fileSize: doc.fileSize});
 	}
 }

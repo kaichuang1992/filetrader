@@ -1,3 +1,4 @@
+<div class="thumbnail">
 {if $hasThumb}
 	<img width="{$fileInfo->image->thumbnail->{360}->width}" height="{$fileInfo->image->thumbnail->{360}->height}" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=image_thumbnail_360" alt="Thumbnail of {$fileInfo->fileName}"/>
 {/if}
@@ -34,6 +35,8 @@
 	<source src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=audio_transcode" type='audio/ogg; codecs="vorbis"' />
 </audio>
 {/if}
+
+</div> <!-- /thumbnail -->
 
 <div id="fileInfo">
 	<form method="post">
@@ -142,17 +145,16 @@
 				</td>
 			</tr>
 			{/if}
-
-			<tr>
-				<td colspan="2">
-                                        <input type="submit" value="Download" name="buttonPressed">
-					{if $isOwner}
-		                                <input type="submit" value="Update" name="buttonPressed">
-	                                        <input type="submit" value="Delete" name="buttonPressed">
-						<input type="submit" value="Reexamine" name="buttonPressed">
-					{/if}
-				</td>
-			</tr>
 		</table>
+                                        <div class="controls">
+                                        {if $isOwner}
+                                                <input type="submit" value="Update" name="buttonPressed">
+                                                <input type="submit" value="Delete" name="buttonPressed">
+						<input type="submit" value="Share" name="buttonPressed">
+                                                <input type="submit" value="Reexamine" name="buttonPressed">
+                                        {/if}
+                                        <input type="submit" value="Download" name="buttonPressed">
+                                        </div>
+
 	</form>
 </div>
