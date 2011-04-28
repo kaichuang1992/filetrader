@@ -18,7 +18,7 @@
 				<li><a href="?action=logout">Logout</a> <span class="small" title="{$auth->getUserID()}">({$auth->getUserDisplayName()})</span></li>
 			</ul>
 		{else}
-			FileTrader
+			<strong>FileTrader</strong>
 		{/if}
         </div> <!-- /header -->
 	
