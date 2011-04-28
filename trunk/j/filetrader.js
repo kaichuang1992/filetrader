@@ -3,7 +3,7 @@ $(document).ready(function() {
                 $("form.change_group").submit();
         });
 
-	$("table.fileInfo img").click(function() {
+	$(".fileinfo img").click(function() {
 		$(this).parent().next().children(".showView").toggle();
 		$(this).parent().next().children(".editView").toggle();
 	});

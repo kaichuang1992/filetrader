@@ -21,9 +21,14 @@
 class Files {
 
 	var $licenses = array (
-		'none' => 'Unspecified',
-		'cc3-by' => 'Creative Commons 3.0 BY (Attribution)',
-		'cc3-by-sa' => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)'
+		'none'         => 'All Rights Reserved',
+		'cc3-by'       => 'Creative Commons 3.0 BY (Attribution)',
+		'cc3-by-sa'    => 'Creative Commons 3.0 BY-SA (Attribution-ShareAlike)',
+		'cc3-by-nd'    => 'Creative Commons 3.0 BY-ND (Attribution-NoDerivs)',
+		'cc3-by-nc'    => 'Creative Commons 3.0 BY-NC (Attribution-NonCommercial)',
+		'cc3-by-nc-nd' => 'Creative Commons 3.0 BY-NC-ND (Attribution-NonCommercial-NoDerivs)',
+		'cc3-by-nc-sa' => 'Creative Commons 3.0 BY-ND-SA (Attribution-NonCommercial-ShareAlike)',
+                'pd'           => 'Public Domain',
 	);
 
 	var $config;
