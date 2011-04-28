@@ -39,9 +39,9 @@
 {/if}
 </div>
 
-<div class="filelist_filter">
+<!-- <div class="filelist_filter">
 	<form class="change_group">
 	<label>List {html_options name=group class=change_group options=$groups selected=$group}</label>
 	<label>Search Tag <input type="text" name="tag" size="10" value="{$tag}" /></label>
 	</form>
-</div> 
+</div>  -->
