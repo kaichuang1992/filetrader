@@ -9,17 +9,22 @@ a {
 	color: #000;
 }
 
-/*label {
-	display: block;
-}*/
-
 #header {
-	background-color: #ccc;
+	background-color: #bbb;
 	border: 1px solid #000;
 	margin: 10px;
         padding: 10px;
 	color: #000;
 	border-radius: 10px;
+}
+
+#content {
+        color: #000;
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 15px;
+        margin: 10px;
+        padding: 10px;
 }
 
 #header ul {
@@ -77,26 +82,16 @@ img {
 	display: block;
 }
 
-.filelist {
-        color: #000;
-        background-color: #fff;
-        border: 1px solid #000;
-	border-radius: 15px;
-        margin: 10px;
-        padding: 10px;
-}
-
-.filelist_controls {
+.fileinfo_controls, .filelist_controls {
 	padding: 10px 0;
 }
 
-.filelist_controls input {
-        margin: 0 5px;
+.fileinfo textarea, .fileinfo select, .fileinfo input, .fileinfo_controls input, .filelist_controls input {
 	border: 1px solid #000;
 	background-color: #eee;
 }
 
-.filelist_tag { 
+.fileinfo_tag, .filelist_tag { 
 	background-color: #c4e5c4;
 	border: 1px solid #000;
 	font-size: 75%;
@@ -136,3 +131,22 @@ img {
 	font-weight: bold;
 	padding: 5px 10px;
 }
+
+.fileinfo th, .fileinfo td {
+	border: 1px dotted #ccc;
+	text-align: left;
+	vertical-align: top;
+	padding: 2px;
+}
+
+.fileinfo label {
+	display: block;
+}
+
+.fileinfo table {
+	margin-top: 10px;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #333;
+}
+

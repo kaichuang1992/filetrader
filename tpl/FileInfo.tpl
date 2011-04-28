@@ -38,12 +38,12 @@
 
 </div> <!-- /thumbnail -->
 
-<div id="fileInfo">
+<div class="fileinfo">
 	<form method="post">
 		<input type="hidden" name="id" value="{$fileInfo->_id}" />
 		<input type="hidden" name="action" value="updateFileInfo">
 
-		<table class="fileInfo">
+		<table>
 			<tr>
 				<th>Name {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
@@ -74,7 +74,7 @@
                         <tr>
                                 <th>Date</th>
                                 <td>
-                                        {$fileInfo->fileDate|date_format:"%d %b  %H:%M"}
+                                        {$fileInfo->fileDate|date_format:"%d %b %Y  %H:%M"}
                                 </td>
                         </tr>
 
@@ -83,7 +83,7 @@
 				<td>
 					<span class="showView">
 					{foreach $fileInfo->fileTags as $tag} 
-						<a href="?action=showFiles&tag={$tag}">{$tag}</a>
+						<a class="fileinfo_tag" href="?action=showFiles&tag={$tag}">{$tag}</a>
 					{/foreach}
 					</span>
 					<input class="editView" type="text" size="50" name="fileTags" value="{', '|implode:$fileInfo->fileTags}" />
@@ -94,11 +94,7 @@
 				<th>License {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">
- 	                                	{if $fileInfo->fileLicense != 'none'}
-                                        		<img src="i/{$fileInfo->fileLicense}.png" alt="{$allLicenses[$fileInfo->fileLicense]}" />
-						{else}
-							<em>No License Specified</em>
-                                        	{/if}
+                                        		<img src="i/{$fileInfo->fileLicense}.png" title="{$allLicenses[$fileInfo->fileLicense]}" alt="{$allLicenses[$fileInfo->fileLicense]}" />
 					</span>
 					<span class="editView">
 						{html_options name='fileLicense' options=$allLicenses selected=$fileInfo->fileLicense}
@@ -146,15 +142,15 @@
 			</tr>
 			{/if}
 		</table>
-                                        <div class="controls">
-                                        {if $isOwner}
-                                                <input type="submit" value="Update" name="buttonPressed">
-                                                <input type="submit" value="Delete" name="buttonPressed">
-						<input type="submit" value="Share" name="buttonPressed">
-                                                <input type="submit" value="Reexamine" name="buttonPressed">
-                                        {/if}
-                                        <input type="submit" value="Download" name="buttonPressed">
-                                        </div>
+                <div class="fileinfo_controls">
+	                {if $isOwner}
+	     	       		<input type="submit" value="Update" name="buttonPressed">
+				<input type="submit" value="Delete" name="buttonPressed">
+				<input type="submit" value="Share" name="buttonPressed">
+	                        <input type="submit" value="Reexamine" name="buttonPressed">
+	                {/if}
+                	<input type="submit" value="Download" name="buttonPressed">
+                </div> <!-- /fileinfo_controls -->
 
 	</form>
-</div>
+</div> <!-- /fileinfo -->

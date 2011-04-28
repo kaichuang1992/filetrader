@@ -1,6 +1,6 @@
 <div class="filelist">
 {if empty($deleteList)}
-        <div class="filelist_nofiles">No files in this collection</div>
+        <div class="filelist_nofiles">No files in selected for deletion</div>
 {else}
 	<div class="filelist_confirm">Are you sure you want to delete the following files?</div>
         <form method="post">
