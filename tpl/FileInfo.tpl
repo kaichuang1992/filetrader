@@ -1,3 +1,5 @@
+<a class="fileinfo_download" href="?action=downloadFile&id={$fileInfo->_id}">Download</a>
+
 <div class="thumbnail">
 {if $hasThumb}
 	<img width="{$fileInfo->image->thumbnail->{360}->width}" height="{$fileInfo->image->thumbnail->{360}->height}" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=image_thumbnail_360" alt="Thumbnail of {$fileInfo->fileName}"/>
@@ -40,8 +42,6 @@
 
 <div class="fileinfo">
 	<form method="post">
-		<input class="fileinfo_download" type="submit" value="Download" name="buttonPressed">
-
 		<input type="hidden" name="id" value="{$fileInfo->_id}" />
 		<input type="hidden" name="action" value="updateFileInfo">
 

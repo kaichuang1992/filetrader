@@ -241,8 +241,8 @@ class Files {
 
 		switch ($button) {
 			/* called from the {File,Media}List page */
-			case "Download" :
-				return $this->downloadFile();
+/*			case "Download" :
+				return $this->downloadFile(); */
 
 			case "Delete Files" :
 				$markedFiles = getRequest("markedFiles", FALSE, array ());
