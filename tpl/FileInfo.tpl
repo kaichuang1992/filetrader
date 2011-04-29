@@ -40,6 +40,8 @@
 
 <div class="fileinfo">
 	<form method="post">
+		<input class="fileinfo_download" type="submit" value="Download" name="buttonPressed">
+
 		<input type="hidden" name="id" value="{$fileInfo->_id}" />
 		<input type="hidden" name="action" value="updateFileInfo">
 
@@ -146,10 +148,8 @@
 	                {if $isOwner}
 	     	       		<input type="submit" value="Update" name="buttonPressed">
 				<input type="submit" value="Delete" name="buttonPressed">
-				<input type="submit" value="Share" name="buttonPressed">
-	                        <input type="submit" value="Reexamine" name="buttonPressed">
+	                        &lt;!-- <input type="submit" value="Reexamine" name="buttonPressed"> --&gt;
 	                {/if}
-                	<input type="submit" value="Download" name="buttonPressed">
                 </div> <!-- /fileinfo_controls -->
 
 	</form>

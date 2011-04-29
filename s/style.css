@@ -158,3 +158,10 @@ img {
 	border: 1px solid #333;
 }
 
+.fileinfo_download {
+	font-size: 150%;
+	background-color: #c00;
+	color: #c00;
+	font-weight: bold;
+}
+
