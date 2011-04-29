@@ -74,7 +74,7 @@ img {
 	padding: 10px 0;
 }
 
-.thumbnail .video-js-box {
+.thumbnail .video-js-box, .thumbnail audio {
         margin: 0 auto;
         border: 1px solid #000;
         display: block;
