@@ -95,6 +95,10 @@ img {
 	background-color: #eee;
 }
 
+input[type="submit"] {
+	cursor: pointer;
+}
+
 .fileinfo_edit {
 	cursor: pointer;
 }
@@ -160,8 +164,10 @@ img {
 
 .fileinfo_download {
 	font-size: 150%;
-	background-color: #c00;
-	color: #c00;
+	background-color: #080;
+	color: #fff;
 	font-weight: bold;
+	border: 1px solid #000;
+	padding: 5px;
+	text-decoration: none;
 }
-

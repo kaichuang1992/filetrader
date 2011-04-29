@@ -35,6 +35,8 @@
 		</table>
 		<div class="filelist_controls">
 			<input type="submit" value="Delete Files" name="buttonPressed">
+	                <input type="submit" value="Share Files" name="buttonPressed" disabled="disabled">
+                        <input type="submit" value="Tag Files" name="buttonPressed" disabled="disabled">
 		</div> <!-- /filelist_controls -->
 	</form>
 {/if}
