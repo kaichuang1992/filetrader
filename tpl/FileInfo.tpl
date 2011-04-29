@@ -54,6 +54,11 @@
 				</td>
 			</tr>
 
+                        <tr>
+                                <th>Owner</th>
+                                <td>{$fileInfo->fileOwner}</td>
+                        </tr>
+
                         {if isset($fileInfo->video)}
 			<tr>
 				<th>Duration</th>
