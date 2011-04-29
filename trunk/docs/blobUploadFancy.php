@@ -1,6 +1,6 @@
 <?php
 $httpHeaders = getallheaders();
-if(array_key_exists('X-Request-With', $httpHeaders) &&
+if(array_key_exists('X-Requested-With', $httpHeaders) &&
    $httpHeaders['X-Requested-With'] === "XMLHttpRequest" &&
    array_key_exists('X-File-Name', $httpHeaders)) {
         $fileName = basename($httpHeaders['X-File-Name']);

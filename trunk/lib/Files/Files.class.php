@@ -454,138 +454,50 @@ class Files {
 	}
 
 	function handleUpload() {
-		// FIXME: this seems to be WAY too crazy
-		// Remove HTML4 support completely, only support HTML5 file upload (and maybe Flash/Silverlight?!)
+                $ownerDir = base64_encode($this->auth->getUserId());
+                $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
+                $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
-		// HTTP headers for no cache etc
-		header('Content-type: text/plain; charset=UTF-8');
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-store, no-cache, must-revalidate");
-		header("Cache-Control: post-check=0, pre-check=0", false);
-		header("Pragma: no-cache");
+		/* FIXME: script timeout?! */
 
-		// Settings
-		$ownerDir = base64_encode($this->auth->getUserId());
-		$targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
-		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+                if (!file_exists($targetDir))
+                        @ mkdir($targetDir);
 
-		// FIXME: are these variables really needed?
-		$cleanupTargetDir = false; // Remove old files
-		$maxFileAge = 60 * 60; // Temp file age in seconds
+		$httpHeaders = getallheaders();
+		if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Requested-With'] === "XMLHttpRequest" && array_key_exists('X-File-Name', $httpHeaders)) {
+			$fileName = basename($httpHeaders['X-File-Name']);
+	                $fileName = filter_var($fileName, FILTER_SANITIZE_SPECIAL_CHARS);
+	                if ($fileName === FALSE)
+	                        logHandler("Unable to sanitize filename '" . $fN . "' uploaded by user '" . $this->auth->getUserId() . "'");
+	                /* FIXME: if file exists, add .1, .2, .3 etc */
+		        $out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, "wb");
+		        if ($out) {
+		                $in = fopen("php://input", "rb");
+		                if ($in) {
+		                        while ($buffer = fread($in, 4096))
+		                        fwrite($out, $buffer);
+		                } else {
+		                       // FIXME: failed to open input stream
+		                }
+		                fclose($in);
+		                fclose($out);
 
-		// 5 minutes execution time
-		@ set_time_limit(5 * 60);
-
-		// Uncomment this one to fake upload time
-		// usleep(5000);
-
-		// Get parameters
-		$chunk = getRequest('chunk', FALSE, 0);
-		$chunks = getRequest('chunks', FALSE, 0);
-		$fN = getRequest('name', FALSE, '');
-
-		// Clean the fileName for security reasons
-		$fileName = filter_var($fN, FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($fileName === FALSE)
-			throw new Exception("Unable to sanitize filename '" . $fN . "' uploaded by user '" . $this->auth->getUserId() . "'");
-
-		// Make sure the fileName is unique but only if chunking is disabled
-		if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
-			$ext = strrpos($fileName, '.');
-			$fileName_a = substr($fileName, 0, $ext);
-			$fileName_b = substr($fileName, $ext);
-
-			$count = 1;
-			while (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName_a . '_' . $count . $fileName_b))
-				$count++;
-
-			$fileName = $fileName_a . '_' . $count . $fileName_b;
+	                        $metaData = new stdClass();
+	                        $metaData->fileName = $fileName;
+	                        analyzeFile($metaData, $targetDir, $cachePath);
+	                        $metaData->fileOwner = $this->auth->getUserId();
+	                        $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
+        	                $metaData->fileGroups = array ();
+	                        $metaData->fileTokens = array ();
+	                        $metaData->fileLicense = 'none';
+	                        $metaData->fileTags = array ();
+	                        $this->storage->post($metaData);
+	                        logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");		
+		        } else {
+	                // FIXME: failed to open output stream
+		        }
 		}
-
-		// Create target dir
-		if (!file_exists($targetDir))
-			@ mkdir($targetDir);
-
-		// Remove old temp files
-		if (is_dir($targetDir) && ($dir = opendir($targetDir))) {
-			while (($file = readdir($dir)) !== false) {
-				$filePath = $targetDir . DIRECTORY_SEPARATOR . $file;
-				// Remove temp files if they are older than the max age
-				if (preg_match('/\\.tmp$/', $file) && (filemtime($filePath) < time() - $maxFileAge))
-					@ unlink($filePath);
-			}
-			closedir($dir);
-		} else
-			die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
-
-		// Look for the content type header
-		if (isset ($_SERVER["HTTP_CONTENT_TYPE"]))
-			$contentType = $_SERVER["HTTP_CONTENT_TYPE"];
-
-		if (isset ($_SERVER["CONTENT_TYPE"]))
-			$contentType = $_SERVER["CONTENT_TYPE"];
-
-		// Handle non multipart uploads older WebKit versions didn't support multipart in HTML5
-		if (strpos($contentType, "multipart") !== false) {
-			if (isset ($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
-				// Open temp file
-				$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
-				if ($out) {
-					// Read binary input stream and append it to temp file
-					$in = fopen($_FILES['file']['tmp_name'], "rb");
-
-					if ($in) {
-						while ($buff = fread($in, 4096))
-							fwrite($out, $buff);
-					} else
-						die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-
-					fclose($out);
-					@ unlink($_FILES['file']['tmp_name']);
-				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
-		} else {
-			// Open temp file
-			$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
-			if ($out) {
-				// Read binary input stream and append it to temp file
-				$in = fopen("php://input", "rb");
-
-				if ($in) {
-					while ($buff = fread($in, 4096))
-						fwrite($out, $buff);
-				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-
-				fclose($out);
-			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-		}
-
-		/* only add entry to the database after receiving the last block */
-		if ($chunk == $chunks -1 || $chunks === 0) {
-			$metaData = new stdClass();
-			$metaData->fileName = $fileName;
-			analyzeFile($metaData, $targetDir, $cachePath);
-                        $metaData->fileOwner = $this->auth->getUserId();
-			$metaData->fileTags = array (
-                        	'Demo Tag',
-	                        "Length" . strlen(basename($userFile))
-	                );
-	                $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
-	                $metaData->fileGroups = array ();
-	                $metaData->fileTokens = array ();
-	                $metaData->fileLicense = 'none';
-	                $metaData->fileTags = array ();
-			$this->storage->post($metaData);
-			logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");
-		}
-
-		// Return JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		exit(0);
 	}
 }
 ?>

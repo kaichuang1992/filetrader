@@ -1,22 +1,18 @@
-<style type="text/css">
-        @import url("ext/plupload/js/jquery.plupload.queue/css/jquery.plupload.queue.css");
-</style>
-
-<!-- Load plupload and all it's runtimes and finally the jQuery queue widget -->
-<script type="text/javascript" src="ext/plupload/js/plupload.full.js"></script>
-<script type="text/javascript" src="ext/plupload/js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
-
-<script type="text/javascript">
-$(function() {
-        $("#uploader").pluploadQueue({
-                runtimes : 'html5,flash',
-                url : 'index.php?action=handleUpload',
-                max_file_size : '4096mb',
-                chunk_size : '1mb',
-                dragdrop : true,
-                flash_swf_url : 'ext/plupload/js/plupload.flash.swf',
-        });
-});
-</script>
-<form id="uploader">
-</form> <!-- /uploader -->
+<script type="text/javascript" src="j/upload.js"></script>
+<table>
+        <thead>
+                <tr><th>File Name</th><th>File Size</th><th>Progress</th></tr>
+        </thead>
+        <tbody id="fileList">
+                <tr><td colspan="3">No files selected yet...</td></tr>
+        </tbody>
+        <tfoot>
+                <tr><td colspan="2">
+                        <input id="inputFiles" type="file" onchange="listFiles(this.files)" multiple>
+                        <button id="startButton" onclick="startUpload()" disabled>Start Upload</button>
+                        <button id="abortButton" onclick="abortUpload()" disabled>Abort Upload</button>
+                </td>
+                <td><span id="uploadStatus"></span></td>
+                </tr>
+        </tfoot>
+</table>
