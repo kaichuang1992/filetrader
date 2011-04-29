@@ -39,7 +39,6 @@ The following external JS libraries are required:
 Library		Version		License		URL
 		Tested
 -------------------------------------------------------------------------------
-Plupload	1.4.3.2		GPLv2		http://www.plupload.com/
 jQuery		1.5.2		MIT, GPLv2	http://jquery.com/
 VideoJS		2.0.2		LGPLv3+		http://www.videojs.com/
 
