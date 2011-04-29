@@ -40,8 +40,12 @@ a {
 	padding: 0;
 }
 
-#header ul li:before {
-	content: "» ";
+#header ul li:after {
+	content: " | ";
+}
+
+#header ul li.last:after {
+	content: "";
 }
 
 #footer {
@@ -89,6 +93,10 @@ img {
 .fileinfo textarea, .fileinfo select, .fileinfo input, .fileinfo_controls input, .filelist_controls input {
 	border: 1px solid #000;
 	background-color: #eee;
+}
+
+.fileinfo_edit {
+	cursor: pointer;
 }
 
 .fileinfo_tag, .filelist_tag { 

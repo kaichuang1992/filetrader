@@ -15,7 +15,7 @@
 	                <ul>
 				<li><a href="?action=showFiles">Home</a></li>
 				<li><a href="?action=fileUpload">Upload</a></li>
-				<li><a href="?action=logout">Logout</a> <span class="small" title="{$auth->getUserID()}">({$auth->getUserDisplayName()})</span></li>
+				<li class="last"><a href="?action=logout">Logout</a> <span class="small" title="{$auth->getUserID()}">({$auth->getUserDisplayName()})</span></li>
 			</ul>
 		{else}
 			<strong>FileTrader</strong>

@@ -45,7 +45,7 @@
 
 		<table>
 			<tr>
-				<th>Name {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
+				<th>Name {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">{$fileInfo->fileName}</span>
 					<input class="editView" type="text" size="50" name="fileName" value="{$fileInfo->fileName}"/>
@@ -79,7 +79,7 @@
                         </tr>
 
 			<tr>
-				<th>Tags {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
+				<th>Tags {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">
 					{foreach $fileInfo->fileTags as $tag} 
@@ -91,7 +91,7 @@
 			</tr>
 
 			<tr>
-				<th>License {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
+				<th>License {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">
                                         		<img src="i/{$fileInfo->fileLicense}.png" title="{$allLicenses[$fileInfo->fileLicense]}" alt="{$allLicenses[$fileInfo->fileLicense]}" />
@@ -103,7 +103,7 @@
 			</tr>
 
 			<tr>
-				<th>Description {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
+				<th>Description {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">{$fileInfo->fileDescription}</span>
 					<textarea class="editView" name="fileDescription" rows="5" cols="55">{$fileInfo->fileDescription}</textarea>
@@ -134,7 +134,7 @@
 
 			{if $isOwner && $emailShare}
                         <tr>
-				<th>Email Invites {if $isOwner}<img src="i/pencil.png" alt="Edit" />{/if}</th>
+				<th>Email Invites {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>
 					<span class="showView">{', '|implode:array_values((array)$fileInfo->fileTokens)}</span>				
 					<textarea class="editView" rows="5" cols="55" name="fileTokens">{', '|implode:array_values((array)$fileInfo->fileTokens)}</textarea>
