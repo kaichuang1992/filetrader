@@ -453,24 +453,43 @@ class Files {
 		exit (0);
 	}
 
+	/* FIXME: deal with duplicate file names */
+	/* FIXME: script timeout? */
 	function handleUpload() {
                 $ownerDir = base64_encode($this->auth->getUserId());
                 $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
                 $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
-		/* FIXME: script timeout?! */
-
                 if (!file_exists($targetDir))
                         @ mkdir($targetDir);
 
 		$httpHeaders = getallheaders();
-		if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Requested-With'] === "XMLHttpRequest" && array_key_exists('X-File-Name', $httpHeaders)) {
+		if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Requested-With'] === "XMLHttpRequest" && array_key_exists('X-File-Name', $httpHeaders) && array_key_exists('X-File-Size', $httpHeaders)) {
 			$fileName = basename($httpHeaders['X-File-Name']);
+			$fileSize = $httpHeaders['X-File-Size'];
+                        $fileChunk = 0;
+                        if(array_key_exists('X-File-Chunk', $httpHeaders))
+                                $fileChunk = $httpHeaders['X-File-Chunk'];
+
 	                $fileName = filter_var($fileName, FILTER_SANITIZE_SPECIAL_CHARS);
-	                if ($fileName === FALSE)
-	                        logHandler("Unable to sanitize filename '" . $fN . "' uploaded by user '" . $this->auth->getUserId() . "'");
-	                /* FIXME: if file exists, add .1, .2, .3 etc */
-		        $out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, "wb");
+	                if ($fileName === FALSE) {
+	                        logHandler("Invalid X-File-Name '" . $fN . "' by user '" . $this->auth->getUserId() . "'");
+				die();
+			}
+
+			if(!is_numeric($fileSize) || $fileSize < 0) {
+				logHandler("Invalid X-File-Size '" . $fileSize . "' by user '" . $this->auth->getUserId() . "'");
+				die();
+			}
+                        $fileSize = (int)$fileSize;
+
+                        if(!is_numeric($fileChunk) || $fileChunk < 0) {
+                                logHandler("Invalid X-File-Chunk '" . $fileChunk . "' by user '" . $this->auth->getUserId() . "'");
+                                die();
+                        }
+                       	$fileChunk = (int)$fileChunk;
+
+		        $out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
 		        if ($out) {
 		                $in = fopen("php://input", "rb");
 		                if ($in) {
@@ -481,21 +500,25 @@ class Files {
 		                }
 		                fclose($in);
 		                fclose($out);
+				flush();
 
-	                        $metaData = new stdClass();
-	                        $metaData->fileName = $fileName;
-	                        analyzeFile($metaData, $targetDir, $cachePath);
-	                        $metaData->fileOwner = $this->auth->getUserId();
-	                        $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
-        	                $metaData->fileGroups = array ();
-	                        $metaData->fileTokens = array ();
-	                        $metaData->fileLicense = 'none';
-	                        $metaData->fileTags = array ();
-	                        $this->storage->post($metaData);
-	                        logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");		
-		        } else {
-	                // FIXME: failed to open output stream
-		        }
+				/* only check file when upload is complete */
+				if($fileSize == filesize($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+		                        $metaData = new stdClass();
+		                        $metaData->fileName = $fileName;
+		                        analyzeFile($metaData, $targetDir, $cachePath);
+		                        $metaData->fileOwner = $this->auth->getUserId();
+		                        $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
+	        	                $metaData->fileGroups = array ();
+		                        $metaData->fileTokens = array ();
+		                        $metaData->fileLicense = 'none';
+		                        $metaData->fileTags = array ();
+		                        $this->storage->post($metaData);
+		                        logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");		
+				}
+			} else {
+		        	// FIXME: failed to open output stream
+			}		
 		}
 		exit(0);
 	}
