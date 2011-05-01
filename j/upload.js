@@ -67,7 +67,12 @@
 					if(bytesLeft > 0) {
 						transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
 						currentChunk++;
-						blob = file.slice(currentChunk*blockSize, transferLength);
+						if(file.slice)
+							blob = file.slice(currentChunk*blockSize, transferLength);
+						if(file.mozSlice)
+	                                                blob = file.mozSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
+						if(file.webkitSlice)
+		                                        blob = file.webkitSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
 						reader.readAsBinaryString(blob);
 					} else {
 						/* all done */
@@ -89,7 +94,12 @@
 				xhr.setRequestHeader("X-File-Chunk", currentChunk);
 				xhr.send(blob);
 			}
-			blob = file.slice(0, transferLength);
+			if(file.slice)
+	 			blob = file.slice(0, transferLength);
+			if(file.mozSlice)
+	                        blob = file.mozSlice(0, currentChunk*blockSize+transferLength);
+			if(file.webkitSlice)
+	                      blob = file.webkitSlice(0, currentChunk*blockSize+transferLength);
 			reader.readAsBinaryString(blob);
 		}
         }
