@@ -139,11 +139,7 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 		var blob;
 
                 if(bytesLeft > 0) {
-			if(blockSize > bytesLeft) {
-				transferLength = bytesLeft;
-			} else {
-				transferLength = blockSize;
-			}
+			transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
 			var reader = new FileReader();
 			reader.onload = function(evt) {
 				var xhr = new XMLHttpRequest();
@@ -160,11 +156,7 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 				xhr.upload.addEventListener("load", function(evt) {
 					bytesLeft -= transferLength;
 					if(bytesLeft > 0) {
-						if(blockSize > bytesLeft) {
-							transferLength = bytesLeft;
-						} else {
-							transferLength = blockSize;
-						}
+						transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
 						currentChunk++;
 						blob = file.slice(currentChunk*blockSize, transferLength);
 						reader.readAsBinaryString(blob);

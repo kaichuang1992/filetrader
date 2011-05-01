@@ -454,14 +454,13 @@ class Files {
 	}
 
 	/* FIXME: deal with duplicate file names */
-	/* FIXME: script timeout? */
 	function handleUpload() {
                 $ownerDir = base64_encode($this->auth->getUserId());
                 $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
                 $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
                 if (!file_exists($targetDir))
-                        @ mkdir($targetDir);
+                        @mkdir($targetDir);
 
 		$httpHeaders = getallheaders();
 		if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Requested-With'] === "XMLHttpRequest" && array_key_exists('X-File-Name', $httpHeaders) && array_key_exists('X-File-Size', $httpHeaders)) {
@@ -489,7 +488,7 @@ class Files {
                         }
                        	$fileChunk = (int)$fileChunk;
 
-		        $out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
+		        $out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, ($fileChunk == 0) ? "wb" : "ab");
 		        if ($out) {
 		                $in = fopen("php://input", "rb");
 		                if ($in) {
