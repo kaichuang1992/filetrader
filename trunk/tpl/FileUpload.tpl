@@ -10,7 +10,7 @@
                 <tr><td colspan="2">
                         <input id="inputFiles" type="file" onchange="listFiles(this.files)" multiple>
                         <button id="startButton" onclick="startUpload()" disabled>Start Upload</button>
-                        <button id="abortButton" onclick="abortUpload()" disabled>Abort Upload</button>
+                        <button id="cancelButton" onclick="cancelUpload()" disabled>Cancel Upload</button>
                 </td>
                 <td><span id="uploadStatus"></span></td>
                 </tr>

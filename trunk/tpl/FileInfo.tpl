@@ -85,6 +85,15 @@
                                 </td>
                         </tr>
 
+			{if isset($fileInfo->fileSHA1)}
+			<tr>
+				<th>SHA1 Checksum</th>
+				<td>
+					{$fileInfo->fileSHA1}
+				</td>
+			</tr>
+			{/if}
+
 			<tr>
 				<th>Tags {if $isOwner}<img class="fileinfo_edit" src="i/pencil.png" alt="Edit" />{/if}</th>
 				<td>

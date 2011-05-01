@@ -24,20 +24,20 @@
                 done = 0;
                 if(files != null) {
                         document.getElementById('startButton').setAttribute('disabled','disabled');
-                        document.getElementById('abortButton').removeAttribute('disabled');
+                        document.getElementById('cancelButton').removeAttribute('disabled');
                         for (var i = 0; i < files.length; i++) {
                                 uploadFile(i,files[i]);
                         }
                 }
         }
 
-        function abortUpload() {
+        function cancelUpload() {
                 for(var i = 0; i < xhrs.length; i++) {
                         xhrs[i].abort();
                 }
-                document.getElementById('abortButton').setAttribute('disabled','disabled');
-                document.getElementById('uploadStatus').textContent = "Aborted";
-                document.getElementById('uploadStatus').setAttribute('class', 'aborted');
+                document.getElementById('cancelButton').setAttribute('disabled','disabled');
+                document.getElementById('uploadStatus').textContent = "Canceled";
+                document.getElementById('uploadStatus').setAttribute('class', 'canceled');
         }
 
         function uploadFile(index,file) {
@@ -47,7 +47,6 @@
                 /* progress information during upload */
                 xhr.upload.addEventListener("progress", function(evt) { 
                         if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
                                 document.getElementById('file_progress_'+index).textContent = Math.round((evt.loaded * 100) / evt.total) + "%";
                         }
                 }, false);
@@ -56,9 +55,9 @@
                 xhr.upload.addEventListener("load", function(evt) {
                         document.getElementById('file_progress_'+index).textContent = "Done";
                         document.getElementById('file_progress_'+index).setAttribute('class', 'done');
-                        /* if this was the last file, disable abort button */
+                        /* if this was the last file, disable cancel button */
                         if(++done == files.length) {
-                                document.getElementById('abortButton').setAttribute('disabled','disabled');
+                                document.getElementById('cancelButton').setAttribute('disabled','disabled');
                                 document.getElementById('uploadStatus').textContent = "Done";
                                 document.getElementById('uploadStatus').setAttribute('class', 'done');
                         }
@@ -67,6 +66,7 @@
                 xhr.open("POST", 'index.php?action=handleUpload', true);
                 xhr.setRequestHeader("X-File-Name", file.name);
                 xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+		xhr.setRequestHeader("X-File-Size", file.size);
                 xhr.send(file);
         }
 

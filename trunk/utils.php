@@ -268,6 +268,7 @@ function analyzeFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 	$metaData->type = "file";
 	$metaData->fileSize = filesize($file);
 	$metaData->fileDate = filemtime($file);
+	$metaData->fileSHA1 = sha1_file($file);
 
 	/* MIME-Type */
 	$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
