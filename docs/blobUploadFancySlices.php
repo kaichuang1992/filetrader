@@ -91,8 +91,9 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 <script>
         var files; /* keep track of the files to upload */
         var xhrs; /* keep track of all xhrs to be able to stop them */
+	var rdrs; /* keep track of all readers to be able to stop them */
         var done; /* keep track of the number of files done uploading */
-	var blockSize = 1024*1024;
+	var blockSize = 128;
 
         /* add the files to the upload list */
         function listFiles(f) {
@@ -113,6 +114,7 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 
         function startUpload() {
                 xhrs = new Array();
+		rdrs = new Array();
                 done = 0;
                 if(files != null) {
                         document.getElementById('startButton').setAttribute('disabled','disabled');
@@ -127,6 +129,9 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
                 for(var i = 0; i < xhrs.length; i++) {
                         xhrs[i].abort();
                 }
+                for(var i = 0; i < rdrs.length; i++) {
+                        rdrs[i].abort();
+                }
                 document.getElementById('cancelButton').setAttribute('disabled','disabled');
                 document.getElementById('uploadStatus').textContent = "Canceled";
                 document.getElementById('uploadStatus').setAttribute('class', 'canceled');
@@ -137,22 +142,23 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 		var currentChunk = 0;
 		var transferLength;
 		var blob;
+		var xhr;
 
                 if(bytesLeft > 0) {
 			transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
 			var reader = new FileReader();
+			rdrs.push(reader);
 			reader.onload = function(evt) {
-				var xhr = new XMLHttpRequest();
+				xhr = new XMLHttpRequest();
 				xhrs.push(xhr);
 
-				/* progress information during upload */
 				xhr.upload.addEventListener("progress", function(evt) { 
 				        if (evt.lengthComputable) {
 				                document.getElementById('file_progress_'+index).textContent = Math.round(((blockSize*currentChunk+evt.loaded) * 100) / file.size) + "%";
 				        }
 				}, false);
 
-				/* when upload of a file is complete */
+				/* when upload of a chunk is complete */
 				xhr.upload.addEventListener("load", function(evt) {
 					bytesLeft -= transferLength;
 					if(bytesLeft > 0) {
@@ -164,6 +170,7 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 	                                                blob = file.mozSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
 						if(file.webkitSlice)
 		                                        blob = file.webkitSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
+						// read the next blob
 						reader.readAsBinaryString(blob);
 					} else {
 						/* all done */
@@ -179,6 +186,7 @@ if(array_key_exists('X-Requested-With', $httpHeaders) && $httpHeaders['X-Request
 				}, false);
 
 				xhr.open("POST", '<?php echo $_SERVER['SCRIPT_NAME'];?>', true);
+                                //xhr.open("POST", 'index.php?action=handleUpload', true);
 				xhr.setRequestHeader("X-File-Name", file.name);
 				xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 				xhr.setRequestHeader("X-File-Size", file.size);
