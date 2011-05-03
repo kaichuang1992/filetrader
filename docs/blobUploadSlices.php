@@ -51,7 +51,7 @@ function uploadFile(file) {
 	var xhr;
 	var reader;
 
-    if(bytesLeft > 0) {
+	if(bytesLeft > 0) {
 		transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
 		reader = new FileReader();
 		reader.onload = function(evt) {
@@ -64,9 +64,9 @@ function uploadFile(file) {
 					if(file.slice)
 						blob = file.slice(currentChunk*blockSize, transferLength);
 					if(file.mozSlice)
-	                    blob = file.mozSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
+						blob = file.mozSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
 					if(file.webkitSlice)
-	                    blob = file.webkitSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
+						blob = file.webkitSlice(currentChunk*blockSize, currentChunk*blockSize+transferLength);
 					reader.readAsBinaryString(blob);
 				} else {
 					alert("File Upload Done!");
@@ -79,14 +79,16 @@ function uploadFile(file) {
 			xhr.setRequestHeader("X-File-Chunk", currentChunk);
 			xhr.send(blob);
 		}
-        if(file.slice)
-            blob = file.slice(0, transferLength);
-        if(file.mozSlice)
-            blob = file.mozSlice(0, currentChunk*blockSize+transferLength);
-        if(file.webkitSlice)
+		if(file.slice)
+			blob = file.slice(0, transferLength);
+		if(file.mozSlice)
+			blob = file.mozSlice(0, currentChunk*blockSize+transferLength);
+		if(file.webkitSlice)
 			blob = file.webkitSlice(0, currentChunk*blockSize+transferLength);		
 		reader.readAsBinaryString(blob);
-	}
+	} else {
+		alert("File Empty!");
+	}		
 }
 </script>
 </body>
