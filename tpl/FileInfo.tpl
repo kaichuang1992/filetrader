@@ -134,6 +134,8 @@
                                                 <em>{$fileInfo->transcodeProgress}%</em>
 					{elseif $fileInfo->transcodeStatus == 'WAITING'}
 						<em>Waiting</em>
+					{elseif $fileInfo->transcodeStatus == 'FAILED'}
+						<em>Failed</em>
                                         {/if}
 	                        </td>
         	        </tr>
