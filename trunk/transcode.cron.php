@@ -58,10 +58,13 @@ do {
                         $cmd = "ffmpeg -i \"$fileName\" -threads 2 -f ogg -acodec libvorbis -ab 96000 -y $transcodeFileName";
 		}
 
-		execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
+		$returnValue = execCommand($cmd, 'data' . DIRECTORY_SEPARATOR . basename($transcodeFileName) . ".log", "Transcoding $fileName");
 
 		$info = $storage->get($id)->body;
-		$info->transcodeStatus = 'DONE';
+		if($returnValue != 0)
+			$info->transcodeStatus = 'FAILED';
+		else		
+			$info->transcodeStatus = 'DONE';
 		$storage->put($id, $info);
 	}
 	sleep(10);

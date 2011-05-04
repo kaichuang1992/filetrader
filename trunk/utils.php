@@ -126,6 +126,7 @@ function execCommand($command, $logFile = NULL, $subject = '') {
 	$logData = "--- RETURN VALUE: $rv\n";
 	$logData .= "\n\n";
 	file_put_contents($logFile, $logData, FILE_APPEND);
+	return $rv;
 }
 
 function isMediaFile(& $metaData, $filePath) {
