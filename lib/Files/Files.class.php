@@ -157,6 +157,7 @@ class Files {
                 $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
                 $cachePath = getConfig($this->config, 'cache_dir', TRUE);
 
+		/* FIXME: also remove image, video, audio elements from metadata array before analyzing! */
 		/* remove thumbnails and transcodes of this file if they exist */
 		$this->deleteCacheObjects($info);
 
@@ -216,6 +217,7 @@ class Files {
                	                	unlink($cachePath . DIRECTORY_SEPARATOR . $v->file);
                 	}
 		}
+		/* FIXME: delete image thumbnails */
 	}
 
 	function confirmDelete($filesToDelete = NULL) {
