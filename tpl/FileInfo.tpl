@@ -1,5 +1,3 @@
-<a class="fileinfo_download" href="?action=downloadFile&id={$fileInfo->_id}">Download</a>
-
 <div class="thumbnail">
 {if $hasThumb}
 	<img width="{$fileInfo->image->thumbnail->{360}->width}" height="{$fileInfo->image->thumbnail->{360}->height}" src="?action=getCacheObject&amp;id={$fileInfo->_id}&amp;type=image_thumbnail_360" alt="Thumbnail of {$fileInfo->fileName}"/>
@@ -37,8 +35,9 @@
 {else}
 <em>No preview available...</em>
 {/if}
-
 </div> <!-- /thumbnail -->
+
+<a class="fileinfo_download" href="?action=downloadFile&id={$fileInfo->_id}">Download</a>
 
 <div class="fileinfo">
 	<form method="post">
