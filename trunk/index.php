@@ -89,8 +89,10 @@ try {
 			'downloadFile',
 			'fileInfo',
 			'fileUpload',
+			'legacyFileUpload',
 			'getCacheObject',
 			'handleUpload',
+			'handleLegacyUpload',
 			'showFiles',
 			'rawFileInfo',
 			'updateFileInfo'), TRUE))

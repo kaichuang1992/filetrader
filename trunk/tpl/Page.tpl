@@ -14,7 +14,8 @@
 	        {if isset($auth) && $auth->isLoggedIn()}
 	                <ul>
 				<li><a href="?action=showFiles">Home</a></li>
-				<li><a href="?action=fileUpload">Upload</a></li>
+				<li><a href="?action=fileUpload">Upload</a> <small>(Firefox 4)</small></li>
+				<li><a href="?action=legacyFileUpload">Legacy Upload</a> <small>(IE, Chrome, Safari, Firefox 3)</small></li>
 				<li class="last"><a href="?action=logout">Logout</a> <span class="small" title="{$auth->getUserID()}">({$auth->getUserDisplayName()})</span></li>
 			</ul>
 		{else}

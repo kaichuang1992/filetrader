@@ -383,6 +383,11 @@ class Files {
 		return $content;
 	}
 
+	function legacyFileUpload() {
+		$content = $this->smarty->fetch('LegacyFileUpload.tpl');
+		return $content;
+	}
+
 	function downloadFile() {
 		$id = getRequest("id", TRUE);
 		$token = getRequest("token", FALSE, NULL);
@@ -453,6 +458,44 @@ class Files {
 		$dl->setContentType($finfo->file($file));
 		$dl->send();
 		exit (0);
+	}
+
+	function handleLegacyUpload() {
+                $ownerDir = base64_encode($this->auth->getUserId());
+                $targetDir = getConfig($this->config, 'file_storage_dir', TRUE) . "/$ownerDir";
+                $cachePath = getConfig($this->config, 'cache_dir', TRUE);
+
+                if (!file_exists($targetDir))
+                        @mkdir($targetDir);
+
+		/* fixme, better checking?! */
+                $fileName = basename($_FILES['userfile']['name']);
+                $fileName = filter_var($fileName, FILTER_SANITIZE_SPECIAL_CHARS);
+                if ($fileName === FALSE) {
+	                logHandler("Invalid File-Name '" . $fN . "' by user '" . $this->auth->getUserId() . "'");
+                        die();
+                }
+		$targetFile = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+
+		if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $targetFile)) {
+			logHandler("Error moving uploaded file to final destination by user '" . $this->auth->getUserId() . "'");
+			die();
+		}
+
+                $metaData = new stdClass();
+                $metaData->fileName = $fileName;
+                analyzeFile($metaData, $targetDir, $cachePath);
+                $metaData->fileOwner = $this->auth->getUserId();
+                $metaData->fileDescription = 'Uploaded on ' . strftime("%c", time());
+                $metaData->fileGroups = array ();
+                $metaData->fileTokens = array ();
+                $metaData->fileLicense = 'none';
+                $metaData->fileTags = array ();
+                $this->storage->post($metaData);
+                logHandler("User '" . $this->auth->getUserID() . "' uploaded file '" . $metaData->fileName . "'");
+
+		header("Location: index.php?action=showFiles");
+		exit(0);
 	}
 
 	/* FIXME: deal with duplicate file names */
