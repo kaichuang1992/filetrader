@@ -384,6 +384,10 @@ class Files {
 	}
 
 	function legacyFileUpload() {
+		$pms = return_bytes(ini_get('post_max_size'));
+		$umf = return_bytes(ini_get('upload_max_filesize'));
+
+                $this->smarty->assign('max_upload_size', min($pms,$umf));
 		$content = $this->smarty->fetch('LegacyFileUpload.tpl');
 		return $content;
 	}
