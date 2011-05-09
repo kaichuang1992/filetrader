@@ -164,6 +164,7 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 		case "video/webm" :
 		case "video/x-ms-asf" :
 		case "video/x-flv" :
+		case "audio/x-wav" :
 		case "application/octet-stream" :
 			if (isMediaFile($metaData, $filePath)) {
 				$media = new ffmpeg_movie($file, FALSE);
