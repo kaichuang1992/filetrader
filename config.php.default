@@ -21,7 +21,7 @@ $config['file_storage_dir'] = 'data/files';
 // Location for cache (e.g. thumbnails, transcodes)
 $config['cache_dir'] = 'data/cache';
 
-// NullAuth, SSPAuth
+// NullAuth, PlainAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
 // NullGroups, ConextGroups
@@ -33,6 +33,10 @@ $config['ssp_path'] = '/var/simplesamlphp';
 $config['ssp_sp'] = 'default-sp';
 $config['ssp_uid_attr'] = 'uid';
 $config['ssp_dn_attr'] = 'cn';
+
+// Plain Authentication configuration (PlainAuth)
+$config['plain_users'] = array ('demo' => array ('pass' => 'user', 'dn' => 'Demo User'),
+                                'omed' => array ('pass' => 'resu', 'dn' => 'Omed Resu'));
 
 // use system wide PEAR installation
 // $config['pear_path'] = '/usr/share/pear';
@@ -63,5 +67,6 @@ $config['conext_host']   = 'os.surfconext.nl';
 // $config['conext_host']   = 'gadgets.dev.coin.surf.net';
 $config['conext_key']    = '12345';
 $config['conext_secret'] = '54321';
+
 
 ?>
