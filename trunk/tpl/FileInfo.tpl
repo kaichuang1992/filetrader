@@ -37,7 +37,7 @@
 {/if}
 </div> <!-- /thumbnail -->
 
-<a class="fileinfo_download" href="?action=downloadFile&id={$fileInfo->_id}">Download</a>
+<a class="fileinfo_download" href="?action=downloadFile&id={$fileInfo->_id}&token={$token}">Download</a>
 
 <div class="fileinfo">
 	<form method="post">
