@@ -21,7 +21,7 @@ $config['file_storage_dir'] = 'data/files';
 // Location for cache (e.g. thumbnails, transcodes)
 $config['cache_dir'] = 'data/cache';
 
-// NullAuth, PlainAuth, SSPAuth
+// NullAuth, SimpleAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
 // NullGroups, ConextGroups
@@ -34,9 +34,9 @@ $config['ssp_sp'] = 'default-sp';
 $config['ssp_uid_attr'] = 'uid';
 $config['ssp_dn_attr'] = 'cn';
 
-// Plain Authentication configuration (PlainAuth)
-$config['plain_users'] = array ('demo' => array ('pass' => 'user', 'dn' => 'Demo User'),
-                                'omed' => array ('pass' => 'resu', 'dn' => 'Omed Resu'));
+// User configuration (SimpleAuth)
+$config['simple_auth_users'] = array ('demo' => array ('pass' => 'user', 'dn' => 'Demo User'),
+                                      'omed' => array ('pass' => 'resu', 'dn' => 'Omed Resu'));
 
 // use system wide PEAR installation
 // $config['pear_path'] = '/usr/share/pear';
