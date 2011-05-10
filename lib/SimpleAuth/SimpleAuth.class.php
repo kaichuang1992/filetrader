@@ -18,19 +18,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class PlainAuth extends Auth {
+class SimpleAuth extends Auth {
 	var $userConfig;
 
 	function __construct($config) {
 		parent :: __construct($config);
-		$this->userConfig = getConfig($this->config, 'plain_users', TRUE);
+		$this->userConfig = getConfig($this->config, 'simple_auth_users', TRUE);
 	}
 
 	function login() {
 		if ($this->isLoggedIn())
 			return;
 
-		if (isset ($_POST['plainProceed'])) {
+		if (isset ($_POST['simpleProceed'])) {
 			$userId = getRequest('userId', TRUE);
 			$userPass = getRequest('userPass', TRUE);
 
@@ -48,7 +48,7 @@ class PlainAuth extends Auth {
 		$smarty = new Smarty();
 		$smarty->template_dir = 'tpl';
 		$smarty->compile_dir = 'tpl_c';
-		$output = $smarty->fetch('PlainAuth.tpl');
+		$output = $smarty->fetch('SimpleAuth.tpl');
 		$smarty->assign('error', FALSE);
 		$smarty->assign('container', $output);
 		$smarty->assign('action', NULL);
