@@ -34,10 +34,10 @@ class SimpleAuth extends Auth {
 			$userId = getRequest('userId', TRUE);
 			$userPass = getRequest('userPass', TRUE);
 
-			if(!empty($userId) && !empty($userPass) && array_key_exists($userId, $this->userConfig) && $this->userConfig[$userId]['pass'] === $userPass) {
+			if(!empty($userId) && !empty($userPass) && array_key_exists($userId, $this->userConfig) && $this->userConfig[$userId]['password'] === $userPass) {
 				$_SESSION['userId'] = $userId;
 				$_SESSION['userAttr'] = array();
-				$_SESSION['userDisplayName'] = $this->userConfig[$userId]['dn'];
+				$_SESSION['userDisplayName'] = $this->userConfig[$userId]['display_name'];
 				return;
 			} else {
 				throw new Exception("invalid credentials");	
