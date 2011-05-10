@@ -24,7 +24,7 @@ $config['cache_dir'] = 'data/cache';
 // NullAuth, SimpleAuth, SSPAuth
 $config['auth_type'] = 'NullAuth';
 
-// NullGroups, ConextGroups
+// NullGroups, SimpleGroups, ConextGroups
 $config['group_type'] = 'NullGroups';
 
 // simpleSAMLphp configuration (SSPAuth)
@@ -35,8 +35,13 @@ $config['ssp_uid_attr'] = 'uid';
 $config['ssp_dn_attr'] = 'cn';
 
 // User configuration (SimpleAuth)
-$config['simple_auth_users'] = array ('demo' => array ('pass' => 'user', 'dn' => 'Demo User'),
-                                      'omed' => array ('pass' => 'resu', 'dn' => 'Omed Resu'));
+$config['simple_auth_users'] = array ('demo' => array ('password' => 'user', 'display_name' => 'Demo User'),
+                                      'omed' => array ('password' => 'resu', 'display_name' => 'Omed Resu'));
+
+// Group configuration (SimpleGroups)
+$config['simple_groups'] = array ('sharedgroup' => array ('display_name' => 'Shared', 'members' => array('demo','omed')),
+                                  'demoprivate' => array ('display_name' => 'Demo Private', 'members' => array('demo')),
+                                  'omedprivate' => array ('display_name' => 'Omed Private', 'members' => array('omed')));
 
 // use system wide PEAR installation
 // $config['pear_path'] = '/usr/share/pear';
@@ -67,6 +72,7 @@ $config['conext_host']   = 'os.surfconext.nl';
 // $config['conext_host']   = 'gadgets.dev.coin.surf.net';
 $config['conext_key']    = '12345';
 $config['conext_secret'] = '54321';
+
 
 
 ?>
