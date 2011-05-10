@@ -51,10 +51,9 @@ class Files {
 	}
 
 	function showFiles() {
-		$userId = $this->auth->getUserId();
-
 		$groupShare = getConfig($this->config, 'group_share', FALSE, FALSE);
 
+                $userId = $this->auth->getUserId();
 		$tag = getRequest("tag", FALSE, FALSE);
 		$group = getRequest("group", FALSE, 0);
 
@@ -63,6 +62,9 @@ class Files {
 
 		if (is_numeric($group))
 			$group = (int) $group;
+
+                if($group !== 0 && !$this->groups->memberOfGroups(array($group)))
+                        throw new Exception("access denied");
 
 		$skip = getRequest("skip", FALSE, 0);
 
@@ -118,6 +120,8 @@ class Files {
 	function fileInfo() {
 		$id = getRequest("id", TRUE);
                 $info = $this->storage->get($id)->body;
+	
+		$token = getRequest("token", FALSE, NULL);
 
                 if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
                         throw new Exception("access denied");
@@ -133,6 +137,7 @@ class Files {
 		$this->smarty->assign('fileInfo', $info);
 		$this->smarty->assign('groupShare', $groupShare);
                 $this->smarty->assign('emailShare', $emailShare);
+		$this->smarty->assign('token', $token);
 		$this->smarty->assign('isOwner', $info->fileOwner === $this->auth->getUserId());
 		if($groupShare) {
 			$this->smarty->assign('userGroups', $this->groups->getUserGroups());
