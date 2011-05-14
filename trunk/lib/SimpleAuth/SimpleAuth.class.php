@@ -30,30 +30,19 @@ class SimpleAuth extends Auth {
 		if ($this->isLoggedIn())
 			return;
 
-		if (isset ($_POST['simpleProceed'])) {
-			$userId = getRequest('userId', TRUE);
-			$userPass = getRequest('userPass', TRUE);
-
-			if(!empty($userId) && !empty($userPass) && array_key_exists($userId, $this->userConfig) && $this->userConfig[$userId]['password'] === $userPass) {
-				$_SESSION['userId'] = $userId;
-				$_SESSION['userAttr'] = array();
-				$_SESSION['userDisplayName'] = $this->userConfig[$userId]['display_name'];
-				return;
-			} else {
-				throw new Exception("invalid credentials");	
+		if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                        $userId = $_SERVER['PHP_AUTH_USER'];
+                        $userPass = $_SERVER['PHP_AUTH_PW'];
+                        if(!empty($userId) && !empty($userPass) && array_key_exists($userId, $this->userConfig) && $this->userConfig[$userId]['password'] === $userPass) {
+                                $_SESSION['userId'] = $userId;
+                                $_SESSION['userAttr'] = array();
+                                $_SESSION['userDisplayName'] = $this->userConfig[$userId]['display_name'];
+                                return;
 			}
 		}
-
-	        require_once ("ext/smarty/libs/Smarty.class.php");
-		$smarty = new Smarty();
-		$smarty->template_dir = __DIR__ . DIRECTORY_SEPARATOR . 'tpl';
-		$smarty->compile_dir = 'tpl_c';
-		$output = $smarty->fetch('SimpleAuth.tpl');
-		$smarty->assign('error', FALSE);
-		$smarty->assign('container', $output);
-		$smarty->assign('action', NULL);
-		$smarty->display('Page.tpl');
-		exit (0);
+                header('WWW-Authenticate: Basic realm="FileTrader"');
+                header('HTTP/1.0 401 Unauthorized');
+                throw new Exception("authentication required");
 	}
 }
 ?>
