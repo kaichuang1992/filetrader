@@ -22,7 +22,7 @@ class NullGroups extends Groups {
 	
         function getUserGroups() {
                         return array (
-                                'A' => 'Alpha',
+                                'A' => 'Alpha Is The Best',
                                 'B' => 'Bravo',
                                 'C' => 'Charlie',
                                 'D' => 'Delta',
