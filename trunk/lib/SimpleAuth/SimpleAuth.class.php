@@ -46,7 +46,7 @@ class SimpleAuth extends Auth {
 
 	        require_once ("ext/smarty/libs/Smarty.class.php");
 		$smarty = new Smarty();
-		$smarty->template_dir = 'tpl';
+		$smarty->template_dir = __DIR__ . DIRECTORY_SEPARATOR . 'tpl';
 		$smarty->compile_dir = 'tpl_c';
 		$output = $smarty->fetch('SimpleAuth.tpl');
 		$smarty->assign('error', FALSE);
