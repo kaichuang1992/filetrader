@@ -32,28 +32,12 @@ class SSPAuth extends Auth {
 		if ($this->isLoggedIn())
 			return;
 
-		if (isset ($_POST['sspProceed'])) {
-
-			$this->ssp->requireAuth();
-			$attr = $this->ssp->getAttributes();
-
-			$_SESSION['userId'] = $attr[getConfig($this->config, 'ssp_uid_attr', TRUE)][0];
-			$_SESSION['userAttr'] = $attr;
-			$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'ssp_dn_attr', TRUE)][0];
-			return;
-		}
-
-	        require_once ("ext/smarty/libs/Smarty.class.php");
-		$smarty = new Smarty();
-		$smarty->template_dir = __DIR__ . DIRECTORY_SEPARATOR . 'tpl';
-		$smarty->compile_dir = 'tpl_c';
-                $smarty->assign('sp_dn', getConfig($this->config, 'ssp_sp_dn', FALSE, 'SAML authentication'));
-		$output = $smarty->fetch('SSPAuth.tpl');
-		$smarty->assign('error', FALSE);
-		$smarty->assign('container', $output);
-		$smarty->assign('action', NULL);
-		$smarty->display('Page.tpl');
-		exit (0);
+		$this->ssp->requireAuth();
+		$attr = $this->ssp->getAttributes();
+		
+		$_SESSION['userId'] = $attr[getConfig($this->config, 'ssp_uid_attr', TRUE)][0];
+		$_SESSION['userAttr'] = $attr;
+		$_SESSION['userDisplayName'] = $attr[getConfig($this->config, 'ssp_dn_attr', TRUE)][0];
 	}
 
 	function logout($url = NULL) {
