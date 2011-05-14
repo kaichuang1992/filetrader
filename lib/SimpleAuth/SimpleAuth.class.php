@@ -40,7 +40,7 @@ class SimpleAuth extends Auth {
                                 return;
 			}
 		}
-                header('WWW-Authenticate: Basic realm="FileTrader"');
+                header('WWW-Authenticate: Basic realm="Restricted Area"');
                 header('HTTP/1.0 401 Unauthorized');
                 throw new Exception("authentication required");
 	}
