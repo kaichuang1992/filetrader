@@ -406,21 +406,17 @@ class Files {
 		if ($info->fileOwner !== $this->auth->getUserId() && $this->groups->memberOfGroups($info->fileGroups) === FALSE && ($token == NULL || !array_key_exists($token, $info->fileTokens)))
 			throw new Exception("access denied");
 
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
+		$filePath = dirname($_SERVER["SCRIPT_FILENAME"]) . DIRECTORY_SEPARATOR . getConfig($this->config, 'file_storage_dir', TRUE) . "/" . base64_encode($info->fileOwner) . "/" . $info->fileName;
 
 		if (!is_file($filePath))
 			throw new Exception("file does not exist on file system");
 
 		logHandler("User '" . $this->auth->getUserID() . "' is downloading file '" . $info->fileName . "'");
 
-		set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-		require_once ('HTTP/Download.php');
-		$dl = new HTTP_Download();
-		$dl->setFile($filePath);
-		$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, $info->fileName);
-		$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
-		$dl->setContentType($finfo->file($filePath));
-		$dl->send();
+                $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+		header("X-Sendfile: " . $filePath);
+		header("Content-Type: " . $finfo->file($filePath));
+		header('Content-Disposition: attachment; filename="' . $info->fileName . '"');
 		exit (0);
 	}
 
@@ -447,26 +443,22 @@ class Files {
 
 		list ($mediaType, $t, $subT) = explode("_", $type);
 
-		$cachePath = getConfig($this->config, 'cache_dir', TRUE);
+		$cachePath = dirname($_SERVER["SCRIPT_FILENAME"]) . DIRECTORY_SEPARATOR . getConfig($this->config, 'cache_dir', TRUE);
 		if($mediaType == 'video')
-			$file = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t-> $subT->file;
+			$filePath = $cachePath . DIRECTORY_SEPARATOR . $info->video->$t-> $subT->file;
 		elseif($mediaType == 'audio')
-                        $file = $cachePath . DIRECTORY_SEPARATOR . $info->audio->$t->file;
+                        $filePath = $cachePath . DIRECTORY_SEPARATOR . $info->audio->$t->file;
 		elseif($mediaType == 'image')
-			$file = $cachePath . DIRECTORY_SEPARATOR . $info->image->$t-> $subT->file;
+			$filePath = $cachePath . DIRECTORY_SEPARATOR . $info->image->$t-> $subT->file;
 
-		if (!is_file($file))
+		if (!is_file($filePath))
 			throw new Exception("file does not exist on file system");
 
-		set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($this->config, 'pear_path', TRUE));
-		require_once ('HTTP/Download.php');
-		$dl = new HTTP_Download();
-		$dl->setFile($file);
-		$dl->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, basename($file));
-		$finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
-		$dl->setContentType($finfo->file($file));
-		$dl->send();
-		exit (0);
+                $finfo = new finfo(FILEINFO_MIME_TYPE, "/usr/share/misc/magic.mgc");
+                header("X-Sendfile: " . $filePath);
+                header("Content-Type: " . $finfo->file($filePath));
+                header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                exit (0);
 	}
 
 	function handleLegacyUpload() {

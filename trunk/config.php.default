@@ -43,12 +43,6 @@ $config['simple_groups'] = array ('sharedgroup' => array ('display_name' => 'Sha
                                   'demoprivate' => array ('display_name' => 'Demo Private', 'members' => array('demo')),
                                   'omedprivate' => array ('display_name' => 'Omed Private', 'members' => array('omed')));
 
-// use system wide PEAR installation
-// $config['pear_path'] = '/usr/share/pear';
-
-// use local PEAR
-$config['pear_path'] = __DIR__."/ext/pear/php";
-
 // Allow users to share files through email invites
 $config['email_share'] = FALSE;
 

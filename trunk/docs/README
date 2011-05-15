@@ -3,6 +3,7 @@ The following base components are required. See REQUIREMENTS for a list of
 external PHP and JavaScript libraries required for FileTrader.
 
 - PHP 5.3.x
+- mod_xsendfile (and enabled in the dir/vhost configuration)
 - CouchDB
 - PHP With PEAR	(see below)
 	HTTP_Download 1.1.4
@@ -51,23 +52,10 @@ $ su -c 'setsebool -P httpd_can_sendmail on'
 
 (The -P flag makes the setting persistent across reboots)
 
---- Setup PEAR ---
-See http://pear.php.net/manual/en/installation.shared.php
-
-(You need SSH access to do this)
-
-$ pear config-create /var/www/html/filetrader/ext ~/.pearrc
-$ pear install -o PEAR
-$ pear install HTTP_Download
-
-This will make PEAR available in the "ext" directory. If you have 
-a complete PEAR installation (including HTTP_Download) on your 
-system you can set the config flag 'pear_path' in config.php.
-
 *** WARNING ***
 Make sure your PHP "error_reporting" is not configured to development
-value, but set it to Production value. There are some issues with PEAR
-and E_STRICT.
+value, but set it to Production value. There are some issues with the 
+CouchDB Sag library and E_STRICT.
 
 ; Default Value: E_ALL & ~E_NOTICE
 ; Development Value: E_ALL | E_STRICT
