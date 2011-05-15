@@ -158,6 +158,7 @@ function analyzeMediaFile(& $metaData, $filePath = NULL, $cachePath = NULL) {
 	switch ($metaData->fileType) {
 		case "video/quicktime" :
 		case "application/ogg" :
+		case "audio/mpeg" :
 		case "video/mp4" :
 		case "video/x-msvideo" :
 		case "video/ogg" :
