@@ -12,7 +12,7 @@
 function smarty_modifier_to_human_size($bytes = 0) {
 	$kilobyte = 1024;
 	$megabyte = $kilobyte * $kilobyte;
-	$gigabyte = $megabyte * $megabyte;
+	$gigabyte = $megabyte * $kilobyte;
 
 	if ($bytes > $gigabyte)
 		return (int) ($bytes / $gigabyte) . "GB";
