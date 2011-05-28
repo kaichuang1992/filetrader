@@ -21,7 +21,7 @@
 $consumer_key = 'abcde';
 $consumer_secret = 'edcba';
 
-$serviceUrl = 'http://192.168.56.101/ftstorage';
+$serviceUrl = 'http://192.168.56.101/fts';
 $getTokenUrl = $serviceUrl . "/index.php?action=getUploadToken";
 $uploadFileUrl = $serviceUrl . "/index.php?action=uploadFile";
 

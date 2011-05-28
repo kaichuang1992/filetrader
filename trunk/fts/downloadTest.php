@@ -21,11 +21,11 @@
 $consumer_key = '12345';
 $consumer_secret = '54321';
 
-$serviceUrl = 'http://192.168.56.101/ftstorage';
+$serviceUrl = 'http://192.168.56.101/fts';
 $getTokenUrl = $serviceUrl . "/index.php?action=getDownloadToken";
 $downloadFileUrl = $serviceUrl . "/index.php?action=downloadFile";
 
-$params = array('fileName' => 'test.txt', 'userName' => 'demoUser');
+$params = array('fileName' => 'COPYING', 'userName' => 'demoUser');
 
 try {
 	$oauth = new OAuth($consumer_key, $consumer_secret,
