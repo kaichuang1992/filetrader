@@ -1,0 +1,19 @@
+<?php
+$config = array ();
+
+$config['time_zone'] = 'Europe/Amsterdam';
+
+// Whether or not to allow only SSL connections
+$config['ssl_only'] = FALSE;
+
+// Location to directory where to store uploaded files (abs or rel)
+$config['storage_dir'] = 'data';
+
+// Static list of allowed OAuth consumers (format: key => secret)
+$config['oauth_consumers'] = array (
+	'12345' => '54321',
+	'abcde' => 'edcba',
+);
+?>
+
+
