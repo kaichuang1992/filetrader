@@ -49,7 +49,6 @@ class Files {
 	function getDownloadToken() {
 		/* FIXME: token should be unique! DB constraint? */
 		/* FIXME: token should expire, based on server request? */
-		/* FIXME: fileName should not contain "/" ! */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST", 405);
@@ -62,8 +61,9 @@ class Files {
 			throw new Exception("invalid username", 400);
 
 		/* verify fileName */
-		$fileName = filter_var(getRequest('fileName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
+		$fileName = filter_var(
+				basename(getRequest('fileName', TRUE),
+						FILTER_SANITIZE_SPECIAL_CHARS));
 		if ($fileName === FALSE)
 			throw new Exception("invalid filename", 400);
 
@@ -96,7 +96,6 @@ class Files {
 		/* FIXME: token should expire, based on server request? */
 		/* FIXME: deal with existing files? */
 		/* FIXME: what if upload size is not known in time? transcode web service for example... */
-		/* FIXME: fileName should not contain "/" ! */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST", 405);
@@ -109,8 +108,9 @@ class Files {
 			throw new Exception("invalid username", 400);
 
 		/* verify fileName */
-		$fileName = filter_var(getRequest('fileName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
+		$fileName = filter_var(
+				basename(getRequest('fileName', TRUE),
+						FILTER_SANITIZE_SPECIAL_CHARS));
 		if ($fileName === FALSE)
 			throw new Exception("invalid filename", 400);
 
@@ -265,8 +265,20 @@ class Files {
 			throw new Exception("invalid request method, should be GET", 405);
 		}
 
+		/* determine available disk space on server */
 		$df = disk_free_space(getConfig($this->config, 'storage_dir', TRUE));
-		return array("availableSpace" => $df);
+
+		/* determine connection type (IPv4, IPv6) */
+		if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP,
+				FILTER_FLAG_IPV6) === FALSE) {
+			$connectionType = "IPv4";
+		} else {
+			$connectionType = "IPv6";
+		}
+
+		return array("availableSpace" => $df,
+				'connectionType' => $connectionType,
+				'remoteAddr' => $_SERVER['REMOTE_ADDR']);
 	}
 }
 ?>
