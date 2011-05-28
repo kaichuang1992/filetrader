@@ -16,7 +16,7 @@
 -- INSTALLATION --
 
 # create data directory
-$ mkdir -p data
+$ mkdir -p data/files
 
 # set unix permissions
 $ chmod o+w -R data
