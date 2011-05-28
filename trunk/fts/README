@@ -1,0 +1,60 @@
+-- REQUIREMENTS --
+* php-pecl-oauth (http://pecl.php.net/package/oauth)
+	==> Fedora Package (php-pecl-oauth)
+		Not yet in Fedora
+		SRPM available at http://fkooman.fedorapeople.org/php-pecl-oauth
+		
+* mod_xsendfile (+ web server configuration!)
+	==> Fedora Package (mod_xsendfile)
+
+* php-pdo (+ sqlite)
+	==> Fedora Package (php-pdo)
+		In Fedora this package contains the SQlite driver
+		
+* 64 bit OS and PHP installation (for >2G file support)
+
+-- INSTALLATION --
+
+# create data directory
+$ mkdir -p data
+
+# set unix permissions
+$ chmod o+w -R data
+
+*** WARNING ***
+Make sure the data directory is not accessible through the web browser,
+use a .htaccess file to limit access to directory structure!
+
+        echo "Deny from all" > data/.htaccess
+
+Make sure Apache allows the use of "Limit" as override in your (virtual host)
+directory:
+
+        AllowOverride Limit
+
+--- SELinux Configuration ---
+Set the correct SELinux labels (only for Fedora/Red Hat systems?)
+
+$ chcon -R -t httpd_sys_rw_content_t data
+
+-- CONFIGURATION --
+
+Copy config.php.default to config.php and modify it for your situation.
+
+In order to configure OAuth consumer/keys it is recommended to use a 
+reasonable length secrets.
+
+For example you can use OpenSSL to generate a key/secret:
+
+$ openssl rand -hex 16
+
+(This creates a 16 byte, 128 bit key encoded in the hexadecimal system)
+
+As an example below, the consumer key is 28...52 and the secret is 5e...b1:
+
+$config['oauth_consumers'] = array (
+        '2879d2f782aab6d022b7e2a97f7b9b52' => '5e3ba9d19d55ae4c1361059fe4e409b1',
+);
+
+Note: This is a shared secret that should be configured in the remote service
+accessing this service.
