@@ -30,27 +30,33 @@ class OAuthAuth {
 	}
 
 	function isAuthenticatedRequest() {
-			$provider = new OAuthProvider();
-			$provider->is2LeggedEndpoint(TRUE);
-			
-			$config = $this->config;
-			$provider->consumerHandler(function ($provider) use ($config) {
-				/* use the OAuth credentials from the config file */
-				if(!array_key_exists($provider->consumer_key, $config['oauth_consumers']))
-					return OAUTH_CONSUMER_KEY_UNKNOWN;
-				$provider->consumer_secret = $config['oauth_consumers'][$provider->consumer_key];
-		                return OAUTH_OK;
-			});
+		$provider = new OAuthProvider();
+		$provider->is2LeggedEndpoint(TRUE);
 
-			$provider->timestampNonceHandler(function($provider) {
-				if($provider->nonce=="bad") {
-				 	return OAUTH_BAD_NONCE;
-			 	} else if($provider->timestamp=="0") {
-				 	return OAUTH_BAD_TIMESTAMP;
-			 	}
-			 	return OAUTH_OK;
-			}); 
-			$provider->checkOAuthRequest();
+		$config = $this->config;
+		$provider
+				->consumerHandler(
+						function ($provider) use ($config) {
+							/* use the OAuth credentials from the config file */
+							if (!array_key_exists($provider->consumer_key,
+									$config['oauth_consumers']))
+								return OAUTH_CONSUMER_KEY_UNKNOWN;
+							$provider->consumer_secret = $config['oauth_consumers'][$provider
+									->consumer_key];
+							return OAUTH_OK;
+						});
+
+		$provider
+				->timestampNonceHandler(
+						function ($provider) {
+							if ($provider->nonce == "bad") {
+								return OAUTH_BAD_NONCE;
+							} else if ($provider->timestamp == "0") {
+								return OAUTH_BAD_TIMESTAMP;
+							}
+							return OAUTH_OK;
+						});
+		$provider->checkOAuthRequest();
 	}
 }
 
