@@ -271,9 +271,9 @@ class Files {
 		/* determine IP version (IPv4, IPv6) */
 		if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP,
 				FILTER_FLAG_IPV6) === FALSE) {
-			$ipVersion = "IPv4";
+			$ipVersion = 4;
 		} else {
-			$ipVersion = "IPv6";
+			$ipVersion = 6;
 		}
 
 		return array("availableSpace" => $df,
