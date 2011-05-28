@@ -268,16 +268,16 @@ class Files {
 		/* determine available disk space on server */
 		$df = disk_free_space(getConfig($this->config, 'storage_dir', TRUE));
 
-		/* determine connection type (IPv4, IPv6) */
+		/* determine IP version (IPv4, IPv6) */
 		if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP,
 				FILTER_FLAG_IPV6) === FALSE) {
-			$connectionType = "IPv4";
+			$ipVersion = "IPv4";
 		} else {
-			$connectionType = "IPv6";
+			$ipVersion = "IPv6";
 		}
 
 		return array("availableSpace" => $df,
-				'connectionType' => $connectionType,
+				'ipVersion' => $ipVersion,
 				'remoteAddr' => $_SERVER['REMOTE_ADDR']);
 	}
 }
