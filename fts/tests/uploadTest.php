@@ -25,7 +25,7 @@ $serviceUrl = 'http://192.168.56.101/fts';
 $getTokenUrl = $serviceUrl . "/index.php?action=getUploadToken";
 $uploadFileUrl = $serviceUrl . "/index.php?action=uploadFile";
 
-$blockSize = 1024*1024;
+$blockSize = 1024 * 1024;
 
 $fileName = "../COPYING";
 
