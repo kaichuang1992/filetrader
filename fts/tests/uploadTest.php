@@ -25,12 +25,15 @@ $serviceUrl = 'http://192.168.56.101/fts';
 $getTokenUrl = $serviceUrl . "/index.php?action=getUploadToken";
 $uploadFileUrl = $serviceUrl . "/index.php?action=uploadFile";
 
-$blockSize = 1024;
+$blockSize = 1024*1024;
 
-$fileName = "COPYING";
+$fileName = "../COPYING";
+
+$filePath = realpath($fileName);
+$fileName = basename($filePath);
 
 $params = array("fileName" => $fileName, "userName" => "demoUser",
-		"fileSize" => filesize($fileName));
+		"fileSize" => filesize($filePath));
 
 try {
 	$oauth = new OAuth($consumer_key, $consumer_secret,
@@ -53,10 +56,10 @@ if (isset($decodedResponse->uploadToken)) {
 	$token = $decodedResponse->uploadToken;
 	/* determing file mime-type */
 	$finfo = new finfo(FILEINFO_MIME_TYPE);
-	$contentType = $finfo->file(realpath($fileName));
-	$fileSize = filesize($fileName);
+	$contentType = $finfo->file($filePath);
+	$fileSize = filesize($filePath);
 
-	$fp = fopen($fileName, "rb");
+	$fp = fopen($filePath, "rb");
 
 	/* Perform chunked file uploading */
 	for ($i = 0; $i * $blockSize < $fileSize; $i++) {
