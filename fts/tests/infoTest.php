@@ -27,7 +27,7 @@ $getInfoUrl = $serviceUrl . "/index.php?action=serverInfo";
 try {
 	$oauth = new OAuth($consumer_key, $consumer_secret,
 			OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
-	$oauth->fetch($getTokenUrl, $params, OAUTH_HTTP_METHOD_POST);
+	$oauth->fetch($getInfoUrl, $params, OAUTH_HTTP_METHOD_GET);
 } catch (OAuthException $e) {
 	die($e->getMessage());
 }
