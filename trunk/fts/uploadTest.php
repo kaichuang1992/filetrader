@@ -25,6 +25,8 @@ $serviceUrl = 'http://192.168.56.101/fts';
 $getTokenUrl = $serviceUrl . "/index.php?action=getUploadToken";
 $uploadFileUrl = $serviceUrl . "/index.php?action=uploadFile";
 
+$blockSize = 1024;
+
 $fileName = "COPYING";
 
 $params = array("fileName" => $fileName, "userName" => "demoUser",
@@ -49,18 +51,34 @@ if ($decodedResponse === NULL)
 
 if (isset($decodedResponse->uploadToken)) {
 	$token = $decodedResponse->uploadToken;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $uploadFileUrl . "&token=$token");
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_INFILE, fopen($fileName, "rb"));
-	curl_setopt($ch, CURLOPT_INFILESIZE, filesize($fileName));
-	curl_setopt($ch, CURLOPT_PUT, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	$uploadResponse = curl_exec($ch);
-	curl_close($ch);
-	echo "---  RESPONSE ---\n";
-	echo $uploadResponse . "\n";
-	echo "--- /RESPONSE ---\n";
+	/* determing file mime-type */
+	$finfo = new finfo(FILEINFO_MIME_TYPE);
+	$contentType = $finfo->file(realpath($fileName));
+	$fileSize = filesize($fileName);
+
+	$fp = fopen($fileName, "rb");
+
+	/* Perform chunked file uploading */
+	for ($i = 0; $i * $blockSize < $fileSize; $i++) {
+		if (($i + 1) * $blockSize > $fileSize) {
+			$size = $fileSize - ($i * $blockSize);
+		} else {
+			$size = $blockSize;
+		}
+		$data = fread($fp, $size);
+		$opts = array(
+				'http' => array('method' => 'PUT',
+						'header' => array('Content-type: ' . $contentType,
+								"X-File-Chunk: $i"), 'content' => $data));
+		$context = stream_context_create($opts);
+		$uploadResponse = file_get_contents(
+				$uploadFileUrl . "&token=" . $token, false, $context);
+
+		echo "---  RESPONSE ---\n";
+		echo $uploadResponse . "\n";
+		echo "--- /RESPONSE ---\n";
+	}
+
 } else if (isset($decodedResponse->message)) {
 	echo "ERROR: $decodedResponse->message\n";
 } else {
