@@ -258,8 +258,6 @@ class Files {
 	}
 
 	function getFileList() {
-		/* FIXME: what if user directory does not exist ? */
-
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET", 405);
 		}
@@ -273,19 +271,20 @@ class Files {
 		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
 
+		/* is chdir only valid for this call? May break some other stuff? */
 		if (chdir($fileDir) === FALSE) {
-			throw new Exception("user does not have files on this store", 400);
+			throw new Exception("user does not have files in this store", 400);
 		}
 
 		$fileList = array();
 		foreach (glob("*") as $fileName) {
-			$fileList['files'][$fileName] = array("fileSize" => filesize($fileName));
+			$fileList['files'][$fileName] = array(
+					"fileSize" => filesize($fileName));
 		}
 		return $fileList;
 	}
 
 	function serverInfo() {
-		/* FIXME: check whether connection is using IPv4 or IPv6 and display this... */
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET", 405);
 		}
