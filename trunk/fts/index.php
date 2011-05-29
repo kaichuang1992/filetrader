@@ -65,6 +65,7 @@ try {
 	$auth = new OAuthAuth($config);
 
 	/* some actions are allowed without authentication */
+	/* FIXME: serverInfo should really not be allowed without authentication */
 	$noAuthActions = array('downloadFile', 'uploadFile', 'serverInfo');
 	if (!in_array($action, $noAuthActions, TRUE)) {
 		$auth->isAuthenticatedRequest();
