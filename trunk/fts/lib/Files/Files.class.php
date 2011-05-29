@@ -276,9 +276,9 @@ class Files {
 			$ipVersion = 6;
 		}
 
-		return array("availableSpace" => $df,
-				'ipVersion' => $ipVersion,
-				'remoteAddr' => $_SERVER['REMOTE_ADDR']);
+		return array("availableSpace" => $df, 'ipVersion' => $ipVersion,
+				'remoteAddr' => $_SERVER['REMOTE_ADDR'],
+				'systemDate' => date("c", time()));
 	}
 }
 ?>
