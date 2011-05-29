@@ -279,7 +279,7 @@ class Files {
 
 		$fileList = array();
 		foreach (glob("*") as $fileName) {
-			$fileList[$fileName] = array("fileSize" => filesize($fileName));
+			$fileList['files'][$fileName] = array("fileSize" => filesize($fileName));
 		}
 		return $fileList;
 	}
