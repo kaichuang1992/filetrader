@@ -63,5 +63,6 @@ accessing this service.
 
 We are using a persistent database connection to the SQlite file, which means that 
 if you remove the file from the file system writing to the database still seems 
-to work, but reading from it fails or something like that...
+to work, but reading from it fails or something like that... A solution is to
+restart Apache/PHP when doing this...
 
