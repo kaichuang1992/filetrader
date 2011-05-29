@@ -56,7 +56,7 @@ try {
 		$action = $_REQUEST['action'];
 	}
 
-	$validActions = array('serverInfo', 'downloadFile', 'uploadFile',
+	$validActions = array('serverInfo', 'getFileList', 'downloadFile', 'uploadFile',
 			'getUploadToken', 'getDownloadToken', 'deleteFile');
 	if (!in_array($action, $validActions, TRUE)) {
 		throw new Exception("unregistered action called", 400);
