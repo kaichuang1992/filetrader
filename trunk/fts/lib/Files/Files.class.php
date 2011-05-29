@@ -32,10 +32,10 @@ class Files {
 			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
 			$this->dbh
 					->query(
-							'CREATE TABLE IF NOT EXISTS downloadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, PRIMARY KEY (token))');
+							'CREATE TABLE IF NOT EXISTS downloadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, PRIMARY KEY (token), UNIQUE(token))');
 			$this->dbh
 					->query(
-							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, fileSize INT, PRIMARY KEY (token))');
+							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
 		} catch (Exception $e) {
 			throw new Exception("database connection failed", 500);
 		}
@@ -47,7 +47,6 @@ class Files {
 	}
 
 	function getDownloadToken() {
-		/* FIXME: token should be unique! DB constraint? */
 		/* FIXME: token should expire, based on server request? */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -92,7 +91,6 @@ class Files {
 	}
 
 	function getUploadToken() {
-		/* FIXME: token should be unique! DB constraint? */
 		/* FIXME: token should expire, based on server request? */
 		/* FIXME: deal with existing files? */
 		/* FIXME: what if upload size is not known in time? transcode web service for example... */

@@ -58,3 +58,10 @@ $config['oauth_consumers'] = array (
 
 Note: This is a shared secret that should be configured in the remote service
 accessing this service.
+
+--- ISSUES ---
+
+We are using a persistent database connection to the SQlite file, which means that 
+if you remove the file from the file system writing to the database still seems 
+to work, but reading from it fails or something like that...
+
