@@ -74,6 +74,8 @@ try {
 	$content = $f->$action();
 	$content["ok"] = TRUE;
 	echo json_encode($content);
+} catch (OAuthException $e) {
+	echo json_encode(array("ok" => FALSE, "message" => $e->lastResponse));
 } catch (Exception $e) {
 	/* FIXME: set correct HTTP code header? */
 	header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
