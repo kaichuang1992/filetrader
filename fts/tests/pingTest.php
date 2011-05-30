@@ -18,23 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$consumer_key = '12345';
-$consumer_secret = '54321';
-
 $serviceUrl = 'http://192.168.56.101/fts';
-$getInfoUrl = $serviceUrl . "/index.php?action=serverInfo";
 
-$params = array();
-
-try {
-	$oauth = new OAuth($consumer_key, $consumer_secret,
-			OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
-	$oauth->fetch($getInfoUrl, $params, OAUTH_HTTP_METHOD_GET);
-} catch (OAuthException $e) {
-	die($e->getMessage());
-}
-
-$response = $oauth->getLastResponse();
+$response = file_get_contents($serviceUrl);
 echo "---  RESPONSE ---\n";
 echo $response . "\n";
 echo "--- /RESPONSE ---\n";
