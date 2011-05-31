@@ -122,7 +122,9 @@ class Files {
 			throw new Exception("invalid filesize");
 		}
 
-		if (file_exists($fileName)) {
+                $fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
+                                . DIRECTORY_SEPARATOR . base64_encode($userName);
+		if (file_exists($fileDir . DIRECTORY_SEPARATOR . $fileName)) {
 			throw new Exception("file already exists");
 		}
 
