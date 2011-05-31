@@ -186,8 +186,26 @@ class Files {
 	function uploadFile() {
 		/* FIXME: limit content-length to something reasonable, max file upload size from PHP? */
 
-		if ($_SERVER['REQUEST_METHOD'] != 'PUT') {
+		if ($_SERVER['REQUEST_METHOD'] != 'PUT'
+				&& $_SERVER['REQUEST_METHOD'] != 'OPTIONS') {
 			throw new Exception("invalid request method, should be PUT", 405);
+		}
+
+		/* This is to allow "preflight" XMLHttpRequests, 
+		 * see https://developer.mozilla.org/En/HTTP_access_control */
+		/* FIXME: maybe move this to after the token verification? */
+		/* FIXME: maybe be more restrictive in where to allow requests from? */
+		if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
+			header('Access-Control-Allow-Origin: *');
+			header('Access-Control-Allow-Methods: PUT, OPTIONS');
+			header('Access-Control-Allow-Headers: X-File-Chunk, Content-Type');
+			header('Access-Control-Max-Age: 1728000');
+			header("Content-Length: 0");
+			header("Content-Type: text/plain");
+			exit(0);
+			break;
+		} else {
+			header('Access-Control-Allow-Origin: *');
 		}
 
 		if (!isset($_GET['token']) || empty($_GET['token'])
