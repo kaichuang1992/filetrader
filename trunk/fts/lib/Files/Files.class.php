@@ -92,8 +92,8 @@ class Files {
 
 	function getUploadToken() {
 		/* FIXME: token should expire, based on server request? */
-		/* FIXME: deal with existing files? */
 		/* FIXME: what if upload size is not known in time? transcode web service for example... */
+		/* FIXME: maybe transparently fix the file name on duplicate upload */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
@@ -120,6 +120,10 @@ class Files {
 		$fileSize = (int) getRequest('fileSize', FALSE, 0);
 		if ($fileSize < 0) {
 			throw new Exception("invalid filesize");
+		}
+
+		if (file_exists($fileName)) {
+			throw new Exception("file already exists");
 		}
 
 		$token = generateToken();
@@ -321,7 +325,7 @@ class Files {
 					"parent of specified directory is not a directory?");
 		}
 
-		/* create the directory */
+		/* create the directory if it does not exists yet */
 		$newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
 		if (file_exists($newDir)) {
 			throw new Exception(
@@ -332,7 +336,7 @@ class Files {
 			throw new Exception("unable to create directory");
 		}
 
-		return array("directoryPath" => $newDir);
+		return array();
 	}
 
 	function serverInfo() {
