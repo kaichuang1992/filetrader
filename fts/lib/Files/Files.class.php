@@ -37,7 +37,7 @@ class Files {
 					->query(
 							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
 		} catch (Exception $e) {
-			throw new Exception("database connection failed", 500);
+			throw new Exception("database connection failed");
 		}
 	}
 
@@ -50,28 +50,28 @@ class Files {
 		/* FIXME: token should expire, based on server request? */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-			throw new Exception("invalid request method, should be POST", 405);
+			throw new Exception("invalid request method, should be POST");
 		}
 
 		/* verify userName */
 		$userName = filter_var(getRequest('userName', TRUE),
 				FILTER_SANITIZE_SPECIAL_CHARS);
 		if ($userName === FALSE)
-			throw new Exception("invalid username", 400);
+			throw new Exception("invalid username");
 
 		/* verify fileName */
 		$fileName = filter_var(
 				basename(getRequest('fileName', TRUE),
 						FILTER_SANITIZE_SPECIAL_CHARS));
 		if ($fileName === FALSE)
-			throw new Exception("invalid filename", 400);
+			throw new Exception("invalid filename");
 
 		/* file needs to exist before getting a token is allowed */
 		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
 		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
 		if (!file_exists($filePath)) {
-			throw new Exception("file does not exist", 404);
+			throw new Exception("file does not exist");
 		}
 
 		$token = generateToken();
@@ -86,7 +86,7 @@ class Files {
 			$stmt->execute();
 			return array("downloadToken" => $token);
 		} catch (Exception $e) {
-			throw new Exception("database query failed", 500);
+			throw new Exception("database query failed");
 		}
 	}
 
@@ -96,21 +96,21 @@ class Files {
 		/* FIXME: what if upload size is not known in time? transcode web service for example... */
 
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-			throw new Exception("invalid request method, should be POST", 405);
+			throw new Exception("invalid request method, should be POST");
 		}
 
 		/* verify userName */
 		$userName = filter_var(getRequest('userName', TRUE),
 				FILTER_SANITIZE_SPECIAL_CHARS);
 		if ($userName === FALSE)
-			throw new Exception("invalid username", 400);
+			throw new Exception("invalid username");
 
 		/* verify fileName */
 		$fileName = filter_var(
 				basename(getRequest('fileName', TRUE),
 						FILTER_SANITIZE_SPECIAL_CHARS));
 		if ($fileName === FALSE)
-			throw new Exception("invalid filename", 400);
+			throw new Exception("invalid filename");
 
 		/* verify fileSize
 		 * 
@@ -119,7 +119,7 @@ class Files {
 		 */
 		$fileSize = (int) getRequest('fileSize', FALSE, 0);
 		if ($fileSize < 0) {
-			throw new Exception("invalid filesize", 400);
+			throw new Exception("invalid filesize");
 		}
 
 		$token = generateToken();
@@ -135,7 +135,7 @@ class Files {
 			$stmt->execute();
 			return array("uploadToken" => $token);
 		} catch (Exception $e) {
-			throw new Exception("database query failed", 500);
+			throw new Exception("database query failed");
 		}
 	}
 
@@ -159,7 +159,7 @@ class Files {
 		$stmt->execute();
 		$row = $stmt->fetch();
 		if (empty($row)) {
-			throw new Exception("token does not exist", 404);
+			throw new Exception("token not found", 404);
 		}
 
 		$userName = $row['userName'];
@@ -169,7 +169,7 @@ class Files {
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
 		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
 		if (!is_file($filePath)) {
-			throw new Exception("file does not exist", 404);
+			throw new Exception("file does not exist", 500);
 		}
 
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
@@ -198,7 +198,7 @@ class Files {
 		$stmt->execute();
 		$row = $stmt->fetch();
 		if (empty($row)) {
-			throw new Exception("token does not exist", 404);
+			throw new Exception("token not found", 404);
 		}
 
 		$userName = $row['userName'];
@@ -223,7 +223,7 @@ class Files {
 		/* chunk can be >0 only if file already exists */
 		if ($fileChunk > 0 && !file_exists($filePath)) {
 			throw new Exception(
-					"file does not exist, cannot send chunk number >0");
+					"file does not exist, cannot send chunk number >0", 400);
 		}
 
 		/* append to existing file if chunk >0, else create new file */
@@ -259,21 +259,21 @@ class Files {
 
 	function getFileList() {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-			throw new Exception("invalid request method, should be GET", 405);
+			throw new Exception("invalid request method, should be GET");
 		}
 
 		/* verify userName */
 		$userName = filter_var(getRequest('userName', TRUE),
 				FILTER_SANITIZE_SPECIAL_CHARS);
 		if ($userName === FALSE)
-			throw new Exception("invalid username", 400);
+			throw new Exception("invalid username");
 
 		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
 
 		/* is chdir only valid for this call? May break some other stuff? */
 		if (chdir($fileDir) === FALSE) {
-			throw new Exception("user does not have files in this store", 400);
+			throw new Exception("user does not have files in this store");
 		}
 
 		$fileList = array();
@@ -287,14 +287,14 @@ class Files {
 
 	function createDirectory() {
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-			throw new Exception("invalid request method, should be POST", 405);
+			throw new Exception("invalid request method, should be POST");
 		}
 
 		/* verify userName */
 		$userName = filter_var(getRequest('userName', TRUE),
 				FILTER_SANITIZE_SPECIAL_CHARS);
 		if ($userName === FALSE)
-			throw new Exception("invalid username", 400);
+			throw new Exception("invalid username");
 
 		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
@@ -304,7 +304,7 @@ class Files {
 				basename(getRequest('dirName', TRUE),
 						FILTER_SANITIZE_SPECIAL_CHARS));
 		if ($dirName === FALSE)
-			throw new Exception("invalid dirname", 400);
+			throw new Exception("invalid dirname");
 
 		/* validate existence of parent of specified directory */
 		$baseDir = realpath($fileDir . DIRECTORY_SEPARATOR . dirname($dirName));
@@ -322,7 +322,11 @@ class Files {
 		}
 
 		/* create the directory */
-		$newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
+                $newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
+		if(file_exists($newDir)) {
+			throw new Exception("directory (or file) with that name already exists");
+		}
+
 		if (mkdir($newDir, 0775) === FALSE) {
 			throw new Exception("unable to create directory");
 		}
@@ -332,7 +336,7 @@ class Files {
 
 	function serverInfo() {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-			throw new Exception("invalid request method, should be GET", 405);
+			throw new Exception("invalid request method, should be GET");
 		}
 
 		/* determine available disk space on server */

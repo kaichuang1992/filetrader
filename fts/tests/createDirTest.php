@@ -29,7 +29,7 @@ $params = array('userName' => 'demoUser', 'dirName' => 'test');
 try {
 	$oauth = new OAuth($consumer_key, $consumer_secret,
 			OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
-	$oauth->fetch($getListUrl, $params, OAUTH_HTTP_METHOD_GET);
+	$oauth->fetch($getListUrl, $params, OAUTH_HTTP_METHOD_POST);
 } catch (OAuthException $e) {
 	die($e->getMessage());
 }

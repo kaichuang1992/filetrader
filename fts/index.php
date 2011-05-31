@@ -31,7 +31,7 @@ date_default_timezone_set(
 try {
 	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
 		if (getProtocol() != "https") {
-			throw new Exception("only available through secure connection", 404);
+			throw new Exception("only available through secure connection");
 		}
 	}
 
@@ -57,25 +57,27 @@ try {
 	}
 
 	$validActions = array('serverInfo', 'getFileList', 'downloadFile',
-			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile');
+			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile', 'createDirectory');
 	if (!in_array($action, $validActions, TRUE)) {
-		throw new Exception("unregistered action called", 400);
+		throw new Exception("unregistered action called");
 	}
-
-	$auth = new OAuthAuth($config);
 
 	/* some actions are allowed without authentication */
 	$noAuthActions = array('downloadFile', 'uploadFile');
 	if (!in_array($action, $noAuthActions, TRUE)) {
+		$auth = new OAuthAuth($config);
 		$auth->isAuthenticatedRequest();
 	}
-
 	$f = new Files($config);
 	$content = $f->$action();
 	$content["ok"] = TRUE;
 	echo json_encode($content);
 } catch (Exception $e) {
-	header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
-	echo json_encode(array("ok" => FALSE, "exceptionType" => get_class($e), "errorMessage" => $e->getMessage(), "errorCode" => $e->getCode()));
+	if($e->getCode() !== 0) {
+		header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
+		echo $e->getMessage();
+	} else {
+		echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage()));
+	}
 }
 ?>
