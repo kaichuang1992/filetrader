@@ -73,6 +73,8 @@ try {
 	$content = $f->$action();
 	$content["ok"] = TRUE;
 	echo json_encode($content);
+} catch (OAuthException $e) {
+        echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage(), "errorCode" => $e->getCode()));
 } catch (Exception $e) {
 	if ($e->getCode() !== 0) {
 		header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
