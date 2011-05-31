@@ -279,9 +279,55 @@ class Files {
 		$fileList = array();
 		foreach (glob("*") as $fileName) {
 			$fileList['files'][$fileName] = array(
-					"fileSize" => filesize($fileName));
+					"fileSize" => filesize($fileName),
+					"isDirectory" => is_dir($fileName));
 		}
 		return $fileList;
+	}
+
+	function createDirectory() {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			throw new Exception("invalid request method, should be POST", 405);
+		}
+
+		/* verify userName */
+		$userName = filter_var(getRequest('userName', TRUE),
+				FILTER_SANITIZE_SPECIAL_CHARS);
+		if ($userName === FALSE)
+			throw new Exception("invalid username", 400);
+
+		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . base64_encode($userName);
+
+		/* verify dirName */
+		$dirName = filter_var(
+				basename(getRequest('dirName', TRUE),
+						FILTER_SANITIZE_SPECIAL_CHARS));
+		if ($dirName === FALSE)
+			throw new Exception("invalid dirname", 400);
+
+		/* validate existence of parent of specified directory */
+		$baseDir = realpath($fileDir . DIRECTORY_SEPARATOR . dirname($dirName));
+		if ($baseDir === FALSE) {
+			throw new Exception(
+					"parent of specified directory is invalid or does not exist");
+		}
+		if (strpos($baseDir, $fileDir) === FALSE
+				|| strpos($baseDir, $fileDir) !== 0) {
+			throw new Exception("trying to escape directory structure?");
+		}
+		if (!is_dir($baseDir)) {
+			throw new Exception(
+					"parent of specified directory is not a directory?");
+		}
+
+		/* create the directory */
+		$newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
+		if (mkdir($newDir, 0775) === FALSE) {
+			throw new Exception("unable to create directory");
+		}
+
+		return array("directoryPath" => $newDir);
 	}
 
 	function serverInfo() {
