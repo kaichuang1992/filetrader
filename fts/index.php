@@ -45,7 +45,7 @@ try {
 			. "tokens.sqlite";
 
 	require_once("lib/Files/Files.class.php");
-	require_once("lib/OAuthAuth/OAuthAuth.class.php");
+	require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
 
 	/* FIXME: use better URLparser with something like htaccess */
 	if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
@@ -57,7 +57,8 @@ try {
 	}
 
 	$validActions = array('serverInfo', 'getFileList', 'downloadFile',
-			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile', 'createDirectory');
+			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile',
+			'createDirectory');
 	if (!in_array($action, $validActions, TRUE)) {
 		throw new Exception("unregistered action called");
 	}
@@ -65,19 +66,20 @@ try {
 	/* some actions are allowed without authentication */
 	$noAuthActions = array('downloadFile', 'uploadFile');
 	if (!in_array($action, $noAuthActions, TRUE)) {
-		$auth = new OAuthAuth($config);
-		$auth->isAuthenticatedRequest();
+		$auth = new MyOAuthProvider($config);
+		$auth->authenticate();
 	}
 	$f = new Files($config);
 	$content = $f->$action();
 	$content["ok"] = TRUE;
 	echo json_encode($content);
 } catch (Exception $e) {
-	if($e->getCode() !== 0) {
+	if ($e->getCode() !== 0) {
 		header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
 		echo $e->getMessage();
 	} else {
-		echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage()));
+		echo json_encode(
+				array("ok" => FALSE, "errorMessage" => $e->getMessage()));
 	}
 }
 ?>

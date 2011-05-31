@@ -322,9 +322,10 @@ class Files {
 		}
 
 		/* create the directory */
-                $newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
-		if(file_exists($newDir)) {
-			throw new Exception("directory (or file) with that name already exists");
+		$newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
+		if (file_exists($newDir)) {
+			throw new Exception(
+					"directory (or file) with that name already exists");
 		}
 
 		if (mkdir($newDir, 0775) === FALSE) {

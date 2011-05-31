@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class OAuthAuth {
+class MyOAuthProvider {
 
 	private $config;
 
@@ -29,7 +29,7 @@ class OAuthAuth {
 		$this->config = $config;
 	}
 
-	function isAuthenticatedRequest() {
+	function authenticate() {
 		$provider = new OAuthProvider();
 		$provider->is2LeggedEndpoint(TRUE);
 
