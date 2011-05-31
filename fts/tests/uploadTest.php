@@ -27,7 +27,7 @@ $uploadFileUrl = $serviceUrl . "/index.php?action=uploadFile";
 
 $blockSize = 1024 * 1024;
 
-$fileName = "../COPYING";
+$fileName = "COPYING";
 
 $filePath = realpath($fileName);
 $fileName = basename($filePath);
