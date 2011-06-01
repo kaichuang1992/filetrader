@@ -65,7 +65,7 @@ handleResponse("upload file", $response);
 $response = $sc->getDownloadFileLocation($userName, $fileName);
 handleResponse("get download location", $response);
 
-$response = downloadFile($response->downloadLocation);
+$response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
 /* delete the file */
