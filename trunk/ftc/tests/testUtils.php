@@ -23,11 +23,12 @@ function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
 						'header' => array('Content-type: ' . $contentType,
 								"X-File-Chunk: $i"), 'content' => $data));
 		$context = stream_context_create($opts);
-		$uploadResponse = file_get_contents($uploadUrl, false, $context);
-		/* FIXME: validate response! */
-		var_dump($uploadResponse);
+		$uploadResponse = json_decode(file_get_contents($uploadUrl, false, $context));
+		if(!$uploadResponse->ok) {
+			return array("ok" => FALSE);
+		}
 	}
-	return array("ok" => TRUE);
+	return json_decode(json_encode(array("ok" => TRUE)));
 }
 
 function downloadFile($downloadUrl, $orignalFile = NULL) {
@@ -41,18 +42,19 @@ function downloadFile($downloadUrl, $orignalFile = NULL) {
 
 		if ($original !== FALSE && $download !== FALSE
 				&& $original === $download) {
-			return array("ok" => TRUE);
+			return json_decode(json_encode(array("ok" => TRUE)));
+		}else {
+			json_decode(json_encode(array("ok" => FALSE, "errorMessage" => "files are not equal!")));
 		}
 	}
-	return array("ok" => FALSE);
+	return json_decode(json_encode(array("ok" => TRUE)));
 }
 
 function handleResponse($testName, $response) {
 	if (!$response->ok) {
-		echo "[TEST] $testName: FAILED!\n";
-		echo "\tERROR: $reponse->message\n\n";
+		echo "[FAILED] $testName <<<< ERROR: $response->errorMessage >>>>\n";
 	} else {
-		echo "[TEST] $testName: OK\n";
+		echo "[    OK] $testName\n";
 	}
 }
 ?>
