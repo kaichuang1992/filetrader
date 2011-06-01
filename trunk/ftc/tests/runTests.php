@@ -28,21 +28,32 @@ if (!isset($config) || !is_array($config)) {
 }
 
 /* generate some random names in order to be reasonably sure they don't exist yet */
-$fileName = generateToken(3);
-$dirName = generateToken(3);
+$fileName = generateToken(4);
+$dirName = generateToken(4);
 
-/* act as this user */
-$userName = 'fkooman';
+/* act as this user, also use a random name */
+$userName = generateToken(4);
 
-/* we use storage provider with name 'one' as defined in the config file */
-$sc = new StorageClient($config, 'one');
+/* we use the first configured storage provider as defined in the config file,
+ * make sure it is valid! */
+$spKeys = array_keys(getConfig($config, 'storage_providers'));
+
+$sc = new StorageClient($config, $spKeys[0]);
 $sc->performDecode(TRUE);
+
+$response = $sc->pingServer();
+var_export($response);
 
 /* create a directory */
 $response = $sc->createDirectory($userName, $dirName);
 var_export($response);
 
-/* upload a file, use random name, but actually send COPYING as it is there anyway... */
+/* delete it again */
+// $reponse = $sc->deleteDirectory($userName, $dirName);
+// var_export($response);
+
+/* upload a file, use random name, but actually send COPYING as it is 
+ * there anyway... */
 $response = $sc
 		->getUploadFileLocation($userName, $fileName, filesize("COPYING"));
 var_export($response);
@@ -50,12 +61,16 @@ var_export($response);
 $response = uploadFile($response->uploadLocation, "COPYING");
 var_export($response);
 
-/* download a file */
+/* download the file */
 $response = $sc->getDownloadFileLocation($userName, $fileName);
 var_export($response);
 
 $response = downloadFile($response->downloadLocation);
 var_export($response);
+
+/* delete the file */
+// $response = deleteFile($userName, $fileName);
+// var_export($response);
 
 /* show directory */
 $response = $sc->getFileList($userName);
