@@ -61,8 +61,10 @@ function handleResponse($testName, $response) {
 }
 
 function showDirectoryListing($data) {
-	foreach($data->files as $fileName => $fileMetaData) {
-		echo $fileName . "\t" . (($fileMetaData->isDirectory) ? "[DIR]" : $fileMetaData->fileSize) . "\n";
+	foreach ($data->files as $fileName => $fileMetaData) {
+		echo $fileName . "\t"
+				. (($fileMetaData->isDirectory) ? "[DIR]"
+						: $fileMetaData->fileSize) . "\n";
 	}
 }
 ?>
