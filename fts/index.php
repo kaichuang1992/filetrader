@@ -49,14 +49,12 @@ try {
 
 	/* FIXME: use better URLparser with something like htaccess */
 	if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
-		echo (json_encode(
-				array("ok" => TRUE, "message" => "FileTrader REST API")));
-		exit(0);
+		$action = 'pingServer';
 	} else {
 		$action = $_REQUEST['action'];
 	}
 
-	$validActions = array('serverInfo', 'getFileList', 'downloadFile',
+	$validActions = array('pingServer', 'serverInfo', 'getFileList', 'downloadFile',
 			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile',
 			'createDirectory');
 	if (!in_array($action, $validActions, TRUE)) {
@@ -64,7 +62,7 @@ try {
 	}
 
 	/* some actions are allowed without authentication */
-	$noAuthActions = array('downloadFile', 'uploadFile');
+	$noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
 	if (!in_array($action, $noAuthActions, TRUE)) {
 		$auth = new MyOAuthProvider($config);
 		$auth->authenticate();
