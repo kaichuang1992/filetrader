@@ -84,7 +84,10 @@ class Files {
 			$stmt->bindParam(':userName', $userName);
 			$stmt->bindParam(':fileName', $fileName);
 			$stmt->execute();
-			return array("downloadToken" => $token);
+
+			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&token=$token";
+
+			return array("downloadLocation" => $downloadLocation);
 		} catch (Exception $e) {
 			throw new Exception("database query failed");
 		}
@@ -139,7 +142,9 @@ class Files {
 			$stmt->bindParam(':fileName', $fileName);
 			$stmt->bindParam(':fileSize', $fileSize);
 			$stmt->execute();
-			return array("uploadToken" => $token);
+
+                        $uploadLocation = getProtocol() . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
+			return array("uploadLocation" => $uploadLocation);
 		} catch (Exception $e) {
 			throw new Exception("database query failed");
 		}
@@ -310,6 +315,8 @@ class Files {
 	}
 
 	function createDirectory() {
+		/* FIXME: if the user directory does not exist, this can be created! */
+
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
 		}
