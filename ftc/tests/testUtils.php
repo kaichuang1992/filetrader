@@ -23,12 +23,13 @@ function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
 						'header' => array('Content-type: ' . $contentType,
 								"X-File-Chunk: $i"), 'content' => $data));
 		$context = stream_context_create($opts);
-		$uploadResponse = json_decode(file_get_contents($uploadUrl, false, $context));
-		if(!$uploadResponse->ok) {
-			return array("ok" => FALSE);
+		$uploadResponse = json_decode(
+				file_get_contents($uploadUrl, false, $context));
+		if (!$uploadResponse->ok) {
+			return (object) array("ok" => FALSE);
 		}
 	}
-	return json_decode(json_encode(array("ok" => TRUE)));
+	return (object) array("ok" => TRUE);
 }
 
 function downloadFile($downloadUrl, $orignalFile = NULL) {
@@ -42,12 +43,13 @@ function downloadFile($downloadUrl, $orignalFile = NULL) {
 
 		if ($original !== FALSE && $download !== FALSE
 				&& $original === $download) {
-			return json_decode(json_encode(array("ok" => TRUE)));
-		}else {
-			json_decode(json_encode(array("ok" => FALSE, "errorMessage" => "files are not equal!")));
+			return (object) array("ok" => TRUE);
+		} else {
+			return (object) array("ok" => FALSE,
+					"errorMessage" => "files are not equal");
 		}
 	}
-	return json_decode(json_encode(array("ok" => TRUE)));
+	return (object) array("ok" => TRUE);
 }
 
 function handleResponse($testName, $response) {
