@@ -19,7 +19,7 @@
  */
 
 require_once('config.php');
-require_once('../fts/utils.php');
+require_once('../fts/utils.php'); /* steal fts utils ;) */
 require_once('lib/StorageClient/StorageClient.class.php');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'testUtils.php');
 
@@ -45,18 +45,23 @@ $response = $sc->call("pingServer");
 handleResponse("ping", $response);
 
 /* create a directory */
-$response = $sc->call("createDirectory", array('userName' => $userName, 'dirName' => $dirName), "POST");
+$response = $sc
+		->call("createDirectory",
+				array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir create", $response);
 
 /* delete it again */
-$response = $sc->call("deleteDirectory", array('userName' => $userName, 'dirName' => $dirName), "POST");
+$response = $sc
+		->call("deleteDirectory",
+				array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir delete", $response);
 
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
 		->call("getUploadToken",
-				array('userName' => $userName, 'fileName' => $fileName, 'fileSize' => filesize("COPYING")), "POST");
+				array('userName' => $userName, 'fileName' => $fileName,
+						'fileSize' => filesize("COPYING")), "POST");
 handleResponse("get upload token", $response);
 
 $response = uploadFile($response->uploadLocation, "COPYING", 1024);
@@ -64,14 +69,19 @@ handleResponse("upload file", $response);
 
 /* download the file */
 $response = $sc
-		->call("getDownloadToken", array('userName' => $userName, 'fileName' => $fileName), "POST");
+		->call("getDownloadToken",
+				array('userName' => $userName, 'fileName' => $fileName),
+				"POST");
 handleResponse("get download token", $response);
 
 $response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
 /* delete the file */
-$response = $sc->call("deleteFile", array('userName' => $userName, 'fileName' => $fileName), "POST");
+$response = $sc
+		->call("deleteFile",
+				array('userName' => $userName, 'fileName' => $fileName),
+				"POST");
 handleResponse("delete file", $response);
 
 /* show directory */
