@@ -393,12 +393,12 @@ class Files {
 		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
 				. DIRECTORY_SEPARATOR . base64_encode($userName);
 
-                if (!file_exists($fileDir)) {
-                        if (mkdir($fileDir) === FALSE) {
-                                throw new Exception("unable to create directory", 500);
-                        }
-                }
-		
+		if (!file_exists($fileDir)) {
+			if (mkdir($fileDir) === FALSE) {
+				throw new Exception("unable to create directory", 500);
+			}
+		}
+
 		/* verify dirName */
 		$dirName = filter_var(
 				basename(getRequest('dirName', TRUE),
