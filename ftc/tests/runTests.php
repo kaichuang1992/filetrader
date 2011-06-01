@@ -45,37 +45,37 @@ $response = $sc->call("pingServer");
 handleResponse("ping", $response);
 
 /* create a directory */
-$response = $sc->call("createDirectory", array($userName, $dirName), "POST");
+$response = $sc->call("createDirectory", array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir create", $response);
 
 /* delete it again */
-$reponse = $sc->call("deleteDirectory", array($userName, $dirName), "POST");
+$response = $sc->call("deleteDirectory", array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir delete", $response);
 
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
-		->call("getUploadFileLocation",
-				array($userName, $fileName, filesize("COPYING")), "POST");
-handleResponse("get upload location", $response);
+		->call("getUploadToken",
+				array('userName' => $userName, 'fileName' => $fileName, 'fileSize' => filesize("COPYING")), "POST");
+handleResponse("get upload token", $response);
 
 $response = uploadFile($response->uploadLocation, "COPYING", 1024);
 handleResponse("upload file", $response);
 
 /* download the file */
 $response = $sc
-		->call("getDownloadFileLocation", array($userName, $fileName), "POST");
-handleResponse("get download location", $response);
+		->call("getDownloadToken", array('userName' => $userName, 'fileName' => $fileName), "POST");
+handleResponse("get download token", $response);
 
 $response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
 /* delete the file */
-$response = $sc->call("deleteFile", array($userName, $fileName), "POST");
-var_export($response);
+$response = $sc->call("deleteFile", array('userName' => $userName, 'fileName' => $fileName), "POST");
+handleResponse("delete file", $response);
 
 /* show directory */
-$response = $sc->call("getFileList", array($userName), "POST");
+$response = $sc->call("getFileList", array('userName' => $userName), "GET");
 handleResponse("get file list", $response);
 
 ?>
