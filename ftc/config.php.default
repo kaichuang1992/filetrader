@@ -11,10 +11,10 @@ $config['storage_dir'] = 'data';
 
 // Static list of storage providers (format: key => secret)
 $config['storage_providers'] = array(
-		array('displayName' => 'Storage Provider One',
+		'one' => array('displayName' => 'Storage Provider One',
 				'apiEndPoint' => 'http://127.0.0.2/storage',
 				'consumerKey' => '12345', 'consumerSecret' => '54321'),
-		array('displayName' => 'Storage Provider Two',
-				'apiEndpoint' => 'http://127.0.0.1/storage',
+		'two' => array('displayName' => 'Storage Provider Two',
+				'apiEndPoint' => 'http://127.0.0.1/storage',
 				'consumerKey' => 'abcde', 'consumerSecret' => 'edcba'));
 ?>

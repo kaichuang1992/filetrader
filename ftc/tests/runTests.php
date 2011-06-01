@@ -19,48 +19,48 @@
  */
 
 require_once('config.php');
-require_once('utils.php');
+require_once('../fts/utils.php');
 require_once('lib/StorageClient/StorageClient.class.php');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'testUtils.php');
 
+
 if (!isset($config) || !is_array($config)) {
-	die("broken or missing configuration file?");
+        die("broken or missing configuration file?");
 }
 
-$storageProvider = getConfig($config, 'storage_providers', TRUE);
-$sP = $storageProvider[0];
+/* generate some random names in order to be reasonably sure they don't exist yet */
+$fileName = generateToken(3);
+$dirName = generateToken(3);
 
-$consumerKey = $sP['consumerKey'];
-$consumerSecret = $sP['consumerSecret'];
-$apiEndpoint = $sP['apiEndpoint'];
+/* act as this user */
+$userName = 'fkooman'; 
 
-$sc = new StorageClient($config);
+/* we use storage provider with name 'one' as defined in the config file */
+$sc = new StorageClient($config, 'one');
 $sc->performDecode(TRUE);
 
 /* create a directory */
-$response = $sc->createDirectory('demoUser', 'test');
+$response = $sc->createDirectory($userName, $dirName);
 var_export($response);
 
-/* upload a file */
+/* upload a file, use random name, but actually send COPYING as it is there anyway... */
 $response = $sc
-		->getUploadFileLocation('demoUser', 'COPYING', filesize("COPYING"));
+		->getUploadFileLocation($userName, $fileName, filesize("COPYING"));
 var_export($response);
 
-$response = uploadFile(
-		$apiEndpoint . "/?action=uploadFile&token=" . $response['uploadToken']);
+$response = uploadFile($response->uploadLocation, "COPYING");
 var_export($response);
 
 /* download a file */
-$response = $sc->getDownloadFileLocation('demoUser', 'COPYING');
+$response = $sc->getDownloadFileLocation($userName, $fileName);
 var_export($response);
 
 $response = downloadFile(
-		$apiEndpoint . "/?action=downloadFile&token="
-				. $response['downloadToken'], 'COPYING');
+		$response->downloadLocation);
 var_export($response);
 
 /* show directory */
-$response = $sc->getFileList('demoUser');
+$response = $sc->getFileList($userName);
 var_export($response);
 
 ?>
