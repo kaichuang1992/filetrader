@@ -67,7 +67,7 @@ class StorageClient {
 			throw new Exception("invalid method, should be either GET or POST");
 		}
 		$endpoint = "$this->endpoint/?action=$action";
-		$this->oauth->fetch($endpoint, $params, $method);
+		$this->oauth->fetch($endpoint, $parameters, $method);
 		$response = $this->oauth->getLastResponse();
 		return ($this->decode) ? json_decode($response) : $response;
 	}
