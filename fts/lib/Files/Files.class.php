@@ -85,7 +85,9 @@ class Files {
 			$stmt->bindParam(':fileName', $fileName);
 			$stmt->execute();
 
-			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . "?action=downloadFile&token=$token";
+			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME']
+					. $_SERVER['PHP_SELF']
+					. "?action=downloadFile&token=$token";
 
 			return array("downloadLocation" => $downloadLocation);
 		} catch (Exception $e) {
@@ -143,7 +145,8 @@ class Files {
 			$stmt->bindParam(':fileSize', $fileSize);
 			$stmt->execute();
 
-                        $uploadLocation = getProtocol() . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
+			$uploadLocation = getProtocol() . $_SERVER['SERVER_NAME']
+					. $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
 			return array("uploadLocation" => $uploadLocation);
 		} catch (Exception $e) {
 			throw new Exception("database query failed");
@@ -282,11 +285,6 @@ class Files {
 		return array("chunk" => $fileChunk);
 	}
 
-	function deleteFile() {
-		/* FIXME: implement */
-		return array();
-	}
-
 	function getFileList() {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET");
@@ -313,6 +311,72 @@ class Files {
 					"isDirectory" => is_dir($fileName));
 		}
 		return $fileList;
+	}
+
+	function deleteFile() {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			throw new Exception("invalid request method, should be POST");
+		}
+
+		/* verify userName */
+		$userName = filter_var(getRequest('userName', TRUE),
+				FILTER_SANITIZE_SPECIAL_CHARS);
+		if ($userName === FALSE)
+			throw new Exception("invalid username");
+
+		/* verify fileName */
+		$fileName = filter_var(
+				basename(getRequest('fileName', TRUE),
+						FILTER_SANITIZE_SPECIAL_CHARS));
+		if ($fileName === FALSE)
+			throw new Exception("invalid filename");
+
+		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . base64_encode($userName);
+		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
+
+		if (!is_file($filePath)) {
+			throw new Exception("file does not exist");
+		}
+
+		if (unlink($filePath) === FALSE) {
+			throw new Exception("unable to delete file");
+		}
+
+		return array();
+	}
+
+	function deleteDirectory() {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			throw new Exception("invalid request method, should be POST");
+		}
+
+		/* verify userName */
+		$userName = filter_var(getRequest('userName', TRUE),
+				FILTER_SANITIZE_SPECIAL_CHARS);
+		if ($userName === FALSE)
+			throw new Exception("invalid username");
+
+		/* verify fileName */
+		$dirName = filter_var(
+				basename(getRequest('dirName', TRUE),
+						FILTER_SANITIZE_SPECIAL_CHARS));
+		if ($dirName === FALSE)
+			throw new Exception("invalid dirname");
+
+		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . base64_encode($userName);
+		$dirPath = $fileDir . DIRECTORY_SEPARATOR . $dirName;
+
+		if (!is_dir($dirPath)) {
+			throw new Exception("directory does not exist");
+		}
+
+		if (rmdir($dirPath) === FALSE) {
+			throw new Exception("unable to delete directory");
+		}
+
+		return array();
 	}
 
 	function createDirectory() {
@@ -389,9 +453,9 @@ class Files {
 	}
 
 	function pingServer() {
-                if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-                        throw new Exception("invalid request method, should be GET");
-                }
+		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+			throw new Exception("invalid request method, should be GET");
+		}
 		return array('message' => 'FileTrader REST API');
 	}
 }

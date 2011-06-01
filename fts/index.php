@@ -54,9 +54,9 @@ try {
 		$action = $_REQUEST['action'];
 	}
 
-	$validActions = array('pingServer', 'serverInfo', 'getFileList', 'downloadFile',
-			'uploadFile', 'getUploadToken', 'getDownloadToken', 'deleteFile',
-			'createDirectory');
+	$validActions = array('pingServer', 'serverInfo', 'getFileList',
+			'downloadFile', 'uploadFile', 'getUploadToken', 'getDownloadToken',
+			'deleteDirectory', 'deleteFile', 'createDirectory');
 	if (!in_array($action, $validActions, TRUE)) {
 		throw new Exception("unregistered action called");
 	}
