@@ -284,6 +284,7 @@ class Files {
 
 	function deleteFile() {
 		/* FIXME: implement */
+		return array();
 	}
 
 	function getFileList() {
@@ -385,6 +386,13 @@ class Files {
 		return array("availableSpace" => $df, 'ipVersion' => $ipVersion,
 				'remoteAddr' => $_SERVER['REMOTE_ADDR'],
 				'systemDate' => date("c", time()));
+	}
+
+	function pingServer() {
+                if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+                        throw new Exception("invalid request method, should be GET");
+                }
+		return array('message' => 'FileTrader REST API');
 	}
 }
 ?>
