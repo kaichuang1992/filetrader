@@ -42,31 +42,31 @@ $sc = new StorageClient($config, $spKeys[0]);
 $sc->performDecode(TRUE);
 
 $response = $sc->pingServer();
-var_export($response);
+handleResponse("ping", $response);
 
 /* create a directory */
 $response = $sc->createDirectory($userName, $dirName);
-var_export($response);
+handleResponse("dir create", $response);
 
 /* delete it again */
 // $reponse = $sc->deleteDirectory($userName, $dirName);
-// var_export($response);
+// handleResponse("dir delete", $response);
 
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
 		->getUploadFileLocation($userName, $fileName, filesize("COPYING"));
-var_export($response);
+handleResponse("get upload location", $response);
 
 $response = uploadFile($response->uploadLocation, "COPYING");
-var_export($response);
+handleResponse("upload file", $response);
 
 /* download the file */
 $response = $sc->getDownloadFileLocation($userName, $fileName);
-var_export($response);
+handleResponse("get download location", $response);
 
 $response = downloadFile($response->downloadLocation);
-var_export($response);
+handleResponse("download file", $response);
 
 /* delete the file */
 // $response = deleteFile($userName, $fileName);
@@ -74,6 +74,6 @@ var_export($response);
 
 /* show directory */
 $response = $sc->getFileList($userName);
-var_export($response);
+handleResponse("get file list", $response);
 
 ?>

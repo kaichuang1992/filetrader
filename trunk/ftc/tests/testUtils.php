@@ -46,4 +46,13 @@ function downloadFile($downloadUrl, $orignalFile = NULL) {
 	}
 	return array("ok" => FALSE);
 }
+
+function handleResponse($testName, $response) {
+	if (!$response->ok) {
+		echo "[TEST] $testName: FAILED!\n";
+		echo "\tERROR: $reponse->message\n\n";
+	} else {
+		echo "[TEST] $testName: OK\n";
+	}
+}
 ?>
