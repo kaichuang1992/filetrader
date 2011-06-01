@@ -30,8 +30,20 @@ function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
 	return array("ok" => TRUE);
 }
 
-function downloadFile($downloadUrl) {
-	$uploadResponse = file_get_contents($downloadUrl, false);
-	return array("ok" => TRUE);
+function downloadFile($downloadUrl, $orignalFile = NULL) {
+	/* don't actually return the downloaded content, just ok! */
+	$downloadResponse = file_get_contents($downloadUrl, false);
+	/* compare original with downloaded content to see if that actually matches in 
+	 * case you want to test downloading the same file as the one you uploaded... */
+	if ($orignalFile != NULL) {
+		$original = sha1_file($orignalFile);
+		$download = sha1($downloadResponse);
+
+		if ($original !== FALSE && $download !== FALSE
+				&& $original === $download) {
+			return array("ok" => TRUE);
+		}
+	}
+	return array("ok" => FALSE);
 }
 ?>
