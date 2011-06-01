@@ -1,6 +1,8 @@
 <?php
 
 function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
+	$filePath = realpath($filePath);
+
 	/* determing file mime-type */
 	$finfo = new finfo(FILEINFO_MIME_TYPE);
 	$contentType = $finfo->file($filePath);
@@ -23,11 +25,12 @@ function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
 		$context = stream_context_create($opts);
 		$uploadResponse = file_get_contents($uploadUrl, false, $context);
 		/* FIXME: validate response! */
+		var_dump($uploadResponse);
 	}
 	return array("ok" => TRUE);
 }
 
-function downloadFile($downloadUrl, $file) {
+function downloadFile($downloadUrl) {
 	$uploadResponse = file_get_contents($downloadUrl, false);
 	return array("ok" => TRUE);
 }

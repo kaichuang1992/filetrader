@@ -25,17 +25,18 @@ class StorageClient {
 	private $oauth;
 	private $decode;
 
-	function __construct($config) {
+	function __construct($config, $sp_name) {
 		if (!is_array($config)) {
 			throw new Exception("config parameter should be array");
 		}
 		$this->config = $config;
 		$this->decode = FALSE;
-		/* FIXME: this should be user configurable at some point */
-		$this->endpoint = getConfig($config, 'api_endpoint', TRUE);
-		$this->oauth = new OAuth(getConfig($config, 'consumerKey', TRUE),
-				getConfig($config, 'consumerSecret', TRUE),
-				OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
+
+		$storage = getConfig($config, 'storage_providers', TRUE);
+		$storage = $storage[$sp_name];
+
+                $this->endpoint = $storage['apiEndPoint'];
+                $this->oauth = new OAuth($storage['consumerKey'], $storage['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
 	}
 
 	/**
@@ -58,7 +59,7 @@ class StorageClient {
 	function createDirectory($userName = NULL, $dirName = NULL) {
 		$endpoint = $this->endpoint . "/?action=createDirectory";
 		$params = array('userName' => $userName, 'dirName' => $dirName);
-		$oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
+		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
 		$response = $this->oauth->getLastResponse();
 		return ($this->decode) ? json_decode($response) : $response;
 	}
@@ -66,7 +67,7 @@ class StorageClient {
 	function getDownloadFileLocation($userName = NULL, $fileName = NULL) {
 		$endpoint = $this->endpoint . "/?action=getDownloadToken";
 		$params = array('userName' => $userName, 'fileName' => $fileName);
-		$oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
+		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
 		$response = $this->oauth->getLastResponse();
 		return ($this->decode) ? json_decode($response) : $response;
 	}
@@ -76,7 +77,7 @@ class StorageClient {
 		$endpoint = $this->endpoint . "/?action=getUploadToken";
 		$params = array('userName' => $userName, 'fileName' => $fileName,
 				'fileSize' => $fileSize);
-		$oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
+		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
 		$response = $this->oauth->getLastResponse();
 		return ($this->decode) ? json_decode($response) : $response;
 	}
@@ -84,15 +85,7 @@ class StorageClient {
 	function getFileList($userName = NULL) {
 		$endpoint = $this->endpoint . "/?action=getFileList";
 		$params = array('userName' => $userName);
-		$oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_GET);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function createDirectory($userName = NULL, $dirName = NULL) {
-		$endpoint = $this->endpoint . "/?action=getFileList";
-		$params = array('userName' => $userName, 'dirName' => $dirName);
-		$oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
+		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_GET);
 		$response = $this->oauth->getLastResponse();
 		return ($this->decode) ? json_decode($response) : $response;
 	}
