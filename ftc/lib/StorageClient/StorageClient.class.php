@@ -35,8 +35,10 @@ class StorageClient {
 		$storage = getConfig($config, 'storage_providers', TRUE);
 		$storage = $storage[$sp_name];
 
-                $this->endpoint = $storage['apiEndPoint'];
-                $this->oauth = new OAuth($storage['consumerKey'], $storage['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
+		$this->endpoint = $storage['apiEndPoint'];
+		$this->oauth = new OAuth($storage['consumerKey'],
+				$storage['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
+				OAUTH_AUTH_TYPE_AUTHORIZATION);
 	}
 
 	/**
