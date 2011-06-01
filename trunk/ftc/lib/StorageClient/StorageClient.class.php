@@ -50,51 +50,25 @@ class StorageClient {
 		$this->decode = $decode;
 	}
 
-	function getServerInfo() {
-		$endpoint = $this->endpoint . "/?action=serverInfo";
-		$params = array();
-		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_GET);
+	/**
+	 * Perform the call to the storage server
+	 * Enter description here ...
+	 * @param string $action action to call
+	 * @param array $parameters call parameters
+	 * @param string $method (POST, GET)
+	 */
+	function call($action = "pingServer", $parameters = array(),
+			$method = "GET") {
+		if ($method == "GET") {
+			$method = OAUTH_HTTP_METHOD_GET;
+		} elseif ($method == "POST") {
+			$method = OAUTH_HTTP_METHOD_POST;
+		} else {
+			throw new Exception("invalid method, should be either GET or POST");
+		}
+		$endpoint = "$this->endpoint/?action=$action";
+		$this->oauth->fetch($endpoint, $params, $method);
 		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function createDirectory($userName = NULL, $dirName = NULL) {
-		$endpoint = $this->endpoint . "/?action=createDirectory";
-		$params = array('userName' => $userName, 'dirName' => $dirName);
-		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function getDownloadFileLocation($userName = NULL, $fileName = NULL) {
-		$endpoint = $this->endpoint . "/?action=getDownloadToken";
-		$params = array('userName' => $userName, 'fileName' => $fileName);
-		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function getUploadFileLocation($userName = NULL, $fileName = NULL,
-			$fileSize = 0) {
-		$endpoint = $this->endpoint . "/?action=getUploadToken";
-		$params = array('userName' => $userName, 'fileName' => $fileName,
-				'fileSize' => $fileSize);
-		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_POST);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function getFileList($userName = NULL) {
-		$endpoint = $this->endpoint . "/?action=getFileList";
-		$params = array('userName' => $userName);
-		$this->oauth->fetch($endpoint, $params, OAUTH_HTTP_METHOD_GET);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
-
-	function pingServer() {
-		$endpoint = $this->endpoint;
-		$response = file_get_contents($endpoint);
 		return ($this->decode) ? json_decode($response) : $response;
 	}
 }

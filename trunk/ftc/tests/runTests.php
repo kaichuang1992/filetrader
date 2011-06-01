@@ -41,39 +41,41 @@ $spKeys = array_keys(getConfig($config, 'storage_providers'));
 $sc = new StorageClient($config, $spKeys[0]);
 $sc->performDecode(TRUE);
 
-$response = $sc->pingServer();
+$response = $sc->call("pingServer");
 handleResponse("ping", $response);
 
 /* create a directory */
-$response = $sc->createDirectory($userName, $dirName);
+$response = $sc->call("createDirectory", array($userName, $dirName), "POST");
 handleResponse("dir create", $response);
 
 /* delete it again */
-// $reponse = $sc->deleteDirectory($userName, $dirName);
-// handleResponse("dir delete", $response);
+$reponse = $sc->call("deleteDirectory", array($userName, $dirName), "POST");
+handleResponse("dir delete", $response);
 
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
-		->getUploadFileLocation($userName, $fileName, filesize("COPYING"));
+		->call("getUploadFileLocation",
+				array($userName, $fileName, filesize("COPYING")), "POST");
 handleResponse("get upload location", $response);
 
 $response = uploadFile($response->uploadLocation, "COPYING", 1024);
 handleResponse("upload file", $response);
 
 /* download the file */
-$response = $sc->getDownloadFileLocation($userName, $fileName);
+$response = $sc
+		->call("getDownloadFileLocation", array($userName, $fileName), "POST");
 handleResponse("get download location", $response);
 
 $response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
 /* delete the file */
-// $response = deleteFile($userName, $fileName);
-// var_export($response);
+$response = $sc->call("deleteFile", array($userName, $fileName), "POST");
+var_export($response);
 
 /* show directory */
-$response = $sc->getFileList($userName);
+$response = $sc->call("getFileList", array($userName), "POST");
 handleResponse("get file list", $response);
 
 ?>
