@@ -78,14 +78,14 @@ handleResponse("get file list", $response);
 
 /* delete the directory */
 $response = $sc
-                ->call("deleteDirectory",
-                                array('userName' => $userName, 'dirName' => $dirName), "POST");
+		->call("deleteDirectory",
+				array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir delete", $response);
 
 /* delete the file */
 $response = $sc
-                ->call("deleteFile",
-                                array('userName' => $userName, 'fileName' => $fileName),
-                                "POST");
+		->call("deleteFile",
+				array('userName' => $userName, 'fileName' => $fileName),
+				"POST");
 handleResponse("delete file", $response);
 ?>
