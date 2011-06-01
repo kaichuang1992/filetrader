@@ -58,7 +58,7 @@ $response = $sc
 		->getUploadFileLocation($userName, $fileName, filesize("COPYING"));
 handleResponse("get upload location", $response);
 
-$response = uploadFile($response->uploadLocation, "COPYING");
+$response = uploadFile($response->uploadLocation, "COPYING", 1024);
 handleResponse("upload file", $response);
 
 /* download the file */
