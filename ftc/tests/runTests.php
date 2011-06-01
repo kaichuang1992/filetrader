@@ -50,12 +50,6 @@ $response = $sc
 				array('userName' => $userName, 'dirName' => $dirName), "POST");
 handleResponse("dir create", $response);
 
-/* delete it again */
-$response = $sc
-		->call("deleteDirectory",
-				array('userName' => $userName, 'dirName' => $dirName), "POST");
-handleResponse("dir delete", $response);
-
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
@@ -77,15 +71,21 @@ handleResponse("get download token", $response);
 $response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
-/* delete the file */
-$response = $sc
-		->call("deleteFile",
-				array('userName' => $userName, 'fileName' => $fileName),
-				"POST");
-handleResponse("delete file", $response);
-
 /* show directory */
 $response = $sc->call("getFileList", array('userName' => $userName), "GET");
+// showDirectoryListing($response);
 handleResponse("get file list", $response);
 
+/* delete the directory */
+$response = $sc
+                ->call("deleteDirectory",
+                                array('userName' => $userName, 'dirName' => $dirName), "POST");
+handleResponse("dir delete", $response);
+
+/* delete the file */
+$response = $sc
+                ->call("deleteFile",
+                                array('userName' => $userName, 'fileName' => $fileName),
+                                "POST");
+handleResponse("delete file", $response);
 ?>
