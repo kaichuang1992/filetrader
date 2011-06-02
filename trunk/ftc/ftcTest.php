@@ -1,15 +1,20 @@
 <?php
 $storageProvider = array('displayName' => 'Storage Provider One',
-		'apiEndPoint' => 'http://127.0.0.2/storage', 'consumerKey' => '12345',
-		'consumerSecret' => '54321');
+                                'apiEndPoint' => 'http://192.168.56.101/fts',
+                                'consumerKey' => '12345', 'consumerSecret' => '54321');
 
 require_once("lib/StorageClient/StorageClient.class.php");
 
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	$action = $_REQUEST['action'];
-
+try {
 	$sc = new StorageClient($storageProvider);
-
+	echo $sc->call($action, array(), "GET");
+	exit(0);
+}catch(Exception $e) {
+	echo $e->getMessage();
+	exit(1);	
+}
 } else {
 	// no action specified show default page
 }
@@ -21,22 +26,27 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 <title>ftc</title>
 <style type="text/css">
 </style>
+<script src="j/jquery.js"></script>
 <script>
-	("#pingServer").onclick(function() {
-
-		$.getJSON('?action=pingServer', function(data) {
+$(document).ready(function(){
+	$("a").click(function(event) {
+		var actionType = $(this).attr('id');
+		$.getJSON('?action=' + actionType, function(data) {
 			  var items = [];
 
 			  $.each(data, function(key, val) {
-			    items.push('<li id="' + key + '">' + val + '</li>');
+			    items.push('<tr><th>' + key + '</th><td>' + val + '</td></tr>>');
 			  });
 
-			  $('<ul/>', {
-			    'class': 'my-new-list',
-			    html: items.join('')
-			  }).appendTo('output');
-			});		
+			$("#output").html(                          $('<table/>', {
+                            'class': 'my-new-list',
+                            html: items.join('')
+                          }));
+
+			});
+                event.preventDefault();	
 	});
+});
 </script>
 </head>
 <body>
