@@ -36,9 +36,9 @@ $userName = generateToken(4);
 
 /* we use the first configured storage provider as defined in the config file,
  * make sure it is valid! */
-$spKeys = array_keys(getConfig($config, 'storage_providers'));
+$storageProviders = getConfig($config, 'storage_providers');
 
-$sc = new StorageClient($config, $spKeys[0]);
+$sc = new StorageClient($storageProviders[0]);
 $sc->performDecode(TRUE);
 
 $response = $sc->call("pingServer");

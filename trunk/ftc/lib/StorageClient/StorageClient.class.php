@@ -20,24 +20,16 @@
 
 class StorageClient {
 
-	private $config;
 	private $endpoint;
 	private $oauth;
 	private $decode;
 
-	function __construct($config, $sp_name) {
-		if (!is_array($config)) {
-			throw new Exception("config parameter should be array");
-		}
-		$this->config = $config;
+	function __construct($storageProvider) {
 		$this->decode = FALSE;
 
-		$storage = getConfig($config, 'storage_providers', TRUE);
-		$storage = $storage[$sp_name];
-
-		$this->endpoint = $storage['apiEndPoint'];
-		$this->oauth = new OAuth($storage['consumerKey'],
-				$storage['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
+		$this->endpoint = $storageProvider['apiEndPoint'];
+		$this->oauth = new OAuth($storageProvider['consumerKey'],
+				$storageProvider['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
 				OAUTH_AUTH_TYPE_AUTHORIZATION);
 	}
 
