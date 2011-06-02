@@ -58,14 +58,12 @@ $(document).ready(
 			    var resp = jQuery.parseJSON(data);
 			    var uploadUrl = resp.uploadLocation;
 			    alert(uploadUrl);
+				
+				var xhr = new XMLHttpRequest();
+				xhr.open("PUT", uploadUrl, true);
+				xhr.send(f);
+
 		    });
 		    event.preventDefault();
-
-		    // var xhr = new XMLHttpRequest();
-		    // xhr.open("PUT", 'http://192.87.110.161<?php echo
-		    // $_SERVER['SCRIPT_NAME']; ?>?action=upload&fileName='+file.name,
-		    // true);
-		    // xhr.setRequestHeader('X-File-Name', file.name);
-		    // xhr.send(file);
 	    });
     });
