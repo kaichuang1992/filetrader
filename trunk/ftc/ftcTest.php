@@ -31,7 +31,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 <title>ftc</title>
 <style type="text/css">
 </style>
-<script type="text/javascript"  src="j/jquery.js"></script>
+<script type="text/javascript" src="j/jquery.js"></script>
 <script type="text/javascript" src="j/handler.js"></script>
 </head>
 <body>
@@ -45,6 +45,8 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 
 <input type="text" id="dirName" />
 <button id="createDirectory">Add Directory</button>
+
+Files to upload: <input id="inputFiles" type="file">
 
 <hr>
 
