@@ -9,7 +9,13 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	$action = $_REQUEST['action'];
 try {
 	$sc = new StorageClient($storageProvider);
-	echo $sc->call($action, array(), "GET");
+
+	$parameters =  array('userName' => 'demoUser');
+
+	if($_SERVER['REQUEST_METHOD'] === 'POST') {
+      		$parameters = array_merge($parameters, $_POST);
+	}	
+	echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
 	exit(0);
 }catch(Exception $e) {
 	echo $e->getMessage();
@@ -26,19 +32,48 @@ try {
 <title>ftc</title>
 <style type="text/css">
 </style>
-<script src="j/jquery.js"></script>
-<script>
+<script type="text/javascript"  src="j/jquery.js"></script>
+<script type="text/javascript">
 $(document).ready(function(){
-	$("a").click(function(event) {
+	$("button").click(function(event) {
+                var actionType = $(this).attr('id');
+
+		//var parameters = Array();
+	//	parameters['dirName'] = $("#dirName").value;
+
+                $.post('?action=' + actionType, { dirName : $("#dirName").val() });
+                event.preventDefault(); 
+	});
+
+        $("a.file").live('click', function(event) {
+		var fileName = $(this).text();
+		$.post('?action=getDownloadToken', { fileName : fileName }, function(data) {
+			var resp = jQuery.parseJSON(data);
+			window.location.href = resp.downloadLocation;
+		});
+		event.preventDefault();
+        });
+
+	$("a.menu").live('click', function(event) {
 		var actionType = $(this).attr('id');
+
 		$.getJSON('?action=' + actionType, function(data) {
 			  var items = [];
 
-			  $.each(data, function(key, val) {
-			    items.push('<tr><th>' + key + '</th><td>' + val + '</td></tr>>');
+			  if(actionType === 'getFileList') {
+			  $.each(data.files, function(key, val) {
+			    if(val.isDirectory) {
+				items.push('<tr><th>' + key + '</th><td>[DIR]</td></tr>>');
+				}else {
+                                items.push('<tr><th><a href="#" class="file">' + key + '</a></th><td>' + val.fileSize + '</td></tr>>');
+				}
 			  });
-
-			$("#output").html(                          $('<table/>', {
+			}else {
+                          $.each(data, function(key, val) {
+                            items.push('<tr><th>' + key + '</th><td>' + val + '</td></tr>>');
+                          });
+			}
+			$("#output").html(	 $('<table/>', {
                             'class': 'my-new-list',
                             html: items.join('')
                           }));
@@ -50,11 +85,19 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
+<h2>Storage Engine</h2>
+<pre><?php var_dump($storageProvider); ?></pre>
 <ul>
-<li><a id="pingServer" href="#">ping server</a></li>
-<li><a id="listFiles" href="#">list files</a></li>
-<li><a id="serverInfo" href="#">server info</a></li>
+<li><a class="menu" id="pingServer" href="#">ping server</a></li>
+<li><a class="menu" id="getFileList" href="#">list files</a></li>
+<li><a class="menu" id="serverInfo" href="#">server info</a></li>
 </ul>
+
+<input type="text" id="dirName" />
+<button id="createDirectory">Add Directory</button>
+
+<hr>
+
 <div id="output">
 This content will be replaced with actual output...
 </div>
