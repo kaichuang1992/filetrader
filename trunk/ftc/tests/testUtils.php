@@ -52,11 +52,16 @@ function downloadFile($downloadUrl, $orignalFile = NULL) {
 	return (object) array("ok" => TRUE);
 }
 
-function handleResponse($testName, $response) {
+function handleResponse($testName = "test", $debug = FALSE, $response) {
 	if (!$response->ok) {
 		echo "[FAILED] $testName <<<< ERROR: $response->errorMessage >>>>\n";
 	} else {
 		echo "[    OK] $testName\n";
+	}
+	if ($debug) {
+		echo "----     OUTPUT [$testName]    -----\n";
+		var_dump($response);
+		echo "---- END OF OUTPUT [$testName] -----\n";
 	}
 }
 
@@ -67,4 +72,5 @@ function showDirectoryListing($data) {
 						: $fileMetaData->fileSize) . "\n";
 	}
 }
+
 ?>
