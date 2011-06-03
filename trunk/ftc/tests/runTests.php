@@ -28,12 +28,13 @@ if (!isset($config) || !is_array($config)) {
 }
 
 /* generate some random names in order to be reasonably sure they don't exist yet */
-$fileName = generateToken(4);
-$otherFileName = generateToken(4);
-$dirName = generateToken(4);
-$otherDirName = generateToken(4);
+$fileName = 'demoFileName.txt';
+$otherFileName = 'otherDemoFileName.txt';
+$dirName = 'demoDirectory';
+$otherDirName = 'otherDemoDirectory';
 
-$dbg = TRUE;
+//$dbg = TRUE;
+$dbg = FALSE;
 
 /* we use the first configured storage provider as defined in the config file,
  * make sure it is valid! */
@@ -42,41 +43,48 @@ $storageProviders = getConfig($config, 'storage_providers');
 $sc = new StorageClient($storageProviders[0]);
 $sc->performDecode(TRUE);
 
-handleResponse("ping " . $storageProvider[0]['apiEndPoint'], $dbg,
+handleResponse("ping " . $storageProviders[0]['apiEndPoint'], $dbg,
 		$sc->call("pingServer"));
 handleResponse("mkdir $dirName", $dbg,
 		$sc
-				->call("createDirectory", array('dirPath' => $dirName), "POST"));
+				->call("createDirectory", array('relativeDirPath' => $dirName), "POST"));
 handleResponse("mkdir $dirName/$otherDirName", $dbg,
 		$sc
 				->call("createDirectory",
 						array(
-								'dirPath' => $dirName . DIRECTORY_SEPARATOR
+								'relativeDirPath' => $dirName . DIRECTORY_SEPARATOR
 										. $otherDirName), "POST"));
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
-handleResponse("utoken $fileName", $dbg,
+$r = handleResponse("utoken $fileName", $dbg,
 		$sc
 				->call("getUploadToken",
-						array('filePath' => $fileName,
+						array('relativeFilePath' => $fileName,
 								'fileSize' => filesize("COPYING")), "POST"));
 
 handleResponse("ufile $fileName", $dbg,
-		uploadFile($response->uploadLocation, "COPYING", 1024));
-handleResponse("dtoken $fileName", $dbg,
+		uploadFile($r->uploadLocation, "COPYING", 1024));
+$r = handleResponse("dtoken $fileName", $dbg,
 		$sc
-				->call("getDownloadToken", array('filePath' => $fileName),
+				->call("getDownloadToken", array('relativeFilePath' => $fileName),
 						"POST"));
 
 handleResponse("dfile $fileName", $dbg,
-		downloadFile($response->downloadLocation, "COPYING"));
+		downloadFile($r->downloadLocation, "COPYING"));
 handleResponse("ls .", $dbg,
-		$sc->call("getFileList", array('dirPath' => '.'), "GET"));
-handleResponse("rmdir $dirPath", $dbg,
+		$sc->call("getFileList", array('relativeDirPath' => '.'), "GET"));
+
+handleResponse("ls $dirName", $dbg,
+                $sc->call("getFileList", array('relativeDirPath' => $dirName), "GET"));
+
+handleNegativeResponse("rmdir $dirName", $dbg,
 		$sc
-				->call("deleteDirectory", array('dirPath' => $dirName), "POST"));
+				->call("deleteDirectory", array('relativeDirPath' => $dirName), "POST"));
+handleResponse("rmdir $dirName/$otherDirName", $dbg,
+                $sc->call("deleteDirectory", array('relativeDirPath' => $dirName . DIRECTORY_SEPARATOR . $otherDirName), "POST"));
+handleResponse("rmdir $dirName", $dbg,
+                $sc->call("deleteDirectory", array('relativeDirPath' => $dirName), "POST"));
 handleResponse("rm $fileName", $dbg,
-		$sc
-				->call("deleteFile", array('filePath' => $fileName), "POST"));
+		$sc->call("deleteFile", array('relativeFilePath' => $fileName), "POST"));
 
 ?>

@@ -52,17 +52,30 @@ function downloadFile($downloadUrl, $orignalFile = NULL) {
 	return (object) array("ok" => TRUE);
 }
 
-function handleResponse($testName = "test", $debug = FALSE, $response) {
-	if (!$response->ok) {
-		echo "[FAILED] $testName <<<< ERROR: $response->errorMessage >>>>\n";
+function handleNegativeResponse($testName = "test", $debug = FALSE, $response) {
+	return handleResponse($testName, $debug, $response, TRUE);
+}
+
+function handleResponse($testName = "test", $debug = FALSE, $response, $negative = FALSE) {
+	if ((!$negative && !$response->ok) || ($negative && $response->ok)) {
+		echo "[FAILED] $testName";
+		if(!$negative) {
+			echo " <<<< ERROR: $response->errorMessage >>>>";
+		}
+		echo "\n";
 	} else {
-		echo "[    OK] $testName\n";
+		echo "[    OK] $testName";
+		if($negative) {
+                        echo " <<<< EXPECTED ERROR: $response->errorMessage >>>>";
+		}
+		echo "\n";
 	}
 	if ($debug) {
 		echo "----     OUTPUT [$testName]    -----\n";
 		var_dump($response);
 		echo "---- END OF OUTPUT [$testName] -----\n";
 	}
+	return $response;
 }
 
 function showDirectoryListing($data) {
