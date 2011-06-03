@@ -21,9 +21,12 @@
 class Files {
 	private $config;
 	private $dbh;
+	private $fsd; /* points to file storage directory from configuration */
 
 	function __construct($config) {
 		$this->config = $config;
+		$this->fsd = getConfig($config, 'file_storage_dir', TRUE);
+
 		try {
 			$this->dbh = new PDO(
 					"sqlite:" . getConfig($this->config, 'token_file', TRUE),
@@ -56,8 +59,7 @@ class Files {
 		$relativeFilePath = getRequest('relativeFilePath', TRUE);
 
 		/* file needs to exist before getting a token is allowed */
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . $relativeFilePath;
+		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
 		if (!file_exists($filePath)) {
 			throw new Exception("file does not exist");
 		}
@@ -91,8 +93,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-                /* FIXME verify filePath */
-                $relativeFilePath = getRequest('relativeFilePath', TRUE);
+		/* FIXME verify filePath */
+		$relativeFilePath = getRequest('relativeFilePath', TRUE);
 
 		/* verify fileSize
 		 * 
@@ -104,8 +106,7 @@ class Files {
 			throw new Exception("invalid filesize");
 		}
 
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . $relativeFilePath;
+		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
 		if (file_exists($filePath)) {
 			throw new Exception("file already exists");
 		}
@@ -155,9 +156,6 @@ class Files {
 		$filePath = $row['filePath'];
 		$fileName = basename($filePath);
 
-//		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-//				. DIRECTORY_SEPARATOR . base64_encode($userName);
-//		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
 		if (!is_file($filePath)) {
 			throw new Exception("file does not exist", 500);
 		}
@@ -213,7 +211,7 @@ class Files {
 		$fileSize = $row['fileSize'];
 
 		/* Directory should already exist! FIXME: also catch in getUploadToken! */
-		if(!file_exists(dirname($filePath)) || !is_dir(dirname($filePath))) {
+		if (!file_exists(dirname($filePath)) || !is_dir(dirname($filePath))) {
 			throw new Exception("directory to upload file does not exist", 500);
 		}
 
@@ -261,11 +259,10 @@ class Files {
 			throw new Exception("invalid request method, should be GET");
 		}
 
-                /* FIXME verify dirPath */
-                $relativeDirPath = getRequest('relativeDirPath', TRUE);
+		/* FIXME verify dirPath */
+		$relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-		$dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . $relativeDirPath;
+		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
 
 		/* is chdir only valid for this call? May break some other stuff? */
 		/* FIXME: check before if dir exists? */
@@ -287,11 +284,10 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-                /* FIXME verify filePath */
-                $relativeFilePath = getRequest('relativeFilePath', TRUE);
+		/* FIXME verify filePath */
+		$relativeFilePath = getRequest('relativeFilePath', TRUE);
 
-		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . $relativeFilePath;
+		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
 
 		if (!is_file($filePath)) {
 			throw new Exception("file does not exist");
@@ -309,14 +305,14 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-                /* FIXME verify dirPath */
-                $relativeDirPath = getRequest('relativeDirPath', TRUE);
+		/* FIXME verify dirPath */
+		$relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-                $dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
-                                . DIRECTORY_SEPARATOR . $relativeDirPath;
+		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
 
 		if (!file_exists($dirPath) || !is_dir($dirPath)) {
-			throw new Exception("directory does not exist, or is not a directory");
+			throw new Exception(
+					"directory does not exist, or is not a directory");
 		}
 
 		if (rmdir($dirPath) === FALSE) {
@@ -331,14 +327,14 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-                /* FIXME verify dirPath */
-                $relativeDirPath = getRequest('relativeDirPath', TRUE);
+		/* FIXME verify dirPath */
+		$relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-                $dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
-                                . DIRECTORY_SEPARATOR . $relativeDirPath;
+		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
 
 		if (!file_exists(dirname($dirPath)) || !is_dir(dirname($dirPath))) {
-                        throw new Exception("parent of directory does not exist, or is not a directory");
+			throw new Exception(
+					"parent of directory does not exist, or is not a directory");
 		}
 
 		if (file_exists($dirPath)) {
@@ -359,7 +355,7 @@ class Files {
 		}
 
 		/* determine available disk space on server */
-		$df = disk_free_space(getConfig($this->config, 'storage_dir', TRUE));
+		$df = disk_free_space($this->fsd);
 
 		/* determine IP version (IPv4, IPv6) */
 		if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP,
