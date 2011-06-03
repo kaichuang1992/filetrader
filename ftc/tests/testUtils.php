@@ -56,17 +56,18 @@ function handleNegativeResponse($testName = "test", $debug = FALSE, $response) {
 	return handleResponse($testName, $debug, $response, TRUE);
 }
 
-function handleResponse($testName = "test", $debug = FALSE, $response, $negative = FALSE) {
+function handleResponse($testName = "test", $debug = FALSE, $response,
+		$negative = FALSE) {
 	if ((!$negative && !$response->ok) || ($negative && $response->ok)) {
 		echo "[FAILED] $testName";
-		if(!$negative) {
+		if (!$negative) {
 			echo " <<<< ERROR: $response->errorMessage >>>>";
 		}
 		echo "\n";
 	} else {
 		echo "[    OK] $testName";
-		if($negative) {
-                        echo " <<<< EXPECTED ERROR: $response->errorMessage >>>>";
+		if ($negative) {
+			echo " <<<< EXPECTED ERROR: $response->errorMessage >>>>";
 		}
 		echo "\n";
 	}
