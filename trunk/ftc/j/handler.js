@@ -17,6 +17,12 @@ $(document).ready(
 		    event.preventDefault();
 	    });
 
+		$("a.dir").live("click", function(event) {
+			var dirName = $(this).text();
+			alert(dirName);
+			event.preventDefault();
+		});
+
 	    $("a.menu").live(
 	        'click',
 	        function(event) {
@@ -28,7 +34,7 @@ $(document).ready(
 			        if (actionType === 'getFileList') {
 				        $.each(data.files, function(key, val) {
 					        if (val.isDirectory) {
-						        items.push('<tr><th>' + key + '</th><td>[DIR]</td></tr>>');
+						        items.push('<tr><th><a href="#" class="dir">' + key + '</a></th><td>[DIR]</td></tr>>');
 					        } else {
 						        items.push('<tr><th><a href="#" class="file">' + key
 						            + '</a></th><td>' + val.fileSize + '</td></tr>>');
