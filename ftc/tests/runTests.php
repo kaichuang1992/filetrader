@@ -47,14 +47,14 @@ handleResponse("ping", $response);
 /* create a directory */
 $response = $sc
 		->call("createDirectory",
-				array('userName' => $userName, 'dirName' => $dirName), "POST");
+				array('relativeDirPath' => $dirName), "POST");
 handleResponse("dir create", $response);
 
 /* upload a file, use random name, but actually send COPYING as it is 
  * there anyway... */
 $response = $sc
 		->call("getUploadToken",
-				array('userName' => $userName, 'fileName' => $fileName,
+				array('relativeFilePath' => $fileName,
 						'fileSize' => filesize("COPYING")), "POST");
 handleResponse("get upload token", $response);
 
@@ -64,7 +64,7 @@ handleResponse("upload file", $response);
 /* download the file */
 $response = $sc
 		->call("getDownloadToken",
-				array('userName' => $userName, 'fileName' => $fileName),
+				array('relativeFilePath' => $fileName),
 				"POST");
 handleResponse("get download token", $response);
 
@@ -72,20 +72,20 @@ $response = downloadFile($response->downloadLocation, "COPYING");
 handleResponse("download file", $response);
 
 /* show directory */
-$response = $sc->call("getFileList", array('userName' => $userName), "GET");
+$response = $sc->call("getFileList", array('relativeDirPath' => '.'), "GET");
 // showDirectoryListing($response);
 handleResponse("get file list", $response);
 
 /* delete the directory */
 $response = $sc
 		->call("deleteDirectory",
-				array('userName' => $userName, 'dirName' => $dirName), "POST");
+				array('relativeDirPath' => $dirName), "POST");
 handleResponse("dir delete", $response);
 
 /* delete the file */
 $response = $sc
 		->call("deleteFile",
-				array('userName' => $userName, 'fileName' => $fileName),
+				array('relativeFilePath' => $fileName),
 				"POST");
 handleResponse("delete file", $response);
 ?>
