@@ -32,17 +32,16 @@ class Files {
 			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
 			$this->dbh
 					->query(
-							'CREATE TABLE IF NOT EXISTS downloadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, PRIMARY KEY (token), UNIQUE(token))');
+							'CREATE TABLE IF NOT EXISTS downloadTokens (token TINYTEXT, filePath TEXT, PRIMARY KEY (token), UNIQUE(token))');
 			$this->dbh
 					->query(
-							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, userName TINYTEXT, fileName TINYTEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
+							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, filePath TEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
 		} catch (Exception $e) {
 			throw new Exception("database connection failed");
 		}
 	}
 
 	function __destruct() {
-
 		$this->dbh = NULL;
 	}
 
@@ -53,23 +52,12 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
-
-		/* verify fileName */
-		$fileName = filter_var(
-				basename(getRequest('fileName', TRUE),
-						FILTER_SANITIZE_SPECIAL_CHARS));
-		if ($fileName === FALSE)
-			throw new Exception("invalid filename");
+		/* FIXME verify filePath */
+		$relativeFilePath = getRequest('relativeFilePath', TRUE);
 
 		/* file needs to exist before getting a token is allowed */
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . $relativeFilePath;
 		if (!file_exists($filePath)) {
 			throw new Exception("file does not exist");
 		}
@@ -79,10 +67,9 @@ class Files {
 		try {
 			$stmt = $this->dbh
 					->prepare(
-							"INSERT INTO downloadTokens (token, userName, fileName) VALUES (:token, :userName, :fileName)");
+							"INSERT INTO downloadTokens (token, filePath) VALUES (:token, :filePath)");
 			$stmt->bindParam(':token', $token);
-			$stmt->bindParam(':userName', $userName);
-			$stmt->bindParam(':fileName', $fileName);
+			$stmt->bindParam(':filePath', $filePath);
 			$stmt->execute();
 
 			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME']
@@ -104,18 +91,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
-
-		/* verify fileName */
-		$fileName = filter_var(
-				basename(getRequest('fileName', TRUE),
-						FILTER_SANITIZE_SPECIAL_CHARS));
-		if ($fileName === FALSE)
-			throw new Exception("invalid filename");
+                /* FIXME verify filePath */
+                $relativeFilePath = getRequest('relativeFilePath', TRUE);
 
 		/* verify fileSize
 		 * 
@@ -127,9 +104,9 @@ class Files {
 			throw new Exception("invalid filesize");
 		}
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		if (file_exists($fileDir . DIRECTORY_SEPARATOR . $fileName)) {
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . $relativeFilePath;
+		if (file_exists($filePath)) {
 			throw new Exception("file already exists");
 		}
 
@@ -138,10 +115,9 @@ class Files {
 		try {
 			$stmt = $this->dbh
 					->prepare(
-							"INSERT INTO uploadTokens (token, userName, fileName, fileSize) VALUES (:token, :userName, :fileName, :fileSize)");
+							"INSERT INTO uploadTokens (token, filePath, fileSize) VALUES (:token, :filePath, :fileSize)");
 			$stmt->bindParam(':token', $token);
-			$stmt->bindParam(':userName', $userName);
-			$stmt->bindParam(':fileName', $fileName);
+			$stmt->bindParam(':filePath', $filePath);
 			$stmt->bindParam(':fileSize', $fileSize);
 			$stmt->execute();
 
@@ -168,7 +144,7 @@ class Files {
 
 		$stmt = $this->dbh
 				->prepare(
-						"SELECT token, userName, fileName FROM downloadTokens WHERE token=:token");
+						"SELECT token, filePath FROM downloadTokens WHERE token=:token");
 		$stmt->bindParam(':token', $token);
 		$stmt->execute();
 		$row = $stmt->fetch();
@@ -176,12 +152,12 @@ class Files {
 			throw new Exception("token not found", 404);
 		}
 
-		$userName = $row['userName'];
-		$fileName = $row['fileName'];
+		$filePath = $row['filePath'];
+		$fileName = basename($filePath);
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
+//		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
+//				. DIRECTORY_SEPARATOR . base64_encode($userName);
+//		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
 		if (!is_file($filePath)) {
 			throw new Exception("file does not exist", 500);
 		}
@@ -225,7 +201,7 @@ class Files {
 
 		$stmt = $this->dbh
 				->prepare(
-						"SELECT token, userName, fileName, fileSize FROM uploadTokens WHERE token=:token");
+						"SELECT token, filePath, fileSize FROM uploadTokens WHERE token=:token");
 		$stmt->bindParam(':token', $token);
 		$stmt->execute();
 		$row = $stmt->fetch();
@@ -233,18 +209,13 @@ class Files {
 			throw new Exception("token not found", 404);
 		}
 
-		$userName = $row['userName'];
-		$fileName = $row['fileName'];
+		$filePath = $row['filePath'];
 		$fileSize = $row['fileSize'];
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		if (!file_exists($fileDir)) {
-			if (mkdir($fileDir) === FALSE) {
-				throw new Exception("unable to create directory", 500);
-			}
+		/* Directory should already exist! FIXME: also catch in getUploadToken! */
+		if(!file_exists(dirname($filePath)) || !is_dir(dirname($filePath))) {
+			throw new Exception("directory to upload file does not exist", 500);
 		}
-		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
 
 		/* chunk number has to be >=0 */
 		$fileChunk = (int) getHeader('X-File-Chunk', FALSE, 0);
@@ -290,18 +261,16 @@ class Files {
 			throw new Exception("invalid request method, should be GET");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
+                /* FIXME verify dirPath */
+                $relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
+		$dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . $relativeDirPath;
 
 		/* is chdir only valid for this call? May break some other stuff? */
-		if (chdir($fileDir) === FALSE) {
-			throw new Exception("user does not have files in this store");
+		/* FIXME: check before if dir exists? */
+		if (chdir($dirPath) === FALSE) {
+			throw new Exception("directory does not exist");
 		}
 
 		$fileList = array();
@@ -318,22 +287,11 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
+                /* FIXME verify filePath */
+                $relativeFilePath = getRequest('relativeFilePath', TRUE);
 
-		/* verify fileName */
-		$fileName = filter_var(
-				basename(getRequest('fileName', TRUE),
-						FILTER_SANITIZE_SPECIAL_CHARS));
-		if ($fileName === FALSE)
-			throw new Exception("invalid filename");
-
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		$filePath = $fileDir . DIRECTORY_SEPARATOR . $fileName;
+		$filePath = getConfig($this->config, 'file_storage_dir', TRUE)
+				. DIRECTORY_SEPARATOR . $relativeFilePath;
 
 		if (!is_file($filePath)) {
 			throw new Exception("file does not exist");
@@ -351,25 +309,14 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
+                /* FIXME verify dirPath */
+                $relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-		/* verify fileName */
-		$dirName = filter_var(
-				basename(getRequest('dirName', TRUE),
-						FILTER_SANITIZE_SPECIAL_CHARS));
-		if ($dirName === FALSE)
-			throw new Exception("invalid dirname");
+                $dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
+                                . DIRECTORY_SEPARATOR . $relativeDirPath;
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
-		$dirPath = $fileDir . DIRECTORY_SEPARATOR . $dirName;
-
-		if (!is_dir($dirPath)) {
-			throw new Exception("directory does not exist");
+		if (!file_exists($dirPath) || !is_dir($dirPath)) {
+			throw new Exception("directory does not exist, or is not a directory");
 		}
 
 		if (rmdir($dirPath) === FALSE) {
@@ -384,51 +331,22 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* verify userName */
-		$userName = filter_var(getRequest('userName', TRUE),
-				FILTER_SANITIZE_SPECIAL_CHARS);
-		if ($userName === FALSE)
-			throw new Exception("invalid username");
+                /* FIXME verify dirPath */
+                $relativeDirPath = getRequest('relativeDirPath', TRUE);
 
-		$fileDir = getConfig($this->config, 'file_storage_dir', TRUE)
-				. DIRECTORY_SEPARATOR . base64_encode($userName);
+                $dirPath = getConfig($this->config, 'file_storage_dir', TRUE)
+                                . DIRECTORY_SEPARATOR . $relativeDirPath;
 
-		if (!file_exists($fileDir)) {
-			if (mkdir($fileDir) === FALSE) {
-				throw new Exception("unable to create directory", 500);
-			}
+		if (!file_exists(dirname($dirPath)) || !is_dir(dirname($dirPath))) {
+                        throw new Exception("parent of directory does not exist, or is not a directory");
 		}
 
-		/* verify dirName */
-		$dirName = filter_var(
-				basename(getRequest('dirName', TRUE),
-						FILTER_SANITIZE_SPECIAL_CHARS));
-		if ($dirName === FALSE)
-			throw new Exception("invalid dirname");
-
-		/* validate existence of parent of specified directory */
-		$baseDir = realpath($fileDir . DIRECTORY_SEPARATOR . dirname($dirName));
-		if ($baseDir === FALSE) {
-			throw new Exception(
-					"parent of specified directory is invalid or does not exist");
-		}
-		if (strpos($baseDir, $fileDir) === FALSE
-				|| strpos($baseDir, $fileDir) !== 0) {
-			throw new Exception("trying to escape directory structure?");
-		}
-		if (!is_dir($baseDir)) {
-			throw new Exception(
-					"parent of specified directory is not a directory?");
-		}
-
-		/* create the directory if it does not exists yet */
-		$newDir = $baseDir . DIRECTORY_SEPARATOR . basename($dirName);
-		if (file_exists($newDir)) {
+		if (file_exists($dirPath)) {
 			throw new Exception(
 					"directory (or file) with that name already exists");
 		}
 
-		if (mkdir($newDir, 0775) === FALSE) {
+		if (mkdir($dirPath, 0775) === FALSE) {
 			throw new Exception("unable to create directory");
 		}
 
