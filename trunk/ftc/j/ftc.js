@@ -5,7 +5,10 @@ $(document).ready(
 	    $("button").click(function(event) {
 		    var actionType = $(this).attr('id');
 		    $.post('?action=' + actionType, {
-			    relativePath : $("#dirName").val() });
+			    relativePath : curDir + "/" + $("#dirName").val() }, function(data) {
+
+				redrawPage('getDirList');
+			});
 		    event.preventDefault();
 	    });
 
@@ -18,6 +21,16 @@ $(document).ready(
 		    });
 		    event.preventDefault();
 	    });
+
+		$("a.up").live("click", function(event) {
+			var lastSlash = curDir.lastIndexOf('/');
+			if(lastSlash >0) {
+				curDir = curDir.substring(0, lastSlash);
+				redrawPage('getDirList');
+			}		
+			event.preventDefault();
+		});
+
 
 	    $("a.dir").live("click", function(event) {
 		    var dirName = $(this).text();
@@ -47,7 +60,7 @@ $(document).ready(
 			    var xhr = new XMLHttpRequest();
 			    xhr.open("PUT", uploadUrl, true);
 			    xhr.send(f);
-
+                        redrawPage('getDirList');
 		    });
 		    event.preventDefault();
 	    });
@@ -59,15 +72,19 @@ function redrawPage(actionType) {
                                 var items = [];
 
                                 if (actionType === 'getDirList') {
+					items.push('<tr><th colspan="2"><a href="#" class="up">Up</a></th></tr>');
+
 					items.push('<tr><th colspan="2">' + curDir + '</th></tr>');
                                         $.each(data, function(key, val) {
+						if(key != "ok") {
+						
                                                 if (val.isDirectory) {
                                                         items.push('<tr><td><a href="#" class="dir">' + val.fileName
                                                             + '</a></td><td>[DIR]</td></tr>>');
                                                 } else {
                                                         items.push('<tr><td><a href="#" class="file">' + val.fileName
                                                             + '</a></td><td>' + val.fileSize + '</td></tr>>');
-                                                }
+                                                }}
                                         });
                                 } else {
                                         $.each(data, function(key, val) {
