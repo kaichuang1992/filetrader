@@ -55,13 +55,9 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* FIXME verify filePath */
-		$relativeFilePath = getRequest('relativeFilePath', TRUE);
-
-		/* file needs to exist before getting a token is allowed */
-		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
-		if (!file_exists($filePath)) {
-			throw new Exception("file does not exist");
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
 		}
 
 		$token = generateToken();
@@ -71,7 +67,7 @@ class Files {
 					->prepare(
 							"INSERT INTO downloadTokens (token, filePath) VALUES (:token, :filePath)");
 			$stmt->bindParam(':token', $token);
-			$stmt->bindParam(':filePath', $filePath);
+			$stmt->bindParam(':filePath', $absPath);
 			$stmt->execute();
 
 			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME']
@@ -93,8 +89,14 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* FIXME verify filePath */
-		$relativeFilePath = getRequest('relativeFilePath', TRUE);
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
+		}
+		/* in case of upload the file should *not* exist */
+		if (file_exists($absPath)) {
+			throw new Exception("file already exists");
+		}
 
 		/* verify fileSize
 		 * 
@@ -106,11 +108,6 @@ class Files {
 			throw new Exception("invalid filesize");
 		}
 
-		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
-		if (file_exists($filePath)) {
-			throw new Exception("file already exists");
-		}
-
 		$token = generateToken();
 
 		try {
@@ -118,7 +115,7 @@ class Files {
 					->prepare(
 							"INSERT INTO uploadTokens (token, filePath, fileSize) VALUES (:token, :filePath, :fileSize)");
 			$stmt->bindParam(':token', $token);
-			$stmt->bindParam(':filePath', $filePath);
+			$stmt->bindParam(':filePath', $absPath);
 			$stmt->bindParam(':fileSize', $fileSize);
 			$stmt->execute();
 
@@ -153,17 +150,17 @@ class Files {
 			throw new Exception("token not found", 404);
 		}
 
-		$filePath = $row['filePath'];
-		$fileName = basename($filePath);
-
-		if (!is_file($filePath)) {
-			throw new Exception("file does not exist", 500);
+		$absPath = validatePath($row['filePath'], FTS_FILE);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path", 500);
 		}
 
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
-		header("X-Sendfile: " . $filePath);
-		header("Content-Type: " . $finfo->file($filePath));
-		header('Content-Disposition: attachment; filename="' . $fileName . '"');
+		header("X-Sendfile: " . $absPath);
+		header("Content-Type: " . $finfo->file($absPath));
+		header(
+				'Content-Disposition: attachment; filename="'
+						. basename($absPath) . '"');
 		exit(0);
 	}
 
@@ -207,12 +204,16 @@ class Files {
 			throw new Exception("token not found", 404);
 		}
 
-		$filePath = $row['filePath'];
+		$absPath = $row['filePath'];
 		$fileSize = $row['fileSize'];
 
-		/* Directory should already exist! FIXME: also catch in getUploadToken! */
-		if (!file_exists(dirname($filePath)) || !is_dir(dirname($filePath))) {
-			throw new Exception("directory to upload file does not exist", 500);
+		$absPath = validatePath($row['filePath'], FTS_PARENT);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
+		}
+		/* in case of upload the file should *not* exist */
+		if (file_exists($absPath)) {
+			throw new Exception("file already exists", 500);
 		}
 
 		/* chunk number has to be >=0 */
@@ -222,13 +223,13 @@ class Files {
 		}
 
 		/* chunk can be >0 only if file already exists */
-		if ($fileChunk > 0 && !file_exists($filePath)) {
+		if ($fileChunk > 0 && !file_exists($absPath)) {
 			throw new Exception(
 					"file does not exist, cannot send chunk number >0", 400);
 		}
 
 		/* append to existing file if chunk >0, else create new file */
-		$out = fopen($filePath, ($fileChunk == 0) ? "wb" : "ab");
+		$out = fopen($absPath, ($fileChunk == 0) ? "wb" : "ab");
 		if ($out) {
 			$in = fopen("php://input", "rb");
 			if ($in) {
@@ -245,7 +246,7 @@ class Files {
 		}
 
 		/* if upload complete, i.e.: final size as specified in token reached, delete token */
-		if (filesize($filePath) >= $fileSize) {
+		if (filesize($absPath) >= $fileSize) {
 			$stmt = $this->dbh
 					->prepare("DELETE FROM uploadTokens WHERE token=:token");
 			$stmt->bindParam(':token', $token);
@@ -259,15 +260,9 @@ class Files {
 			throw new Exception("invalid request method, should be GET");
 		}
 
-		/* FIXME verify dirPath */
-		$relativeDirPath = getRequest('relativeDirPath', TRUE);
-
-		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
-
-		/* is chdir only valid for this call? May break some other stuff? */
-		/* FIXME: check before if dir exists? */
-		if (chdir($dirPath) === FALSE) {
-			throw new Exception("directory does not exist");
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_DIR);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
 		}
 
 		$fileList = array();
@@ -284,16 +279,12 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* FIXME verify filePath */
-		$relativeFilePath = getRequest('relativeFilePath', TRUE);
-
-		$filePath = $this->fsd . DIRECTORY_SEPARATOR . $relativeFilePath;
-
-		if (!is_file($filePath)) {
-			throw new Exception("file does not exist");
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
 		}
 
-		if (unlink($filePath) === FALSE) {
+		if (unlink($absPath) === FALSE) {
 			throw new Exception("unable to delete file");
 		}
 
@@ -305,14 +296,9 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* FIXME verify dirPath */
-		$relativeDirPath = getRequest('relativeDirPath', TRUE);
-
-		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
-
-		if (!file_exists($dirPath) || !is_dir($dirPath)) {
-			throw new Exception(
-					"directory does not exist, or is not a directory");
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_DIR);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
 		}
 
 		if (rmdir($dirPath) === FALSE) {
@@ -327,16 +313,12 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		/* FIXME verify dirPath */
-		$relativeDirPath = getRequest('relativeDirPath', TRUE);
-
-		$dirPath = $this->fsd . DIRECTORY_SEPARATOR . $relativeDirPath;
-
-		if (!file_exists(dirname($dirPath)) || !is_dir(dirname($dirPath))) {
-			throw new Exception(
-					"parent of directory does not exist, or is not a directory");
+		$absPath = validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
 		}
 
+		/* file or directory with this name should *not* already exist */
 		if (file_exists($dirPath)) {
 			throw new Exception(
 					"directory (or file) with that name already exists");
@@ -375,6 +357,56 @@ class Files {
 			throw new Exception("invalid request method, should be GET");
 		}
 		return array('message' => 'FileTrader REST API');
+	}
+
+	/**
+	 * Validate the relative path specified with the request
+	 * @param unknown_type $relativePath the relative path to a file or directory
+	 * @param unknown_type $validateOption can be either
+	 * FTS_FILE: validate that the absolute file location is inside the global file storage 
+	 * directory and the file exists
+	 * FTS_DIR: validate that the absolute directory location is inside the global file storage 
+	 * directory and that the directory exists
+	 * FTS_PARENT: validate that the absolute directory location of the parent is inside the 
+	 * global file storage directory and that this parent directory exists
+	 * @return The absoute location of the file or directory when validated, or FALSE when the
+	 * validation failed
+	 * @throws Exception never?
+	 */
+	private function validatePath($relativePath, $validateOption) {
+		/* FIXME: should we validate the characeters in relativePath? */
+		$fsd = $this->fsd;
+		if ($validateOption == FTS_FILE || $validateOption == FTS_DIR) {
+			$absPath = realpath($fsd . DIRECTORY_SEPARATOR . $relativePath);
+			$fsdPos = strpos($absPath, $fsd, 0);
+			if ($fsdPos === FALSE || $fsdPos != 0) {
+				return FALSE;
+			}
+			if (!file_exists($absPath)) {
+				return FALSE;
+			}
+			if ($validateOption == FTS_FILE && !is_file($absPath)) {
+				return FALSE;
+			}
+			if ($validateOption == FTS_DIR && !is_dir($absPath)) {
+				return FALSE;
+			}
+			return $absPath;
+		} else if ($validateOption == FTS_PARENT) {
+			$absPath = realpath(
+					$fsd . DIRECTORY_SEPARATOR . dirname($relativePath));
+			$fsdPos = strpos($absPath, $fsd, 0);
+			if ($fsdPos === FALSE || $fsdPos != 0) {
+				return FALSE;
+			}
+			if (!file_exists($absPath) || !is_dir($absPath)) {
+				return FALSE;
+			}
+			return $absPath . DIRECTORY_SEPARATOR . basename($relativePath);
+		} else {
+			/* invalid validateOption */
+			return FALSE;
+		}
 	}
 }
 ?>
