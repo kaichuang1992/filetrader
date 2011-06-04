@@ -54,7 +54,7 @@ try {
 		$action = $_REQUEST['action'];
 	}
 
-	$validActions = array('pingServer', 'serverInfo', 'getFileList',
+	$validActions = array('pingServer', 'serverInfo', 'getDirList',
 			'downloadFile', 'uploadFile', 'getUploadToken', 'getDownloadToken',
 			'deleteDirectory', 'deleteFile', 'createDirectory');
 	if (!in_array($action, $validActions, TRUE)) {
