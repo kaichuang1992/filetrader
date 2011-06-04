@@ -251,7 +251,7 @@ class Files {
 		return array("chunk" => $fileChunk);
 	}
 
-	function getFileList() {
+	function getDirList() {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET");
 		}
@@ -266,14 +266,11 @@ class Files {
 			throw new Exception("directory does not exist");
 		}
 
-		$fileList = array();
-		$fileList['absPath'] = $absPath;
+		$dirList = array();
 		foreach (glob("*") as $fileName) {
-			$fileList['files'][$fileName] = array(
-					"fileSize" => filesize($fileName),
-					"isDirectory" => is_dir($fileName));
+			array_push($dirList, array("fileName" => $fileName, "fileSize" => filesize($fileName), "isDirectory" => is_dir($fileName)));
 		}
-		return $fileList;
+		return $dirList;
 	}
 
 	function deleteFile() {
