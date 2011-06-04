@@ -35,28 +35,45 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 <meta charset="utf8">
 <title>ftc</title>
 <style type="text/css">
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+li { 
+	list-style: none;
+	display: inline;
+	margin: 0;
+	padding: 5px;
+	border: 1px solid #000;
+	background-color: #ccc;
+}
+
+li a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #000;
+}
+td.header {
+	background-color: #ccc;
+}
 </style>
 <script type="text/javascript" src="j/jquery.js"></script>
 <script type="text/javascript" src="j/ftc.js"></script>
 </head>
 <body>
-<h2>Storage Engine</h2>
-<pre><?php var_dump($storageProvider); ?></pre>
+<h2>File Trader Client (FTC)</h2>
 <ul>
-<li><a class="menu" id="pingServer" href="#">ping server</a></li>
 <li><a class="menu" id="getDirList" href="#">list files</a></li>
+<li><a class="menu" id="pingServer" href="#">ping server</a></li>
 <li><a class="menu" id="serverInfo" href="#">server info</a></li>
 </ul>
-
+<hr>
+<div id="output"></div>
+<hr>
 <input type="text" id="dirName" />
 <button id="createDirectory">Add Directory</button>
 
 Files to upload: <input id="inputFiles" type="file">
-
-<hr>
-
-<div id="output">
-This content will be replaced with actual output...
-</div>
 </body>
 </html>
