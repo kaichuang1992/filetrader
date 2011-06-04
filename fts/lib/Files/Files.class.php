@@ -376,7 +376,7 @@ class Files {
 	 * @throws Exception never?
 	 */
 	private function validatePath($relativePath, $validateOption) {
-		/* FIXME: should we validate the characeters in relativePath? */
+		/* FIXME: should we validate the characters in relativePath? */
 		$fsd = $this->fsd;
 		if ($validateOption == FTS_FILE || $validateOption == FTS_DIR) {
 			$absPath = realpath($fsd . DIRECTORY_SEPARATOR . $relativePath);
@@ -403,6 +403,13 @@ class Files {
 			}
 			if (!file_exists($absPath) || !is_dir($absPath)) {
 				return FALSE;
+			}
+			$baseName = basename($relativePath);
+			if(empty($baseName)) {
+				throw new Exception("no empty path allowed");
+			}
+			if(substr($baseName, 0,1) === FALSE || substr($baseName,0,1) === ".") {
+				throw new Exception("invalid name, cannot start with '.'");
 			}
 			return $absPath . DIRECTORY_SEPARATOR . basename($relativePath);
 		} else {
