@@ -16,9 +16,9 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 			$parameters = array_merge($parameters, $_POST);
 		}
 
-                if ($_SERVER['REQUEST_METHOD'] === 'GET') { 
-                        $parameters = array_merge($parameters, $_GET);
-                }
+		if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+			$parameters = array_merge($parameters, $_GET);
+		}
 
 		echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
 		exit(0);
@@ -37,7 +37,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 <style type="text/css">
 </style>
 <script type="text/javascript" src="j/jquery.js"></script>
-<script type="text/javascript" src="j/handler.js"></script>
+<script type="text/javascript" src="j/ftc.js"></script>
 </head>
 <body>
 <h2>Storage Engine</h2>
