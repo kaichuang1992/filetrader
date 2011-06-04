@@ -1,4 +1,4 @@
-var curDir = ".";
+var curDir = "/";
 
 $(document).ready(
     function() {
@@ -6,11 +6,49 @@ $(document).ready(
 		    var actionType = $(this).attr('id');
 		    $.post('?action=' + actionType, {
 			    relativePath : curDir + "/" + $("#dirName").val() }, function(data) {
-
-				redrawPage('getDirList');
+				var resp = jQuery.parseJSON(data);
+				if(!resp.ok) {
+					alert(resp.errorMessage); //.errorMessage);
+				}else {
+					redrawPage('getDirList');
+				}
 			});
 		    event.preventDefault();
 	    });
+
+		$("a.dirdel").live('click', function(event) {
+			if(confirm('Are you sure you want to delete this directory?')) {
+
+			var dirName = $(this).attr('id');
+                    $.post('?action=deleteDirectory', {
+                            relativePath : curDir + "/" + dirName }, function(data) {
+                            var resp = jQuery.parseJSON(data);
+                                if(!resp.ok) {
+                                        alert(resp.errorMessage); //.errorMessage);
+                                }else {
+                                        redrawPage('getDirList');
+                                }			
+                    });
+			}
+                    event.preventDefault();
+
+		});
+
+                $("a.filedel").live('click', function(event) {
+                        if(confirm('Are you sure you want to delete this file?')) {
+                        var dirName = $(this).attr('id');
+                    $.post('?action=deleteFile', {
+                            relativePath : curDir + "/" + dirName }, function(data) {
+                            var resp = jQuery.parseJSON(data);
+                                if(!resp.ok) {
+                                        alert(resp.errorMessage); //.errorMessage);
+                                }else {
+                                        redrawPage('getDirList');
+                                }
+                    });
+			}
+                    event.preventDefault();
+                });
 
 	    $("a.file").live('click', function(event) {
 		    var fileName = $(this).text();
@@ -55,15 +93,20 @@ $(document).ready(
 		      relativePath : curDir + "/" + f.name,
 		      fileSize : f.size }, function(data) {
 			    var resp = jQuery.parseJSON(data);
+				if(!resp.ok) {
+					alert(resp.errorMessage);
+				}else {
 			    var uploadUrl = resp.uploadLocation;
 
 			    var xhr = new XMLHttpRequest();
 			    xhr.open("PUT", uploadUrl, true);
 			    xhr.send(f);
                         redrawPage('getDirList');
+				}
 		    });
 		    event.preventDefault();
 	    });
+                                        redrawPage('getDirList');
     });
 
 function redrawPage(actionType) {
@@ -72,23 +115,21 @@ function redrawPage(actionType) {
                                 var items = [];
 
                                 if (actionType === 'getDirList') {
-					items.push('<tr><th colspan="2"><a href="#" class="up">Up</a></th></tr>');
-
-					items.push('<tr><th colspan="2">' + curDir + '</th></tr>');
+					items.push('<tr><td class="header" colspan="3"><a href="#" class="up">Up</a> (' + curDir + ')</td></tr>');
                                         $.each(data, function(key, val) {
 						if(key != "ok") {
 						
                                                 if (val.isDirectory) {
                                                         items.push('<tr><td><a href="#" class="dir">' + val.fileName
-                                                            + '</a></td><td>[DIR]</td></tr>>');
+                                                            + '</a></td><td>[DIR]</td><td><a href="#" class="dirdel" id="' + val.fileName + '">delete</a></td></tr>');
                                                 } else {
                                                         items.push('<tr><td><a href="#" class="file">' + val.fileName
-                                                            + '</a></td><td>' + val.fileSize + '</td></tr>>');
+                                                            + '</a></td><td>' + val.fileSize + '</td><td><a href="#" class="filedel" id="' + val.fileName + '">delete</a></td></tr>');
                                                 }}
                                         });
                                 } else {
                                         $.each(data, function(key, val) {
-                                                items.push('<tr><th>' + key + '</th><td>' + val
+                                                items.push('<tr><td>' + key + '</td><td>' + val
                                                     + '</td></tr>>');
                                         });
                                 }
