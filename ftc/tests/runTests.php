@@ -74,10 +74,10 @@ $r = handleResponse("dtoken $fileName", $dbg,
 handleResponse("dfile $fileName", $dbg,
 		downloadFile($r->downloadLocation, "COPYING"));
 handleResponse("ls .", $dbg,
-		$sc->call("getFileList", array('relativePath' => '.'), "GET"));
+		$sc->call("getDirList", array('relativePath' => '.'), "GET"));
 
 handleResponse("ls $dirName", $dbg,
-		$sc->call("getFileList", array('relativePath' => $dirName), "GET"));
+		$sc->call("getDirList", array('relativePath' => $dirName), "GET"));
 
 handleNegativeResponse("rmdir $dirName", $dbg,
 		$sc

@@ -44,7 +44,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 <pre><?php var_dump($storageProvider); ?></pre>
 <ul>
 <li><a class="menu" id="pingServer" href="#">ping server</a></li>
-<li><a class="menu" id="getFileList" href="#">list files</a></li>
+<li><a class="menu" id="getDirList" href="#">list files</a></li>
 <li><a class="menu" id="serverInfo" href="#">server info</a></li>
 </ul>
 
