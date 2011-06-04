@@ -26,7 +26,7 @@ function uploadFile($uploadUrl, $filePath, $blockSize = 1024) {
 		$uploadResponse = json_decode(
 				file_get_contents($uploadUrl, false, $context));
 		if (!$uploadResponse->ok) {
-			return (object) array("ok" => FALSE);
+			return (object) array("ok" => FALSE, "errorMessage" => $uploadResponse->errorMessage);
 		}
 	}
 	return (object) array("ok" => TRUE);
