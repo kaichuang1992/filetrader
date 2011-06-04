@@ -55,7 +55,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
@@ -74,7 +75,8 @@ class Files {
 					. $_SERVER['PHP_SELF']
 					. "?action=downloadFile&token=$token";
 
-			return array("downloadLocation" => $downloadLocation, "absPath" => $absPath);
+			return array("downloadLocation" => $downloadLocation,
+					"absPath" => $absPath);
 		} catch (Exception $e) {
 			throw new Exception("database query failed");
 		}
@@ -89,7 +91,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
@@ -121,7 +124,8 @@ class Files {
 
 			$uploadLocation = getProtocol() . $_SERVER['SERVER_NAME']
 					. $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
-			return array("uploadLocation" => $uploadLocation, "absPath" => $absPath);
+			return array("uploadLocation" => $uploadLocation,
+					"absPath" => $absPath);
 		} catch (Exception $e) {
 			throw new Exception("database query failed");
 		}
@@ -204,22 +208,13 @@ class Files {
 		$absPath = $row['filePath'];
 		$fileSize = $row['fileSize'];
 
-//		$absPath = $this->validatePath($row['filePath'], FTS_PARENT);
-//		if ($absPath === FALSE) {
-//			throw new Exception("invalid path");
-//		}
-//	/* in case of upload the file should *not* exist */
-//		if (file_exists($absPath) && ) {
-//			throw new Exception("file already exists", 500);
-//		}
-
 		/* chunk number has to be >=0 */
 		$fileChunk = (int) getHeader('X-File-Chunk', FALSE, 0);
 		if ($fileChunk < 0) {
 			throw new Exception("invalid x-file-chunk header", 400);
 		}
 
-		if($fileChunk == 0 && file_exists($absPath)) {
+		if ($fileChunk == 0 && file_exists($absPath)) {
 			throw new Exception("file already exists", 500);
 		}
 
@@ -261,14 +256,15 @@ class Files {
 			throw new Exception("invalid request method, should be GET");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
 
-                if (chdir($absPath) === FALSE) {
-                        throw new Exception("directory does not exist");
-                }
+		if (chdir($absPath) === FALSE) {
+			throw new Exception("directory does not exist");
+		}
 
 		$fileList = array();
 		$fileList['absPath'] = $absPath;
@@ -285,7 +281,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
@@ -302,7 +299,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
@@ -319,7 +317,8 @@ class Files {
 			throw new Exception("invalid request method, should be POST");
 		}
 
-		$absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
