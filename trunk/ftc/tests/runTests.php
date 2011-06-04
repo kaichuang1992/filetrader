@@ -47,13 +47,13 @@ handleResponse("ping " . $storageProviders[0]['apiEndPoint'], $dbg,
 		$sc->call("pingServer"));
 handleResponse("mkdir $dirName", $dbg,
 		$sc
-				->call("createDirectory", array('relativeDirPath' => $dirName),
+				->call("createDirectory", array('relativePath' => $dirName),
 						"POST"));
 handleResponse("mkdir $dirName/$otherDirName", $dbg,
 		$sc
 				->call("createDirectory",
 						array(
-								'relativeDirPath' => $dirName
+								'relativePath' => $dirName
 										. DIRECTORY_SEPARATOR . $otherDirName),
 						"POST"));
 /* upload a file, use random name, but actually send COPYING as it is 
@@ -61,40 +61,40 @@ handleResponse("mkdir $dirName/$otherDirName", $dbg,
 $r = handleResponse("utoken $fileName", $dbg,
 		$sc
 				->call("getUploadToken",
-						array('relativeFilePath' => $fileName,
+						array('relativePath' => $fileName,
 								'fileSize' => filesize("COPYING")), "POST"));
 
 handleResponse("ufile $fileName", $dbg,
 		uploadFile($r->uploadLocation, "COPYING", 1024));
 $r = handleResponse("dtoken $fileName", $dbg,
 		$sc
-				->call("getDownloadToken",
-						array('relativeFilePath' => $fileName), "POST"));
+				->call("getDownloadToken", array('relativePath' => $fileName),
+						"POST"));
 
 handleResponse("dfile $fileName", $dbg,
 		downloadFile($r->downloadLocation, "COPYING"));
 handleResponse("ls .", $dbg,
-		$sc->call("getFileList", array('relativeDirPath' => '.'), "GET"));
+		$sc->call("getFileList", array('relativePath' => '.'), "GET"));
 
 handleResponse("ls $dirName", $dbg,
-		$sc->call("getFileList", array('relativeDirPath' => $dirName), "GET"));
+		$sc->call("getFileList", array('relativePath' => $dirName), "GET"));
 
 handleNegativeResponse("rmdir $dirName", $dbg,
 		$sc
-				->call("deleteDirectory", array('relativeDirPath' => $dirName),
+				->call("deleteDirectory", array('relativePath' => $dirName),
 						"POST"));
 handleResponse("rmdir $dirName/$otherDirName", $dbg,
 		$sc
 				->call("deleteDirectory",
 						array(
-								'relativeDirPath' => $dirName
+								'relativePath' => $dirName
 										. DIRECTORY_SEPARATOR . $otherDirName),
 						"POST"));
 handleResponse("rmdir $dirName", $dbg,
 		$sc
-				->call("deleteDirectory", array('relativeDirPath' => $dirName),
+				->call("deleteDirectory", array('relativePath' => $dirName),
 						"POST"));
 handleResponse("rm $fileName", $dbg,
-		$sc->call("deleteFile", array('relativeFilePath' => $fileName), "POST"));
+		$sc->call("deleteFile", array('relativePath' => $fileName), "POST"));
 
 ?>
