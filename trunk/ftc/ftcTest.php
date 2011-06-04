@@ -10,11 +10,16 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	try {
 		$sc = new StorageClient($storageProvider);
 
-		$parameters = array('userName' => 'demoUser');
+		$parameters = array();
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$parameters = array_merge($parameters, $_POST);
 		}
+
+                if ($_SERVER['REQUEST_METHOD'] === 'GET') { 
+                        $parameters = array_merge($parameters, $_GET);
+                }
+
 		echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
 		exit(0);
 	} catch (Exception $e) {

@@ -33,7 +33,7 @@ $otherFileName = 'otherDemoFileName.txt';
 $dirName = 'demoDirectory';
 $otherDirName = 'otherDemoDirectory';
 
-//$dbg = TRUE;
+// $dbg = TRUE;
 $dbg = FALSE;
 
 /* we use the first configured storage provider as defined in the config file,

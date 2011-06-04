@@ -3,14 +3,14 @@ $(document).ready(
 	    $("button").click(function(event) {
 		    var actionType = $(this).attr('id');
 		    $.post('?action=' + actionType, {
-			    dirName : $("#dirName").val() });
+			    relativePath : $("#dirName").val() });
 		    event.preventDefault();
 	    });
 
 	    $("a.file").live('click', function(event) {
 		    var fileName = $(this).text();
 		    $.post('?action=getDownloadToken', {
-			    fileName : fileName }, function(data) {
+			    relativePath : fileName }, function(data) {
 			    var resp = jQuery.parseJSON(data);
 			    window.location.href = resp.downloadLocation;
 		    });
@@ -28,16 +28,16 @@ $(document).ready(
 	        function(event) {
 		        var actionType = $(this).attr('id');
 
-		        $.getJSON('?action=' + actionType, function(data) {
+		        $.getJSON('?action=' + actionType, { relativePath : '/' }, function(data) {
 			        var items = [];
 
 			        if (actionType === 'getFileList') {
 				        $.each(data.files, function(key, val) {
 					        if (val.isDirectory) {
-						        items.push('<tr><th><a href="#" class="dir">' + key + '</a></th><td>[DIR]</td></tr>>');
+						        items.push('<tr><td><a href="#" class="dir">' + key + '</a></td><td>[DIR]</td></tr>>');
 					        } else {
-						        items.push('<tr><th><a href="#" class="file">' + key
-						            + '</a></th><td>' + val.fileSize + '</td></tr>>');
+						        items.push('<tr><td><a href="#" class="file">' + key
+						            + '</a></td><td>' + val.fileSize + '</td></tr>>');
 					        }
 				        });
 			        } else {
@@ -59,7 +59,7 @@ $(document).ready(
 
 		    var fileName = $(this).text();
 		    $.post('?action=getUploadToken', {
-		      fileName : f.name,
+		      relativePath : f.name,
 		      fileSize : f.size }, function(data) {
 			    var resp = jQuery.parseJSON(data);
 			    var uploadUrl = resp.uploadLocation;
