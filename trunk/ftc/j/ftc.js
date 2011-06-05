@@ -124,11 +124,14 @@ function redrawPage(actionType) {
                                                             + '</a></td><td>[DIR]</td><td><a href="#" class="dirdel" id="' + val.fileName + '">delete</a></td></tr>');
                                                 } else {
                                                         items.push('<tr><td><a href="#" class="file">' + val.fileName
-                                                            + '</a></td><td>' + val.fileSize + '</td><td><a href="#" class="filedel" id="' + val.fileName + '">delete</a></td></tr>');
+                                                            + '</a></td><td>' + toHumanSize(val.fileSize) + '</td><td><a href="#" class="filedel" id="' + val.fileName + '">delete</a></td></tr>');
                                                 }}
                                         });
                                 } else {
                                         $.each(data, function(key, val) {
+						if(key === 'availableSpace') {
+							val = toHumanSize(val);
+						}
                                                 items.push('<tr><td>' + key + '</td><td>' + val
                                                     + '</td></tr>>');
                                         });
@@ -138,4 +141,18 @@ function redrawPage(actionType) {
                                   html : items.join('') }));
 
                         });
+}
+
+function toHumanSize(bytes) {
+	var kilobyte = 1024;
+	var megabyte = kilobyte * kilobyte;
+	var gigabyte = megabyte * kilobyte;
+
+	if (bytes >= gigabyte)
+		return Math.round((bytes / gigabyte)) + "GB";
+	if (bytes >= megabyte)
+		return Math.round((bytes / megabyte)) + "MB";
+	if (bytes >= kilobyte)
+		return Math.round((bytes / kilobyte)) + "kB";
+	return bytes;
 }
