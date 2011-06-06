@@ -39,6 +39,10 @@ class Files {
 			$this->dbh
 					->query(
 							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, filePath TEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
+			$this->dbh
+					->query(
+							'CREATE TABLE IF NOT EXISTS   metaData (filePath TEXT, fileDescription TEXT, PRIMARY KEY (filePath), UNIQUE(filePath))');
+
 		} catch (Exception $e) {
 			throw new Exception("database connection failed");
 		}
@@ -144,6 +148,7 @@ class Files {
 			throw new Exception("invalid token", 400);
 		$token = $_GET['token'];
 
+		/* FIXME: why no try/catch here? */
 		$stmt = $this->dbh
 				->prepare(
 						"SELECT token, filePath FROM downloadTokens WHERE token=:token");
@@ -157,9 +162,9 @@ class Files {
 		$absPath = $row['filePath'];
 
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
-                header("Content-Type: " . $finfo->file($absPath));
+		header("Content-Type: " . $finfo->file($absPath));
 		header("X-Sendfile: " . $absPath);
-		if($finfo->file($absPath) != "text/plain") {
+		if ($finfo->file($absPath) != "text/plain") {
 			header(
 					'Content-Disposition: attachment; filename="'
 							. basename($absPath) . '"');
@@ -253,6 +258,53 @@ class Files {
 		return array("chunk" => $fileChunk);
 	}
 
+	function setFileDescription() {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			throw new Exception("invalid request method, should be POST");
+		}
+
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
+		}
+
+		/* FIXME: filter_var */
+		$description = getRequest('fileDescription', FALSE, '');
+
+		$stmt = $this->dbh
+				->prepare(
+						"INSERT INTO metaData (filePath, fileDescription) VALUES (:filePath, :fileDescription)");
+		$stmt->bindParam(':filePath', $absPath);
+		$stmt->bindParam(':fileDescription', $description);
+		$stmt->execute();
+
+		return array();
+	}
+
+	function getFileDescription() {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			throw new Exception("invalid request method, should be POST");
+		}
+
+		$absPath = $this
+				->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
+		if ($absPath === FALSE) {
+			throw new Exception("invalid path");
+		}
+
+		$stmt = $this->dbh
+				->prepare(
+						"SELECT fileDescription FROM metaData WHERE filePath=:filePath");
+		$stmt->bindParam(':filePath', $absPath);
+		$stmt->execute();
+		$row = $stmt->fetch();
+		if (empty($row)) {
+			throw new Exception("no description for this file");
+		}
+		return array('fileDescripion' => $row['fileDescription']);
+	}
+
 	function getDirList() {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET");
@@ -270,7 +322,10 @@ class Files {
 
 		$dirList = array();
 		foreach (glob("*") as $fileName) {
-			array_push($dirList, array("fileName" => $fileName, "fileSize" => filesize($fileName), "isDirectory" => is_dir($fileName)));
+			array_push($dirList,
+					array("fileName" => $fileName,
+							"fileSize" => filesize($fileName),
+							"isDirectory" => is_dir($fileName)));
 		}
 		return $dirList;
 	}
@@ -379,6 +434,7 @@ class Files {
 	 */
 	private function validatePath($relativePath, $validateOption) {
 		/* FIXME: should we validate the characters in relativePath? */
+		/* FIXME: why does it throw exceptions sometimes and returns false at other times? */
 		$fsd = $this->fsd;
 		if ($validateOption == FTS_FILE || $validateOption == FTS_DIR) {
 			$absPath = realpath($fsd . DIRECTORY_SEPARATOR . $relativePath);
@@ -407,10 +463,11 @@ class Files {
 				return FALSE;
 			}
 			$baseName = basename($relativePath);
-			if(empty($baseName)) {
+			if (empty($baseName)) {
 				throw new Exception("no empty path allowed");
 			}
-			if(substr($baseName, 0,1) === FALSE || substr($baseName,0,1) === ".") {
+			if (substr($baseName, 0, 1) === FALSE
+					|| substr($baseName, 0, 1) === ".") {
 				throw new Exception("invalid name, cannot start with '.'");
 			}
 			return $absPath . DIRECTORY_SEPARATOR . basename($relativePath);
