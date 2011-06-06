@@ -66,6 +66,19 @@ $r = handleResponse("utoken $fileName", $dbg,
 
 handleResponse("ufile $fileName", $dbg,
 		uploadFile($r->uploadLocation, "COPYING", 1024));
+
+handleResponse("setdesc $fileName", $dbg,
+		$sc
+				->call('setDescription',
+						array('relativePath' => $fileName,
+								'fileDescription' => 'Hello World')));
+
+$d = handleResponse("getdesc $fileName", $dbg,
+		$sc->call('getDescription', array('relativePath' => $fileName)));
+if ($d->fileDescrption !== 'Hello World') {
+	die("FAIL");
+}
+
 $r = handleResponse("dtoken $fileName", $dbg,
 		$sc
 				->call("getDownloadToken", array('relativePath' => $fileName),
