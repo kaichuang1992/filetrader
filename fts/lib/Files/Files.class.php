@@ -258,7 +258,7 @@ class Files {
 		return array("chunk" => $fileChunk);
 	}
 
-	function setFileDescription() {
+	function setDescription() {
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
 		}
@@ -282,7 +282,7 @@ class Files {
 		return array();
 	}
 
-	function getFileDescription() {
+	function getDescription() {
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
 		}
@@ -302,7 +302,7 @@ class Files {
 		if (empty($row)) {
 			throw new Exception("no description for this file");
 		}
-		return array('fileDescripion' => $row['fileDescription']);
+		return array('fileDescription' => $row['fileDescription']);
 	}
 
 	function getDirList() {
@@ -331,6 +331,7 @@ class Files {
 	}
 
 	function deleteFile() {
+		/* FIXME: remove the metaData for this file... */
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
 		}
