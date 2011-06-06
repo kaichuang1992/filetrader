@@ -71,11 +71,11 @@ handleResponse("setdesc $fileName", $dbg,
 		$sc
 				->call('setDescription',
 						array('relativePath' => $fileName,
-								'fileDescription' => 'Hello World')));
+								'fileDescription' => 'Hello World'), "POST"));
 
 $d = handleResponse("getdesc $fileName", $dbg,
-		$sc->call('getDescription', array('relativePath' => $fileName)));
-if ($d->fileDescrption !== 'Hello World') {
+		$sc->call('getDescription', array('relativePath' => $fileName), "POST"));
+if ($d->fileDescription !== 'Hello World') {
 	die("FAIL");
 }
 
