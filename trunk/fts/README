@@ -3,14 +3,23 @@
 	==> Fedora Package (php-pecl-oauth)
 		Not yet in Fedora
 		SRPM available at http://fkooman.fedorapeople.org/php-pecl-oauth
+		Package Review: https://bugzilla.redhat.com/show_bug.cgi?id=710751
+
+	==> Debian Package
+		Not in Debian as far as I know (use "pecl install oauth")
 		
 * mod_xsendfile (+ web server configuration!)
 	==> Fedora Package (mod_xsendfile)
 
+	==> Debian Package (libapache2-mod-xsendfile)
+
 * php-pdo (+ sqlite)
 	==> Fedora Package (php-pdo)
 		In Fedora this package contains the SQlite driver
-		
+
+	==> Debian Package (php5-sqlite)
+		Also contains SQlite PDO driver
+
 * 64 bit OS and PHP installation (for >2G file support)
 
 -- INSTALLATION --
