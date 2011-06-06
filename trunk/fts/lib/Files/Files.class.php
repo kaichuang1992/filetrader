@@ -157,11 +157,13 @@ class Files {
 		$absPath = $row['filePath'];
 
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
+                header("Content-Type: " . $finfo->file($absPath));
 		header("X-Sendfile: " . $absPath);
-		header("Content-Type: " . $finfo->file($absPath));
-		header(
-				'Content-Disposition: attachment; filename="'
-						. basename($absPath) . '"');
+		if($finfo->file($absPath) != "text/plain") {
+			header(
+					'Content-Disposition: attachment; filename="'
+							. basename($absPath) . '"');
+		}
 		exit(0);
 	}
 
