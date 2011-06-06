@@ -68,12 +68,22 @@ $config['oauth_consumers'] = array (
 Note: This is a shared secret that should be configured in the remote service
 accessing this service.
 
-To support the X-Send-File header Apache needs to be configured to allow for this
+To support the X-Sendfile header Apache needs to be configured to allow for this
 header. Set:
 
     XSendFile on
 
-In the directory containing the scripts (see https://tn123.org/mod_xsendfile/)
+In the (virtual) directory configuration containing the scripts (see https://tn123.org/mod_xsendfile/). 
+
+For example:
+
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride Limit
+    XSendFile on
+    Order allow,deny
+    Allow from all
+</Directory>
 
 --- ISSUES ---
 
