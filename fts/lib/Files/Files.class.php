@@ -18,6 +18,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+define('FTS_DIR', 0);
+define('FTS_FILE', 1);
+define('FTS_PARENT', 2);
+
 class Files {
 	private $config;
 	private $dbh;
