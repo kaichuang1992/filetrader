@@ -1,7 +1,17 @@
 <?php
-$storageProvider = array('displayName' => 'Storage Provider One',
-		'apiEndPoint' => 'http://192.168.56.101/fts', 'consumerKey' => '12345',
-		'consumerSecret' => '54321');
+require_once('config.php');
+require_once('utils.php');
+
+if (!isset($config) || !is_array($config)) {
+	die("broken or missing configuration file?");
+}
+
+date_default_timezone_set(
+		getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
+
+$storageProviders = getConfig($config, 'storageProviders', TRUE);
+
+$storageProvider = $storageProviders[0];
 
 require_once("lib/StorageClient/StorageClient.class.php");
 
@@ -63,6 +73,13 @@ td.header {
 </head>
 <body>
 <h2>File Trader Client (FTC)</h2>
+<form method="get">
+<label>Storage Provider: <select name="serviceProvider">
+<?php foreach ($serviceProviders as $spno => $sp) { ?>
+<option name="<?php echo $spno; ?>"><?php echo $sp['displayName']; ?></option>
+<?php } ?>
+</select></label>
+</form>
 <ul>
 <li><a class="menu" id="getDirList" href="#">list files</a></li>
 <li><a class="menu" id="pingServer" href="#">ping server</a></li>
