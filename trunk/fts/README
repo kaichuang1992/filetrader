@@ -24,6 +24,10 @@
 
 -- INSTALLATION --
 
+It is assumed you placed the source files of fts in /var/www/html/fts. This
+is the default directory on Red Hat based systems. On Debian this would
+be /var/www/fts.
+ 
 # create data directory
 $ mkdir -p data/files
 
@@ -73,6 +77,9 @@ header. Set:
 
     XSendFile on
 
+    # on Debian (SendFile module 0.9)  you seem to need this option as well:
+    ### XSendFileAllowAbove on
+
 In the (virtual) directory configuration containing the scripts (see https://tn123.org/mod_xsendfile/). 
 
 For example:
@@ -81,6 +88,8 @@ For example:
     Options Indexes FollowSymLinks
     AllowOverride Limit
     XSendFile on
+    # on Debian (SendFile module 0.9) you seem to need this option as well:
+    ### XSendFileAllowAbove on
     Order allow,deny
     Allow from all
 </Directory>
