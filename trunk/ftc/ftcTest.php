@@ -2,7 +2,7 @@
 require_once('config.php');
 require_once('../fts/utils.php');
 require_once("lib/StorageClient/StorageClient.class.php");
-require_once("lib/Auth.class.php");
+require_once("lib/Auth/Auth.class.php");
 require_once("lib/SimpleAuth/SimpleAuth.class.php");
 
 if (!isset($config) || !is_array($config)) {
@@ -12,19 +12,20 @@ if (!isset($config) || !is_array($config)) {
 date_default_timezone_set(
 		getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
-$auth = new SimpleAuth();
+$auth = new SimpleAuth($config);
 $auth->login();
 
 $storageProviders = getConfig($config, 'storage_providers', TRUE);
 
+$spNumber = isset($_SESSION['storageProvider']) ? $_SESSION['storageProvider'] : 0;
+
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	$action = $_REQUEST['action'];
-	$spNumber = session_is_registered('storageProvider') ? $_SESSION['storageProvider']
-			: 0;
 	if ($action == "setSP") {
 		$_SESSION['storageProvider'] = $_REQUEST['sp'];
 		$spNumber = $_SESSION['storageProvider'];
 	}
+	else {
 	try {
 		$sc = new StorageClient($storageProviders[$spNumber]);
 
@@ -42,7 +43,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	} catch (Exception $e) {
 		echo $e->getMessage();
 		exit(1);
-	}
+	}}
 }
 // no action specified show default page
 
@@ -84,12 +85,13 @@ td.header {
 <form method="post">
 <input type="hidden" name="action" value="setSP">
 <select name="sp">
-<?php foreach ($storageProvider as $k => $v) { ?>
+<?php foreach ($storageProviders as $k => $v) { ?>
 <option value="<?php echo $k; ?>" <?php if ($k == $spNumber) {
 		echo "selected";
 	} ?>><?php echo $v['displayName']; ?></option>
 <?php } ?>
 </select>
+<input type="submit" value="Switch">
 </form>
 <h2>Server Operations</h2>
 <ul>

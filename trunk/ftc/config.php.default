@@ -17,4 +17,9 @@ $config['storage_providers'] = array(
 		array('displayName' => 'Storage Provider Two',
 				'apiEndPoint' => 'http://127.0.0.1/storage',
 				'consumerKey' => 'abcde', 'consumerSecret' => 'edcba'));
+
+// User configuration (SimpleAuth)
+$config['simple_auth_users'] = array ('demo' => array ('password' => 'user', 'display_name' => 'Demo User'),
+                                      'omed' => array ('password' => 'resu', 'display_name' => 'Omed Resu'));
+
 ?>
