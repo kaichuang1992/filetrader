@@ -2,6 +2,8 @@
 require_once('config.php');
 require_once('../fts/utils.php');
 require_once("lib/StorageClient/StorageClient.class.php");
+require_once("lib/Auth.class.php");
+require_once("lib/SimpleAuth/SimpleAuth.class.php");
 
 if (!isset($config) || !is_array($config)) {
 	die("broken or missing configuration file?");
@@ -10,12 +12,21 @@ if (!isset($config) || !is_array($config)) {
 date_default_timezone_set(
 		getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
+$auth = new SimpleAuth();
+$auth->login();
+
 $storageProviders = getConfig($config, 'storage_providers', TRUE);
 
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 	$action = $_REQUEST['action'];
+	$spNumber = session_is_registered('storageProvider') ? $_SESSION['storageProvider']
+			: 0;
+	if ($action == "setSP") {
+		$_SESSION['storageProvider'] = $_REQUEST['sp'];
+		$spNumber = $_SESSION['storageProvider'];
+	}
 	try {
-		$sc = new StorageClient($storageProviders[0]);
+		$sc = new StorageClient($storageProviders[$spNumber]);
 
 		$parameters = array();
 
@@ -26,7 +37,6 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
 		if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 			$parameters = array_merge($parameters, $_GET);
 		}
-
 		echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
 		exit(0);
 	} catch (Exception $e) {
@@ -69,15 +79,27 @@ td.header {
 <script type="text/javascript" src="j/ftc.js"></script>
 </head>
 <body>
-<h2>File Trader Client (FTC)</h2>
+<h1>File Trader Client (FTC)</h1>
+<h2>Storage Provider</h2>
+<form method="post">
+<input type="hidden" name="action" value="setSP">
+<select name="sp">
+<?php foreach ($storageProvider as $k => $v) { ?>
+<option value="<?php echo $k; ?>" <?php if ($k == $spNumber) {
+		echo "selected";
+	} ?>><?php echo $v['displayName']; ?></option>
+<?php } ?>
+</select>
+</form>
+<h2>Server Operations</h2>
 <ul>
 <li><a class="menu" id="getDirList" href="#">list files</a></li>
 <li><a class="menu" id="pingServer" href="#">ping server</a></li>
 <li><a class="menu" id="serverInfo" href="#">server info</a></li>
 </ul>
-<hr>
+<h2>Output</h2>
 <div id="output"></div>
-<hr>
+<h3>File Operations</h3>
 <input type="text" id="dirName" />
 <button id="createDirectory">Add Directory</button>
 
