@@ -342,7 +342,7 @@ class Files {
 			throw new Exception("invalid path");
 		}
 
-		if (unlink($absPath) === FALSE) {
+		if (@unlink($absPath) === FALSE) {
 			throw new Exception("unable to delete file");
 		}
 
@@ -360,10 +360,9 @@ class Files {
 			throw new Exception("invalid path");
 		}
 
-		if (rmdir($absPath) === FALSE) {
+		if (@rmdir($absPath) === FALSE) {
 			throw new Exception("unable to delete directory");
 		}
-
 		return array();
 	}
 
@@ -384,7 +383,7 @@ class Files {
 					"directory (or file) with that name already exists");
 		}
 
-		if (mkdir($absPath, 0775) === FALSE) {
+		if (@mkdir($absPath, 0775) === FALSE) {
 			throw new Exception("unable to create directory");
 		}
 
