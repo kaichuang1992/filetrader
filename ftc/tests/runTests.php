@@ -18,14 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('config.php');
 require_once('../fts/utils.php'); /* steal fts utils ;) */
 require_once('lib/StorageClient/StorageClient.class.php');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'testUtils.php');
-
-if (!isset($config) || !is_array($config)) {
-	die("broken or missing configuration file?");
-}
 
 /* generate some random names in order to be reasonably sure they don't exist yet */
 $fileName = 'demoFileName.txt';
@@ -36,14 +31,12 @@ $otherDirName = 'otherDemoDirectory';
 // $dbg = TRUE;
 $dbg = FALSE;
 
-/* we use the first configured storage provider as defined in the config file,
- * make sure it is valid! */
-$storageProviders = getConfig($config, 'storage_providers');
+$storageProvider = array ('displayName' => 'Test Server', 'apiUrl' => 'http://localhost/filetrader/fts', 'consumerKey' => '12345', 'consumerSecret' => '54321');
 
-$sc = new StorageClient($storageProviders[0]);
+$sc = new StorageClient($storageProvider);
 $sc->performDecode(TRUE);
 
-handleResponse("ping " . $storageProviders[0]['apiEndPoint'], $dbg,
+handleResponse("ping " . $storageProvider['apiUrl'], $dbg,
 		$sc->call("pingServer"));
 handleResponse("mkdir $dirName", $dbg,
 		$sc
