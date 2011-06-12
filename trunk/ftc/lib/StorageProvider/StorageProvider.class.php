@@ -25,7 +25,7 @@ class StorageProvider {
 	function __construct($config) {
 		$this->config = $config;
 		$this->dbh = new PDO(
-				"sqlite:" . getConfig($this->config, 'ftc_data', TRUE),
+				"sqlite:" . getConfig($this->config, 'ftc_db', TRUE),
 				NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
 		/* FIXME: maybe this should be placed somewhere else, inefficient?!... */

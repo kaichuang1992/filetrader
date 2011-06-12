@@ -4,14 +4,9 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // Whether or not to allow only SSL connections
 $config['ssl_only'] = FALSE;
 
-// Location to directory where to store uploaded files, can be
-// either absolute or relative location. Should be writable by
-// web server!
-$config['storage_dir'] = 'data';
+$config['ftc_db'] = 'data/ftc.sqlite';
 
 $config['auth_type'] = 'SimpleAuth';
-
-$config['ftc_data'] = 'data/ftc_data.sqlite';
 
 // User configuration (SimpleAuth)
 $config['simple_auth_users'] = array ('demo' => array ('password' => 'user', 'display_name' => 'Demo User'),
