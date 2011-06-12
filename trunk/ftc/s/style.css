@@ -21,3 +21,6 @@ td.header {
         background-color: #ccc;
 }
 
+div#addStorageProvider {
+	display: none;
+}

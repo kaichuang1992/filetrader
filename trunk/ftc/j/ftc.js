@@ -1,6 +1,11 @@
 var curDir = "/";
 
 $(document).ready(function() {
+
+	$("#toggleAddStorageProvider").click(function(event) {
+		$("#addStorageProvider").toggle();
+	});
+
 	$("button").click(function(event) {
 		var actionType = $(this).attr('id');
 		$.post('?action=' + actionType, {
