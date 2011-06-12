@@ -27,7 +27,7 @@ class StorageClient {
 	function __construct($storageProvider) {
 		$this->decode = FALSE;
 
-		$this->endpoint = $storageProvider['apiEndPoint'];
+		$this->endpoint = $storageProvider['apiUrl'];
 		$this->oauth = new OAuth($storageProvider['consumerKey'],
 				$storageProvider['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
 				OAUTH_AUTH_TYPE_AUTHORIZATION);

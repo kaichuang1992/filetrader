@@ -37,15 +37,9 @@ class Files {
 					NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
 			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
-			$this->dbh
-					->query(
-							'CREATE TABLE IF NOT EXISTS downloadTokens (token TINYTEXT, filePath TEXT, PRIMARY KEY (token), UNIQUE(token))');
-			$this->dbh
-					->query(
-							'CREATE TABLE IF NOT EXISTS   uploadTokens (token TINYTEXT, filePath TEXT, fileSize INT, PRIMARY KEY (token), UNIQUE(token))');
-			$this->dbh
-					->query(
-							'CREATE TABLE IF NOT EXISTS   metaData (filePath TEXT, fileDescription TEXT, PRIMARY KEY (filePath), UNIQUE(filePath))');
+			$this->dbh->query('CREATE TABLE IF NOT EXISTS downloadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT)');
+			$this->dbh->query('CREATE TABLE IF NOT EXISTS   uploadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT, fileSize INTEGER)');
+			$this->dbh->query('CREATE TABLE IF NOT EXISTS       metaData (filePath TEXT PRIMARY KEY UNIQUE, fileDescription TEXT)');
 
 		} catch (Exception $e) {
 			throw new Exception("database connection failed");
@@ -79,6 +73,8 @@ class Files {
 			$stmt->bindParam(':filePath', $absPath);
 			$stmt->execute();
 
+			/* FIXME: pay attention if IPv6 is used! SERVER_NAME needs to
+			   be written in between brackets, e.g.: [2001:610:508:109::] */
 			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME']
 					. $_SERVER['PHP_SELF']
 					. "?action=downloadFile&token=$token";
