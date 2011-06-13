@@ -41,8 +41,8 @@ try {
 	}
 	$config['file_storage_dir'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
 			. "files";
-	$config['token_file'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
-			. "tokens.sqlite";
+	$config['fts_db'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
+			. "fts.sqlite";
 
 	require_once("lib/Files/Files.class.php");
 	require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");

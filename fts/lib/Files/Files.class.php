@@ -33,7 +33,7 @@ class Files {
 
 		try {
 			$this->dbh = new PDO(
-					"sqlite:" . getConfig($this->config, 'token_file', TRUE),
+					"sqlite:" . getConfig($this->config, 'fts_db', TRUE),
 					NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
 			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
