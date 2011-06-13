@@ -50,13 +50,14 @@ class StorageProvider {
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	function getUserStorageById($id, $ownerId) {
+	function getUserStorageById($id) {
 		/* FIXME: validate ownerId? */
-		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id AND storageOwner=:ownerId");
+//		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id AND storageOwner=:ownerId");
+		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id");
 		$stmt->bindParam(':id', $id);
-		$stmt->bindParam(':ownerId', $ownerId);
+		// $stmt->bindParam(':ownerId', $ownerId);
 		$stmt->execute();
-		return $stmt->fetch(PDO::FETCH_ASSOC);	
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 
 	function addUserStorage($displayName, $apiUrl, $consumerKey, $consumerSecret, $ownerId) {
