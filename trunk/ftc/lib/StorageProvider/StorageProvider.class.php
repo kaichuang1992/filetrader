@@ -31,6 +31,11 @@ class StorageProvider {
 		/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
 		$this->dbh->query('CREATE TABLE IF NOT EXISTS storageProviders (id INTEGER PRIMARY KEY AUTOINCREMENT, displayName TEXT, apiUrl TEXT, consumerKey TEXT, consumerSecret TEXT, storageOwner TEXT)');
 
+		/* future */
+		/*
+                $this->dbh->query('CREATE TABLE IF NOT EXISTS Providers (id INTEGER PRIMARY KEY AUTOINCREMENT, displayName TEXT, apiUrl TEXT, consumerKey TEXT, consumerSecret TEXT, userId TINYTEXT)');
+		$this->dbh->query('CREATE TABLE IF NOT EXISTS Shares (providerId INTEGER FOREIGN KEY ???, groupId TINYTEXT, filePath TINYTEXT)');
+		*/
 	}
 
 	function __destruct() {

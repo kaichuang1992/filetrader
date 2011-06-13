@@ -4,7 +4,7 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // Whether or not to allow only SSL connections
 $config['ssl_only'] = FALSE;
 
-$config['ftc_db'] = 'data/ftc.sqlite';
+$config['storage_dir'] = 'data';
 
 $config['auth_type'] = 'SimpleAuth';
 

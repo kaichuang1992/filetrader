@@ -44,6 +44,13 @@ try {
 		}
 	}
 
+        $config['storage_dir'] = realpath(getConfig($config, 'storage_dir', TRUE));
+        if ($config['storage_dir'] === FALSE) {
+                throw new Exception("storage_dir does not exist");
+        }
+        $config['ftc_db'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
+                        . "ftc.sqlite";
+
 	$authType = getConfig($config, 'auth_type', TRUE);
 
 	require_once ("../lib/Auth/Auth.class.php");
