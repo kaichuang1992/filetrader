@@ -52,15 +52,27 @@ try {
                         . "ftc.sqlite";
 
 	$authType = getConfig($config, 'auth_type', TRUE);
+	$groupType = getConfig($config, 'group_type', TRUE);
 
 	require_once ("../lib/Auth/Auth.class.php");
 	require_once ("../lib/$authType/$authType.class.php");
+        require_once ("../lib/Groups/Groups.class.php");
+        require_once ("../lib/$groupType/$groupType.class.php");
 
 	$auth = new $authType ($config);
 	$auth->login();
 
+	$groups = new $groupType ($config, $auth);
+
 	$sp = new StorageProvider($config);
 	$storageProviders = $sp->getUserStorage($auth->getUserId());
+	foreach($groups->getUserGroups() as $gid => $gname) {
+		$us = $sp->getUserStorage("@" . $gid);
+		if(!empty($us)) {
+			/* FIXME: wth $us[0]... */
+			array_push($storageProviders, $us[0]);
+		}
+	}
 
 	/* get a list of all my storage providers */
 
@@ -72,13 +84,30 @@ try {
 			$_SESSION['storageProvider'] = getRequest('storageProvider', FALSE, 0);
 			$activeStorageProvider = $_SESSION['storageProvider'];
 		} else if ($action == "addStorageProvider") {
-
-
-			$sp->addUserStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), getRequest('consumerSecret', TRUE), $auth->getUserId());
+			$group = getRequest('group', FALSE, '');
+			if(empty($group)) {
+				$sp->addUserStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), 
+getRequest('consumerSecret', TRUE), $auth->getUserId());
+			}else {
+				$sp->addUserStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), getRequest('consumerSecret', TRUE), "@" . $group);
+			}
 			$storageProviders = $sp->getUserStorage($auth->getUserId());
+			foreach($groups->getUserGroups() as $gid => $gname) {
+				$us = $sp->getUserStorage("@" . $gid);
+				if(!empty($us)) {
+					/* FIXME: wth $us[0]... */
+					array_push($storageProviders, $us[0]);
+				}
+			}
 
 		} else {
-			$sc = new StorageClient($sp->getUserStorageById($activeStorageProvider, $auth->getUserId()));
+//			$sc = new StorageClient($sp->getUserStorageById($activeStorageProvider, $auth->getUserId()));
+			/* FIXME: really limit this! */
+
+			$blaat=	$sp->getUserStorageById($activeStorageProvider);
+			//var_dump($blaat);
+			$sc = new StorageClient($blaat);
+
 			$parameters = array();
 			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$parameters = array_merge($parameters, $_POST);
@@ -93,12 +122,13 @@ try {
 	$smarty = new Smarty();
 	$smarty->template_dir = 'tpl';
 	$smarty->compile_dir = 'data/tpl_c';
-
 	$sps = array();
 	foreach($storageProviders as $s) {
 		$sps[$s['id']] = $s['displayName'];
 	}
+
 	$smarty->assign('storageProviders', $sps);
+	$smarty->assign('groups', $groups);
 	$smarty->assign('activeStorageProvider', $activeStorageProvider);
 	$smarty->display('index.tpl');
 }catch(Exception $e) {
