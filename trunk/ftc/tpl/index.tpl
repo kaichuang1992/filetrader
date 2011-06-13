@@ -11,12 +11,16 @@
 <body>
 <h1>File Trader Client (FTC)</h1>
 <h2>Storage Provider</h2>
+{if !empty($storageProviders)}
 <form method="post">
 <input type="hidden" name="action" value="setStorageProvider">
 {html_options name=storageProvider options=$storageProviders selected=$activeStorageProvider}
 <input type="submit" value="Switch">
 </form>
-<a id="toggleAddStorageProvider" href="#">Add Storage Provider</a>
+{else}
+No storage providers configured, please add some!
+{/if}
+<br><a id="toggleAddStorageProvider" href="#">Add Storage Provider</a>
 <div id="addStorageProvider">
 <form method="post">
 <input type="hidden" name="action" value="addStorageProvider">
