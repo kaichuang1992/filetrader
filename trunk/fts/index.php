@@ -35,18 +35,6 @@ try {
 		}
 	}
 
-	$config['storage_dir'] = realpath(getConfig($config, 'storage_dir', TRUE));
-	if ($config['storage_dir'] === FALSE) {
-		throw new Exception("storage_dir does not exist");
-	}
-	$config['file_storage_dir'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
-			. "files";
-	$config['fts_db'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
-			. "fts.sqlite";
-
-	require_once("lib/Files/Files.class.php");
-	require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
-
 	/* FIXME: use better URLparser with something like htaccess */
 	if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 		$action = 'pingServer';
@@ -64,9 +52,22 @@ try {
 	/* some actions are allowed without authentication */
 	$noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
 	if (!in_array($action, $noAuthActions, TRUE)) {
+		require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
 		$auth = new MyOAuthProvider($config);
 		$auth->authenticate();
 	}
+
+	/* prepare config variables for location to files and db */
+	$config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
+	if ($config['fts_data'] === FALSE) {
+		throw new Exception("fts_data does not exist");
+	}
+	$config['fts_data_files'] = $config['fts_data'] . DIRECTORY_SEPARATOR
+			. "files";
+	$config['fts_data_db'] = $config['fts_data'] . DIRECTORY_SEPARATOR
+			. "fts.sqlite";
+
+	require_once("lib/Files/Files.class.php");
 	$f = new Files($config);
 	$content = $f->$action();
 	$content["ok"] = TRUE;
@@ -77,9 +78,14 @@ try {
 					"errorCode" => $e->getCode()));
 } catch (Exception $e) {
 	if ($e->getCode() !== 0) {
+	        /* This is for non OAuthExceptions that get throw in methods not protected
+	           by OAuth, like downloadFile and uploadFile, they set HTTP headers */
 		header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
 		echo $e->getMessage();
 	} else {
+		/* This is for non OAuthExceptions that get thrown in methods protected
+		   by OAuth, so we want to convey the error, and not return different
+		   HTTP header */
 		echo json_encode(
 				array("ok" => FALSE, "errorMessage" => $e->getMessage()));
 	}

@@ -7,7 +7,7 @@ $config['ssl_only'] = FALSE;
 // Location to directory where to store uploaded files, can be
 // either absolute or relative location. Should be writable by
 // web server!
-$config['storage_dir'] = 'data';
+$config['fts_data'] = 'data';
 
 // Static list of allowed OAuth consumers (format: key => secret)
 $config['oauth_consumers'] = array (
