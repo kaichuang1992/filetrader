@@ -29,7 +29,7 @@ is the default directory on Red Hat based systems. On Debian this would
 be /var/www/fts.
  
 # create data directory
-$ mkdir -p data/files
+$ mkdir -p data
 
 # set unix permissions
 $ chmod o+w -R data
