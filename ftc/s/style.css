@@ -29,3 +29,15 @@ td.header {
 div#addStorageProvider {
 	display: none;
 }
+
+div#progress {
+	display: none;
+	background-color: yellow;
+	color: black;
+	padding: 5px;
+	width: 50px;
+	text-align: right;
+	position: absolute;
+	right: 0;
+	top: 0;
+}

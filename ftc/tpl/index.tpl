@@ -9,6 +9,7 @@
 <script type="text/javascript" src="j/ftc.js"></script>
 </head>
 <body>
+<div id="progress"></div>
 <h1>File Trader Client (FTC)</h1>
 {if !empty($storageProviders)}
 <form method="post">

@@ -100,6 +100,19 @@ $(document).ready(function() {
 				var uploadUrl = resp.uploadLocation;
 
 				var xhr = new XMLHttpRequest();
+				xhr.upload.addEventListener("progress", function(evt) { 
+				  if (evt.lengthComputable) {
+				   var percentComplete = Math.round(evt.loaded / evt.total * 100);
+				   $("#progress").show();
+				   $("#progress").text(percentComplete + "%");
+				  }	
+				}, false);
+
+                                xhr.upload.addEventListener("load", function(evt) {
+                                   $("#progress").hide();
+				   redrawPage('getDirList');
+                                }, false);
+
 				xhr.open("PUT", uploadUrl, true);
 				xhr.send(f);
 				redrawPage('getDirList');
