@@ -77,7 +77,7 @@ header. Set:
 
     XSendFile on
 
-    # on Debian (SendFile module 0.9)  you seem to need this option as well:
+    # on Debian (SendFile module 0.9) you seem to need this option as well:
     ### XSendFileAllowAbove on
 
 In the (virtual) directory configuration containing the scripts (see https://tn123.org/mod_xsendfile/). 

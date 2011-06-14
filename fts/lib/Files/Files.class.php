@@ -29,11 +29,11 @@ class Files {
 
 	function __construct($config) {
 		$this->config = $config;
-		$this->fsd = getConfig($config, 'file_storage_dir', TRUE);
+		$this->fsd = getConfig($config, 'fts_data_files', TRUE);
 
 		try {
 			$this->dbh = new PDO(
-					"sqlite:" . getConfig($this->config, 'fts_db', TRUE),
+					"sqlite:" . getConfig($this->config, 'fts_data_db', TRUE),
 					NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
 			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
