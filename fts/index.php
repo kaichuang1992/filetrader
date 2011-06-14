@@ -60,10 +60,16 @@ try {
 	/* prepare config variables for location to files and db */
 	$config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
 	if ($config['fts_data'] === FALSE) {
-		throw new Exception("fts_data does not exist");
+		throw new Exception("fts_data diretory does not exist");
 	}
 	$config['fts_data_files'] = $config['fts_data'] . DIRECTORY_SEPARATOR
 			. "files";
+	/* create the files directory if it does not exist yet */
+	if(!file_exists($config['fts_data_files'])) {
+		if (@mkdir($config['fts_data_files'], 0775) === FALSE) {
+			throw new Exception("unable to create fts_data_files directory");
+		}
+	}
 	$config['fts_data_db'] = $config['fts_data'] . DIRECTORY_SEPARATOR
 			. "fts.sqlite";
 
