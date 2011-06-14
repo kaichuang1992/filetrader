@@ -25,49 +25,48 @@ class StorageProvider {
 	function __construct($config) {
 		$this->config = $config;
 		$this->dbh = new PDO(
-				"sqlite:" . getConfig($this->config, 'ftc_db', TRUE),
+				"sqlite:" . getConfig($this->config, 'ftc_data_db', TRUE),
 				NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
-		/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
+		/* FIXME: move to SETUP procedure? */
 		$this->dbh->query('CREATE TABLE IF NOT EXISTS storageProviders (id INTEGER PRIMARY KEY AUTOINCREMENT, displayName TEXT, apiUrl TEXT, consumerKey TEXT, consumerSecret TEXT, storageOwner TEXT)');
-
-		/* future */
-		/*
-                $this->dbh->query('CREATE TABLE IF NOT EXISTS Providers (id INTEGER PRIMARY KEY AUTOINCREMENT, displayName TEXT, apiUrl TEXT, consumerKey TEXT, consumerSecret TEXT, userId TINYTEXT)');
-		$this->dbh->query('CREATE TABLE IF NOT EXISTS Shares (providerId INTEGER FOREIGN KEY ???, groupId TINYTEXT, filePath TINYTEXT)');
-		*/
 	}
 
 	function __destruct() {
 		$this->dbh = NULL;
 	}
 
-	function getUserStorage($ownerId) {
-		/* FIXME: validate ownerId? */
-		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE storageOwner=:ownerId");
-		$stmt->bindParam(':ownerId', $ownerId);
-		$stmt->execute();
+	function getStorageByOwner($owner) {
+		if(!is_array($owner)) {
+			$owner = array($owner);
+		}
+
+		/* ugliest code ever, to make the IN clause work,
+		   generate an array with "?" as placeholders for the prepare
+		   statement...this really makes me cry */
+		$a = array_fill(0, sizeof($owner), '?');
+		$in = implode(",", $a);
+
+		$stmt = $this->dbh->prepare("SELECT id, displayName FROM storageProviders WHERE storageOwner IN ($in)");
+		$stmt->execute($owner);
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	function getUserStorageById($id) {
-		/* FIXME: validate ownerId? */
-//		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id AND storageOwner=:ownerId");
-		$stmt = $this->dbh->prepare("SELECT id, displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id");
+	function getStorageById($id) {
+		$stmt = $this->dbh->prepare("SELECT displayName, apiUrl, consumerKey, consumerSecret FROM storageProviders WHERE id=:id");
 		$stmt->bindParam(':id', $id);
-		// $stmt->bindParam(':ownerId', $ownerId);
 		$stmt->execute();
 		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 
-	function addUserStorage($displayName, $apiUrl, $consumerKey, $consumerSecret, $ownerId) {
-		$stmt = $this->dbh->prepare("INSERT INTO storageProviders (displayName, apiUrl, consumerKey, consumerSecret, storageOwner) VALUES (:displayName, :apiUrl, :consumerKey, :consumerSecret, :ownerId)");
+	function addStorage($displayName, $apiUrl, $consumerKey, $consumerSecret, $owner) {
+		$stmt = $this->dbh->prepare("INSERT INTO storageProviders (displayName, apiUrl, consumerKey, consumerSecret, storageOwner) VALUES (:displayName, :apiUrl, :consumerKey, :consumerSecret, :owner)");
 		$stmt->bindParam(':displayName', $displayName);
 		$stmt->bindParam(':apiUrl', $apiUrl);
 		$stmt->bindParam(':consumerKey', $consumerKey);
 		$stmt->bindParam(':consumerSecret', $consumerSecret);
-		$stmt->bindParam(':ownerId', $ownerId);
+		$stmt->bindParam(':ownerId', $owner);
 		$stmt->execute();
 	}
 }
-
+?>

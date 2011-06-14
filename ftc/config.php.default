@@ -4,7 +4,7 @@ $config['time_zone'] = 'Europe/Amsterdam';
 // Whether or not to allow only SSL connections
 $config['ssl_only'] = FALSE;
 
-$config['storage_dir'] = 'data';
+$config['ftc_data'] = 'data';
 
 $config['auth_type'] = 'SimpleAuth';
 
