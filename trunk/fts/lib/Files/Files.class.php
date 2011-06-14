@@ -18,6 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+define('API_VERSION', '0.1');
 define('FTS_DIR', 0);
 define('FTS_FILE', 1);
 define('FTS_PARENT', 2);
@@ -415,7 +416,7 @@ class Files {
 		if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 			throw new Exception("invalid request method, should be GET");
 		}
-		return array('message' => 'FileTrader REST API');
+		return array('message' => 'FTS reporting for duty', 'apiVersion' => API_VERSION);
 	}
 
 	/**
