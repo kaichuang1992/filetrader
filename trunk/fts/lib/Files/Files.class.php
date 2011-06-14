@@ -37,7 +37,7 @@ class Files {
 					"sqlite:" . getConfig($this->config, 'fts_data_db', TRUE),
 					NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
 
-			/* FIXME: maybe this should be placed somewhere else, inefficient?!... */
+	                /* FIXME: move to SETUP procedure? */
 			$this->dbh->query('CREATE TABLE IF NOT EXISTS downloadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT)');
 			$this->dbh->query('CREATE TABLE IF NOT EXISTS   uploadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT, fileSize INTEGER)');
 			$this->dbh->query('CREATE TABLE IF NOT EXISTS       metaData (filePath TEXT PRIMARY KEY UNIQUE, fileDescription TEXT)');

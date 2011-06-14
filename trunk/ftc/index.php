@@ -44,12 +44,13 @@ try {
 		}
 	}
 
-        $config['storage_dir'] = realpath(getConfig($config, 'storage_dir', TRUE));
-        if ($config['storage_dir'] === FALSE) {
-                throw new Exception("storage_dir does not exist");
-        }
-        $config['ftc_db'] = $config['storage_dir'] . DIRECTORY_SEPARATOR
-                        . "ftc.sqlite";
+	/* prepare config variables for location to db */
+	$config['ftc_data'] = realpath(getConfig($config, 'ftc_data', TRUE));
+	if ($config['ftc_data'] === FALSE) {
+		throw new Exception("ftc_data diretory does not exist");
+	}
+	$config['ftc_data_db'] = $config['ftc_data'] . DIRECTORY_SEPARATOR
+			. "ftc.sqlite";
 
 	$authType = getConfig($config, 'auth_type', TRUE);
 	$groupType = getConfig($config, 'group_type', TRUE);
@@ -64,50 +65,31 @@ try {
 
 	$groups = new $groupType ($config, $auth);
 
-	$sp = new StorageProvider($config);
-	$storageProviders = $sp->getUserStorage($auth->getUserId());
+	/* FIXME: this makes me cry... maybe we should have getUserGroups already
+	   prepend the group identifier with a "@" */
+	$userGroups = array();
 	foreach($groups->getUserGroups() as $gid => $gname) {
-		$us = $sp->getUserStorage("@" . $gid);
-		if(!empty($us)) {
-			/* FIXME: wth $us[0]... */
-			array_push($storageProviders, $us[0]);
-		}
+		array_push($userGroups, "@" . $gid);
 	}
+	array_push($userGroups, $auth->getUserId());
 
-	/* get a list of all my storage providers */
+	$sp = new StorageProvider($config);
+	$storageProviders = $sp->getStorageByOwner($userGroups);
+	$activeStorageProvider = isset($_SESSION['storageProvider']) ? $_SESSION['storageProvider'] : -1;
+	/* FIXME: make sure user has access to this provider! */
 
-	$activeStorageProvider = isset($_SESSION['storageProvider']) ? $_SESSION['storageProvider'] : 0;
-
-	if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) {
-		$action = $_REQUEST['action'];
+	$action = getRequest('action', FALSE, FALSE);
+	if($action) {
 		if ($action == "setStorageProvider") {
 			$_SESSION['storageProvider'] = getRequest('storageProvider', FALSE, 0);
 			$activeStorageProvider = $_SESSION['storageProvider'];
 		} else if ($action == "addStorageProvider") {
 			$group = getRequest('group', FALSE, '');
-			if(empty($group)) {
-				$sp->addUserStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), 
-getRequest('consumerSecret', TRUE), $auth->getUserId());
-			}else {
-				$sp->addUserStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), getRequest('consumerSecret', TRUE), "@" . $group);
-			}
-			$storageProviders = $sp->getUserStorage($auth->getUserId());
-			foreach($groups->getUserGroups() as $gid => $gname) {
-				$us = $sp->getUserStorage("@" . $gid);
-				if(!empty($us)) {
-					/* FIXME: wth $us[0]... */
-					array_push($storageProviders, $us[0]);
-				}
-			}
-
+			$owner = empty($group) ? $auth->getUserId() : "@" . $group;
+			$sp->addStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), 
+getRequest('consumerSecret', TRUE), $owner);
 		} else {
-//			$sc = new StorageClient($sp->getUserStorageById($activeStorageProvider, $auth->getUserId()));
-			/* FIXME: really limit this! */
-
-			$blaat=	$sp->getUserStorageById($activeStorageProvider);
-			//var_dump($blaat);
-			$sc = new StorageClient($blaat);
-
+			$sc = new StorageClient($sp->getStorageById($activeStorageProvider));
 			$parameters = array();
 			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$parameters = array_merge($parameters, $_POST);
@@ -119,6 +101,7 @@ getRequest('consumerSecret', TRUE), $auth->getUserId());
 			exit(0);
 		}
 	}
+
 	$smarty = new Smarty();
 	$smarty->template_dir = 'tpl';
 	$smarty->compile_dir = 'data/tpl_c';
@@ -126,7 +109,6 @@ getRequest('consumerSecret', TRUE), $auth->getUserId());
 	foreach($storageProviders as $s) {
 		$sps[$s['id']] = $s['displayName'];
 	}
-
 	$smarty->assign('storageProviders', $sps);
 	$smarty->assign('groups', $groups);
 	$smarty->assign('activeStorageProvider', $activeStorageProvider);
