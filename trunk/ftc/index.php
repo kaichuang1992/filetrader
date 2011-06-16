@@ -21,7 +21,7 @@
 require_once ('config.php');
 require_once ('../fts/utils.php');
 require_once ("lib/StorageClient/StorageClient.class.php");
-require_once ("lib/StorageProvider/StorageProvider.class.php");
+require_once ("lib/StorageNodes/StorageNodes.class.php");
 require_once ("/usr/share/php/Smarty/Smarty.class.php");
 
 
@@ -73,23 +73,23 @@ try {
 	}
 	array_push($userGroups, $auth->getUserId());
 
-	$sp = new StorageProvider($config);
-	$storageProviders = $sp->getStorageByOwner($userGroups);
-	$activeStorageProvider = isset($_SESSION['storageProvider']) ? $_SESSION['storageProvider'] : -1;
+	$sp = new StorageNodes($config);
+	$storageNodes = $sp->getStorageByOwner($userGroups);
+	$activeStorageNode = isset($_SESSION['storageNode']) ? $_SESSION['storageNode'] : -1;
 	/* FIXME: make sure user has access to this provider! */
 
 	$action = getRequest('action', FALSE, FALSE);
 	if($action) {
-		if ($action == "setStorageProvider") {
-			$_SESSION['storageProvider'] = getRequest('storageProvider', FALSE, 0);
-			$activeStorageProvider = $_SESSION['storageProvider'];
-		} else if ($action == "addStorageProvider") {
+		if ($action == "setStorageNode") {
+			$_SESSION['storageNode'] = getRequest('storageNode', FALSE, 0);
+			$activeStorageNode = $_SESSION['storageNode'];
+		} else if ($action == "addStorageNode") {
 			$group = getRequest('group', FALSE, '');
 			$owner = empty($group) ? $auth->getUserId() : "@" . $group;
 			$sp->addStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), 
 getRequest('consumerSecret', TRUE), $owner);
 		} else {
-			$sc = new StorageClient($sp->getStorageById($activeStorageProvider));
+			$sc = new StorageClient($sp->getStorageById($activeStorageNode));
 			$parameters = array();
 			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$parameters = array_merge($parameters, $_POST);
@@ -106,12 +106,12 @@ getRequest('consumerSecret', TRUE), $owner);
 	$smarty->template_dir = 'tpl';
 	$smarty->compile_dir = 'data/tpl_c';
 	$sps = array();
-	foreach($storageProviders as $s) {
+	foreach($storageNodes as $s) {
 		$sps[$s['id']] = $s['displayName'];
 	}
-	$smarty->assign('storageProviders', $sps);
+	$smarty->assign('storageNodes', $sps);
 	$smarty->assign('groups', $groups);
-	$smarty->assign('activeStorageProvider', $activeStorageProvider);
+	$smarty->assign('activeStorageNode', $activeStorageNode);
 	$smarty->display('index.tpl');
 }catch(Exception $e) {
 	echo $e->getMessage();

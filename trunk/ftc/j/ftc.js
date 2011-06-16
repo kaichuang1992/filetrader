@@ -2,8 +2,8 @@ var curDir = "/";
 
 $(document).ready(function() {
 
-	$("#toggleAddStorageProvider").click(function(event) {
-		$("#addStorageProvider").toggle();
+	$("#toggleAddStorageNode").click(function(event) {
+		$("#addStorageNode").toggle();
 	});
 
 	$("button").click(function(event) {
