@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+<ModulePrefs title="FTS" scrolling="true">
+	<Require feature="opensocial-0.8"/>
+	<Require feature="locked-domain"/>	<!-- ???? -->
+	<OAuth>
+		<Service name="FTS">
+			<Authorization url="http://sheeva.tuxed.net/fts"/>
+		</Service>
+	</OAuth>
+</ModulePrefs>
+<Content type="html">
+<![CDATA[ 
+<script language="text/javascript">
+	url = 'http://sheeva.tuxed.net/fts/?action=getFileList';
+	var params = {};
+	params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.OAUTH;
+	params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
+	params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+	gadgets.io.makeRequest(url, function (response) {
+		// do something with response
+		alert(response);
+	}, params);
+</script>
+]]>
+</Content>
+</Module>
