@@ -101,10 +101,9 @@ class Files {
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
-		/* in case of upload the file should *not* exist */
-		if (file_exists($absPath)) {
-			throw new Exception("file already exists");
-		}
+
+		/* make sure the uploaded file name is unique */
+		$absPath = getUniqueName($absPath);
 
 		/* verify fileSize
 		 * 
