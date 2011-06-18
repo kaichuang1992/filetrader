@@ -19,6 +19,8 @@
  */
 
 define('API_VERSION', '0.1');
+
+/* Validation constants */
 define('FTS_DIR', 0);
 define('FTS_FILE', 1);
 define('FTS_PARENT', 2);
@@ -335,7 +337,6 @@ class Files {
 	}
 
 	function deleteFile() {
-		/* FIXME: remove the metaData for this file... */
 		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 			throw new Exception("invalid request method, should be POST");
 		}
@@ -345,6 +346,16 @@ class Files {
 		if ($absPath === FALSE) {
 			throw new Exception("invalid path");
 		}
+
+		/* delete meta data */
+                $stmt = $this->dbh->prepare("DELETE FROM metaData WHERE filePath=:filePath");
+                $stmt->bindParam(':filePath', $absPath);
+                $stmt->execute();
+
+		/* delete download tokens */
+                $stmt = $this->dbh->prepare("DELETE FROM downloadTokens WHERE filePath=:filePath");
+                $stmt->bindParam(':filePath', $absPath);
+                $stmt->execute();
 
 		if (@unlink($absPath) === FALSE) {
 			throw new Exception("unable to delete file");
