@@ -111,4 +111,29 @@ function getServerName() {
 		return '[' . $serverName . ']';
 	}
 }
+
+/**
+ * Get a unique name when uploading a file if requested file name already
+ * exists.
+ * 
+ * Suppose "text.txt" exists already, the suggestion becomes "test (1).txt"
+ * If "test (1).txt" already exists, make it "test (2).txt"
+ *
+ * NOTE: If you want to upload "test (1).txt" and it already exists, it will 
+ * become "test (1) (1).txt" though!
+ */
+function getUniqueName($absPath) {
+        $count = 1;
+        $uploadName = $absPath;
+        while (file_exists($uploadName)) {
+               $dirName = dirname($absPath);
+               $fileName = basename($absPath);
+               $fileExt = substr($fileName,strrpos($fileName, "."));
+               $fileBase = substr($fileName, 0, strrpos($fileName, "."));
+               $fileBase = $fileBase . " (" . $count . ")";
+               $uploadName = $dirName . DIRECTORY_SEPARATOR . $fileBase . $fileExt;
+               $count++;
+        }
+        return $uploadName;
+}
 ?>
