@@ -125,14 +125,20 @@ function getServerName() {
 function getUniqueName($absPath) {
         $count = 1;
         $uploadName = $absPath;
-        while (file_exists($uploadName)) {
-               $dirName = dirname($absPath);
-               $fileName = basename($absPath);
-               $fileExt = substr($fileName,strrpos($fileName, "."));
-               $fileBase = substr($fileName, 0, strrpos($fileName, "."));
-               $fileBase = $fileBase . " (" . $count . ")";
-               $uploadName = $dirName . DIRECTORY_SEPARATOR . $fileBase . $fileExt;
-               $count++;
+	while (file_exists($uploadName)) {
+        	$dirName = dirname($absPath);
+                $fileName = basename($absPath);
+	        $lastDotPos = strrpos($fileName, ".");
+		if($lastDotPos === FALSE) {
+	                $fileBase = $fileName . " (" . $count . ")";
+			$fileExt = '';
+		} else { 			
+	                $fileExt = substr($fileName,$lastDotPos);
+	                $fileBase = substr($fileName, 0, $lastDotPos);
+	                $fileBase = $fileBase . " (" . $count . ")";
+		}
+                $uploadName = $dirName . DIRECTORY_SEPARATOR . $fileBase . $fileExt;
+                $count++;
         }
         return $uploadName;
 }
