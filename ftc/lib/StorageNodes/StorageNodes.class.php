@@ -65,7 +65,7 @@ class StorageNodes {
 		$stmt->bindParam(':apiUrl', $apiUrl);
 		$stmt->bindParam(':consumerKey', $consumerKey);
 		$stmt->bindParam(':consumerSecret', $consumerSecret);
-		$stmt->bindParam(':ownerId', $owner);
+		$stmt->bindParam(':owner', $owner);
 		$stmt->execute();
 	}
 }
