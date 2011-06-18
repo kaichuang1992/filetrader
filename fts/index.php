@@ -49,29 +49,36 @@ try {
 		throw new Exception("unregistered action called");
 	}
 
+        /* prepare config variables for location to files and db */
+        $config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
+        if ($config['fts_data'] === FALSE || !is_dir($config['fts_data'])) {
+  	      throw new Exception("fts_data directory does not exist");
+        }
+
+        $config['fts_data_db'] = $config['fts_data'] . DIRECTORY_SEPARATOR
+                                . "fts.sqlite";
+
 	/* some actions are allowed without authentication */
 	$noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
 	if (!in_array($action, $noAuthActions, TRUE)) {
 		require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
 		$auth = new MyOAuthProvider($config);
 		$auth->authenticate();
-	}
+		/* FIXME: make sure consumerKey cannot mess with path if it for
+		   example contains an url with slashes! */
+		$consumerKey = $auth->getConsumerKey();
 
-	/* prepare config variables for location to files and db */
-	$config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
-	if ($config['fts_data'] === FALSE) {
-		throw new Exception("fts_data diretory does not exist");
+	        /* append the OAuth consumer key to the path to keep file storages separate */
+	        $config['fts_data_files'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerKey;
+	        if(!file_exists($config['fts_data_files'])) {
+	                if (@mkdir($config['fts_data_files'], 0775) === FALSE) {
+	                        throw new Exception("unable to create specific fts_data directory for this consumer");
+	                }
+	        }
+	} else {
+		/* FIXME: fts_data_files is not used in this case... should not be needed to set this! */
+                $config['fts_data_files'] = $config['fts_data'];
 	}
-	$config['fts_data_files'] = $config['fts_data'] . DIRECTORY_SEPARATOR
-			. "files";
-	/* create the files directory if it does not exist yet */
-	if(!file_exists($config['fts_data_files'])) {
-		if (@mkdir($config['fts_data_files'], 0775) === FALSE) {
-			throw new Exception("unable to create fts_data_files directory");
-		}
-	}
-	$config['fts_data_db'] = $config['fts_data'] . DIRECTORY_SEPARATOR
-			. "fts.sqlite";
 
 	require_once("lib/Files/Files.class.php");
 	$f = new Files($config);
