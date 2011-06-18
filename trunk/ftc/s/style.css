@@ -1,43 +1,43 @@
 body {
-	font-size: 85%;
-	font-family: sans-serif;
+    font-size: 85%;
+    font-family: sans-serif;
 }
 
 ul {
-        margin: 0;
-        padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 li {
-        list-style: none;
-        display: inline;
-        margin: 0;
-        padding: 5px;
-        border: 1px solid #000;
-        background-color: #ccc;
+    list-style: none;
+    display: inline;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid #000;
+    background-color: #ccc;
 }
 
 li a {
-        text-decoration: none;
-        font-weight: bold;
-        color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    color: #000;
 }
 td.header {
-        background-color: #ccc;
+    background-color: #ccc;
 }
 
 div#addStorageNode {
-	display: none;
+    display: none;
 }
 
 div#progress {
-	display: none;
-	background-color: yellow;
-	color: black;
-	padding: 5px;
-	width: 50px;
-	text-align: right;
-	position: absolute;
-	right: 0;
-	top: 0;
+    display: none;
+    background-color: yellow;
+    color: black;
+    padding: 5px;
+    width: 50px;
+    text-align: right;
+    position: absolute;
+    right: 0;
+    top: 0;
 }

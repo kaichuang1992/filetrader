@@ -26,94 +26,93 @@ require_once ("/usr/share/php/Smarty/Smarty.class.php");
 
 
 if (!isset($config) || !is_array($config)) {
-	die("broken or missing configuration file?");
+    die("broken or missing configuration file?");
 }
 
 date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
 try {
-	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
-		// only allow SSL connections
-		if (!isset ($_SERVER['HTTPS']) || empty ($_SERVER['HTTPS'])) {
-			throw new Exception("only available through secure connection");
-		} else {
-			/* support HTTP Strict Transport Security */
-			if(getConfig($config, 'ssl_hsts', FALSE, FALSE)) {
-				header('Strict-Transport-Security: max-age=3600');
-			}
-		}
-	}
+    if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
+        // only allow SSL connections
+        if (!isset($_SERVER['HTTPS']) || empty($_SERVER['HTTPS'])) {
+            throw new Exception("only available through secure connection");
+        } else {
+            /* support HTTP Strict Transport Security */
+            if (getConfig($config, 'ssl_hsts', FALSE, FALSE)) {
+                header('Strict-Transport-Security: max-age=3600');
+            }
+        }
+    }
 
-	/* prepare config variables for location to db */
-	$config['ftc_data'] = realpath(getConfig($config, 'ftc_data', TRUE));
-	if ($config['ftc_data'] === FALSE) {
-		throw new Exception("ftc_data diretory does not exist");
-	}
-	$config['ftc_data_db'] = $config['ftc_data'] . DIRECTORY_SEPARATOR
-			. "ftc.sqlite";
+    /* prepare config variables for location to db */
+    $config['ftc_data'] = realpath(getConfig($config, 'ftc_data', TRUE));
+    if ($config['ftc_data'] === FALSE) {
+        throw new Exception("ftc_data diretory does not exist");
+    }
+    $config['ftc_data_db'] = $config['ftc_data'] . DIRECTORY_SEPARATOR
+            . "ftc.sqlite";
 
-	$authType = getConfig($config, 'auth_type', TRUE);
-	$groupType = getConfig($config, 'group_type', TRUE);
+    $authType = getConfig($config, 'auth_type', TRUE);
+    $groupType = getConfig($config, 'group_type', TRUE);
 
-	require_once ("../lib/Auth/Auth.class.php");
-	require_once ("../lib/$authType/$authType.class.php");
-        require_once ("../lib/Groups/Groups.class.php");
-        require_once ("../lib/$groupType/$groupType.class.php");
+    require_once ("../lib/Auth/Auth.class.php");
+    require_once ("../lib/$authType/$authType.class.php");
+    require_once ("../lib/Groups/Groups.class.php");
+    require_once ("../lib/$groupType/$groupType.class.php");
 
-	$auth = new $authType ($config);
-	$auth->login();
+    $auth = new $authType($config);
+    $auth->login();
 
-	$groups = new $groupType ($config, $auth);
+    $groups = new $groupType($config, $auth);
 
-	/* FIXME: this makes me cry... maybe we should have getUserGroups already
-	   prepend the group identifier with a "@" */
-	$userGroups = array();
-	foreach($groups->getUserGroups() as $gid => $gname) {
-		array_push($userGroups, "@" . $gid);
-	}
-	array_push($userGroups, $auth->getUserId());
+    /* FIXME: this makes me cry... maybe we should have getUserGroups already
+      prepend the group identifier with a "@" */
+    $userGroups = array();
+    foreach ($groups->getUserGroups() as $gid => $gname) {
+        array_push($userGroups, "@" . $gid);
+    }
+    array_push($userGroups, $auth->getUserId());
 
-	$sp = new StorageNodes($config);
-	$storageNodes = $sp->getStorageByOwner($userGroups);
-	$activeStorageNode = isset($_SESSION['storageNode']) ? $_SESSION['storageNode'] : -1;
-	/* FIXME: make sure user has access to this provider! */
+    $sp = new StorageNodes($config);
+    $storageNodes = $sp->getStorageByOwner($userGroups);
+    $activeStorageNode = isset($_SESSION['storageNode']) ? $_SESSION['storageNode'] : -1;
+    /* FIXME: make sure user has access to this provider! */
 
-	$action = getRequest('action', FALSE, FALSE);
-	if($action) {
-		if ($action == "setStorageNode") {
-			$_SESSION['storageNode'] = getRequest('storageNode', FALSE, 0);
-			$activeStorageNode = $_SESSION['storageNode'];
-		} else if ($action == "addStorageNode") {
-			$group = getRequest('group', FALSE, '');
-			$owner = empty($group) ? $auth->getUserId() : "@" . $group;
-			$sp->addStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), 
-getRequest('consumerSecret', TRUE), $owner);
-		} else {
-			$sc = new StorageClient($sp->getStorageById($activeStorageNode));
-			$parameters = array();
-			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-				$parameters = array_merge($parameters, $_POST);
-			}
-			if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-				$parameters = array_merge($parameters, $_GET);
-			}
-			echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
-			exit(0);
-		}
-	}
+    $action = getRequest('action', FALSE, FALSE);
+    if ($action) {
+        if ($action == "setStorageNode") {
+            $_SESSION['storageNode'] = getRequest('storageNode', FALSE, 0);
+            $activeStorageNode = $_SESSION['storageNode'];
+        } else if ($action == "addStorageNode") {
+            $group = getRequest('group', FALSE, '');
+            $owner = empty($group) ? $auth->getUserId() : "@" . $group;
+            $sp->addStorage(getRequest('displayName', TRUE), getRequest('apiUrl', TRUE), getRequest('consumerKey', TRUE), getRequest('consumerSecret', TRUE), $owner);
+        } else {
+            $sc = new StorageClient($sp->getStorageById($activeStorageNode));
+            $parameters = array();
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $parameters = array_merge($parameters, $_POST);
+            }
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $parameters = array_merge($parameters, $_GET);
+            }
+            echo $sc->call($action, $parameters, $_SERVER['REQUEST_METHOD']);
+            exit(0);
+        }
+    }
 
-	$smarty = new Smarty();
-	$smarty->template_dir = 'tpl';
-	$smarty->compile_dir = 'data/tpl_c';
-	$sps = array();
-	foreach($storageNodes as $s) {
-		$sps[$s['id']] = $s['displayName'];
-	}
-	$smarty->assign('storageNodes', $sps);
-	$smarty->assign('groups', $groups);
-	$smarty->assign('activeStorageNode', $activeStorageNode);
-	$smarty->display('index.tpl');
-}catch(Exception $e) {
-	echo $e->getMessage();
+    $smarty = new Smarty();
+    $smarty->template_dir = 'tpl';
+    $smarty->compile_dir = 'data/tpl_c';
+    $sps = array();
+    foreach ($storageNodes as $s) {
+        $sps[$s['id']] = $s['displayName'];
+    }
+    $smarty->assign('storageNodes', $sps);
+    $smarty->assign('groups', $groups);
+    $smarty->assign('activeStorageNode', $activeStorageNode);
+    $smarty->display('index.tpl');
+} catch (Exception $e) {
+    echo $e->getMessage();
 }
 ?>

@@ -20,48 +20,49 @@
 
 class StorageClient {
 
-	private $endpoint;
-	private $oauth;
-	private $decode;
+    private $endpoint;
+    private $oauth;
+    private $decode;
 
-	function __construct($storageProvider) {
-		$this->decode = FALSE;
+    function __construct($storageProvider) {
+        $this->decode = FALSE;
 
-		$this->endpoint = $storageProvider['apiUrl'];
-		$this->oauth = new OAuth($storageProvider['consumerKey'],
-				$storageProvider['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
-				OAUTH_AUTH_TYPE_AUTHORIZATION);
-	}
+        $this->endpoint = $storageProvider['apiUrl'];
+        $this->oauth = new OAuth($storageProvider['consumerKey'],
+                        $storageProvider['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
+                        OAUTH_AUTH_TYPE_AUTHORIZATION);
+    }
 
-	/**
-	 * Whether or not to decode the response from the server (JSON to array)
-	 * 
-	 * @param boolean $decode FALSE is not decode, TRUE is decode
-	 */
-	function performDecode($decode = FALSE) {
-		$this->decode = $decode;
-	}
+    /**
+     * Whether or not to decode the response from the server (JSON to array)
+     *
+     * @param boolean $decode FALSE is not decode, TRUE is decode
+     */
+    function performDecode($decode = FALSE) {
+        $this->decode = $decode;
+    }
 
-	/**
-	 * Perform the call to the storage server
-	 * Enter description here ...
-	 * @param string $action action to call
-	 * @param array $parameters call parameters
-	 * @param string $method (POST, GET)
-	 */
-	function call($action = "pingServer", $parameters = array(),
-			$method = "GET") {
-		if ($method == "GET") {
-			$method = OAUTH_HTTP_METHOD_GET;
-		} elseif ($method == "POST") {
-			$method = OAUTH_HTTP_METHOD_POST;
-		} else {
-			throw new Exception("invalid method, should be either GET or POST");
-		}
-		$endpoint = "$this->endpoint/?action=$action";
-		$this->oauth->fetch($endpoint, $parameters, $method);
-		$response = $this->oauth->getLastResponse();
-		return ($this->decode) ? json_decode($response) : $response;
-	}
+    /**
+     * Perform the call to the storage server
+     * Enter description here ...
+     * @param string $action action to call
+     * @param array $parameters call parameters
+     * @param string $method (POST, GET)
+     */
+    function call($action = "pingServer", $parameters = array(), $method = "GET") {
+        if ($method == "GET") {
+            $method = OAUTH_HTTP_METHOD_GET;
+        } elseif ($method == "POST") {
+            $method = OAUTH_HTTP_METHOD_POST;
+        } else {
+            throw new Exception("invalid method, should be either GET or POST");
+        }
+        $endpoint = "$this->endpoint/?action=$action";
+        $this->oauth->fetch($endpoint, $parameters, $method);
+        $response = $this->oauth->getLastResponse();
+        return ($this->decode) ? json_decode($response) : $response;
+    }
+
 }
+
 ?>
