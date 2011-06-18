@@ -1,4 +1,5 @@
 <?php
+
 $config['time_zone'] = 'Europe/Amsterdam';
 
 // Whether or not to allow only SSL connections
@@ -9,16 +10,16 @@ $config['ftc_data'] = 'data';
 $config['auth_type'] = 'SimpleAuth';
 
 // User configuration (SimpleAuth)
-$config['simple_auth_users'] = array ('demo' => array ('password' => 'user', 'display_name' => 'Demo User'),
-                                      'omed' => array ('password' => 'resu', 'display_name' => 'Omed Resu'));
+$config['simple_auth_users'] = array(
+    'demo' => array('password' => 'user', 'display_name' => 'Demo User'),
+    'omed' => array('password' => 'resu', 'display_name' => 'Omed Resu'));
 
 // NullGroups, SimpleGroups, ConextGroups
 $config['group_type'] = 'SimpleGroups';
 
 // Group configuration (SimpleGroups)
-$config['simple_groups'] = array ('sharedgroup' => array ('display_name' => 'Shared', 'members' => array('demo','omed')),
-                                  'demoprivate' => array ('display_name' => 'Demo Private', 'members' => array('demo')),
-                                  'omedprivate' => array ('display_name' => 'Omed Private', 'members' => array('omed')));
-
-
+$config['simple_groups'] = array(
+    'sharedgroup' => array('display_name' => 'Shared', 'members' => array('demo', 'omed')),
+    'demoprivate' => array('display_name' => 'Demo Private', 'members' => array('demo')),
+    'omedprivate' => array('display_name' => 'Omed Private', 'members' => array('omed')));
 ?>

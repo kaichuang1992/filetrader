@@ -25,21 +25,20 @@ require_once('tests/testUtils.php');
 // $dbg = TRUE;
 $dbg = FALSE;
 
-$storageProvider = array ('displayName' => 'Test Server', 'apiUrl' => 'http://localhost/filetrader/fts', 'consumerKey' => '12345', 'consumerSecret' => '54321');
+$storageProvider = array('displayName' => 'Test Server', 'apiUrl' => 'http://localhost/filetrader/fts', 'consumerKey' => '12345', 'consumerSecret' => '54321');
 
 $sc = new StorageClient($storageProvider);
 $sc->performDecode(TRUE);
 
-handleResponse("ping " . $storageProvider['apiUrl'], $dbg,
-		$sc->call("pingServer"));
+handleResponse("ping " . $storageProvider['apiUrl'], $dbg, $sc->call("pingServer"));
 
-if(!isset($argv) || empty($argv[1])) {
-	die("Specify path to upload\n");
+if (!isset($argv) || empty($argv[1])) {
+    die("Specify path to upload\n");
 }
 
 $pth = realpath($argv[1]);
-if($pth === FALSE) {
-	die("Path does not exist\n");
+if ($pth === FALSE) {
+    die("Path does not exist\n");
 }
 
 $rootDir = dirname($pth);
@@ -50,17 +49,18 @@ echo "Recursivly uploading '$pth'...\n";
 uploadPath($sc, $dbg, $rootDir, $relativePath);
 
 function uploadPath($sc, $dbg, $rootDir, $relativePath) {
-        handleResponse("mkdir $relativePath", $dbg, $sc->call("createDirectory", array('relativePath' => $relativePath),"POST"));
-	$fullDir = $rootDir . DIRECTORY_SEPARATOR . $relativePath;
+    handleResponse("mkdir $relativePath", $dbg, $sc->call("createDirectory", array('relativePath' => $relativePath), "POST"));
+    $fullDir = $rootDir . DIRECTORY_SEPARATOR . $relativePath;
 
-	foreach(glob($fullDir . DIRECTORY_SEPARATOR . "*") as $fileName) {
-		echo $fileName . "\n";
-		if(is_file($fileName)) {
-			$r = handleResponse("utoken $fileName", $dbg, $sc->call("getUploadToken", array('relativePath' => $relativePath . DIRECTORY_SEPARATOR . basename($fileName), 'fileSize' => filesize($fileName)), "POST"));
-			handleResponse("ufile $fileName", $dbg, uploadFile($r->uploadLocation, $fileName, 1024*1024));
-		}else if(is_dir($fileName)) {
-			uploadPath($sc, $dbg, $rootDir, $relativePath . DIRECTORY_SEPARATOR . basename($fileName));
-		}
-	}
+    foreach (glob($fullDir . DIRECTORY_SEPARATOR . "*") as $fileName) {
+        echo $fileName . "\n";
+        if (is_file($fileName)) {
+            $r = handleResponse("utoken $fileName", $dbg, $sc->call("getUploadToken", array('relativePath' => $relativePath . DIRECTORY_SEPARATOR . basename($fileName), 'fileSize' => filesize($fileName)), "POST"));
+            handleResponse("ufile $fileName", $dbg, uploadFile($r->uploadLocation, $fileName, 1024 * 1024));
+        } else if (is_dir($fileName)) {
+            uploadPath($sc, $dbg, $rootDir, $relativePath . DIRECTORY_SEPARATOR . basename($fileName));
+        }
+    }
 }
+
 ?>
