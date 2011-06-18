@@ -1,4 +1,5 @@
 <?php
+
 /* Time zone
  * See http://php.net/manual/en/timezones.php */
 $config['time_zone'] = 'Europe/Amsterdam';
@@ -18,8 +19,8 @@ $config['fts_db_pass'] = NULL;
 $config['fts_db_options'] = array(PDO::ATTR_PERSISTENT => TRUE);
 
 /* List of allowed OAuth consumers (format: key => secret) */
-$config['oauth_consumers'] = array (
-	'12345' => '54321',
-	'abcde' => 'edcba',
+$config['oauth_consumers'] = array(
+    '12345' => '54321',
+    'abcde' => 'edcba',
 );
 ?>

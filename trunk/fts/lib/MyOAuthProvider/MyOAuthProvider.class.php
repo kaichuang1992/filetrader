@@ -20,51 +20,49 @@
 
 class MyOAuthProvider {
 
-	private $config;
-	private $consumerKey;
+    private $config;
+    private $consumerKey;
 
-	function __construct($config) {
-		if (!is_array($config)) {
-			throw new Exception("config parameter should be array");
-		}
-		$this->config = $config;
-		$this->consumerKey = NULL;
-	}
+    function __construct($config) {
+        if (!is_array($config)) {
+            throw new Exception("config parameter should be array");
+        }
+        $this->config = $config;
+        $this->consumerKey = NULL;
+    }
 
-	function authenticate() {
-		$provider = new OAuthProvider();
-		$provider->is2LeggedEndpoint(TRUE);
+    function authenticate() {
+        $provider = new OAuthProvider();
+        $provider->is2LeggedEndpoint(TRUE);
 
-		$config = $this->config;
-		$provider
-				->consumerHandler(
-						function ($provider) use ($config) {
-							/* use the OAuth credentials from the config file */
-							if (!array_key_exists($provider->consumer_key,
-									$config['oauth_consumers']))
-								return OAUTH_CONSUMER_KEY_UNKNOWN;
-							$provider->consumer_secret = $config['oauth_consumers'][$provider
-									->consumer_key];
-							return OAUTH_OK;
-						});
+        $config = $this->config;
+        $provider->consumerHandler(
+                function ($provider) use ($config) {
+                    /* use the OAuth credentials from the config file */
+                    if (!array_key_exists($provider->consumer_key, $config['oauth_consumers'])) {
+                        return OAUTH_CONSUMER_KEY_UNKNOWN;
+                    }
+                    $provider->consumer_secret = $config['oauth_consumers'][$provider->consumer_key];
+                    return OAUTH_OK;
+                });
 
-		$provider
-				->timestampNonceHandler(
-						function ($provider) {
-							if ($provider->nonce == "bad") {
-								return OAUTH_BAD_NONCE;
-							} else if ($provider->timestamp == "0") {
-								return OAUTH_BAD_TIMESTAMP;
-							}
-							return OAUTH_OK;
-						});
-		$provider->checkOAuthRequest();
-		$this->consumerKey = $provider->consumer_key;
-	}
+        $provider->timestampNonceHandler(
+                function ($provider) {
+                    if ($provider->nonce == "bad") {
+                        return OAUTH_BAD_NONCE;
+                    } else if ($provider->timestamp == "0") {
+                        return OAUTH_BAD_TIMESTAMP;
+                    }
+                    return OAUTH_OK;
+                });
+        $provider->checkOAuthRequest();
+        $this->consumerKey = $provider->consumer_key;
+    }
 
-	function getConsumerKey() {
-		return $this->consumerKey;
-	}
+    function getConsumerKey() {
+        return $this->consumerKey;
+    }
+
 }
 
 ?>
