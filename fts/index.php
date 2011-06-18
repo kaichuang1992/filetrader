@@ -61,9 +61,7 @@ try {
 		require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
 		$auth = new MyOAuthProvider($config);
 		$auth->authenticate();
-		/* FIXME: make sure consumerKey cannot mess with path if it for
-		   example contains an url with slashes! */
-		$consumerKey = $auth->getConsumerKey();
+		$consumerKey = urlencode($auth->getConsumerKey());
 
 	        /* append the OAuth consumer key to the path to keep file storages separate */
 	        $config['fts_data'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerKey;
