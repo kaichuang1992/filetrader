@@ -26,11 +26,13 @@ define('FTS_PARENT', 2);
 class Files {
 	private $config;
 	private $dbh;
-	private $fsd; /* points to file storage directory from configuration */
+	private $fsd; /* points to file storage directory from configuration
+			 with the consumer key appended to it in case of OAuth
+			 requests */
 
 	function __construct($config) {
 		$this->config = $config;
-		$this->fsd = getConfig($config, 'fts_data_files', TRUE);
+		$this->fsd = getConfig($config, 'fts_data', TRUE);
 
 		try {
 			$this->dbh = new PDO(getConfig($this->config, 'fts_db_dsn', TRUE), 
