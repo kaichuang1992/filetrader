@@ -22,77 +22,74 @@ require_once('config.php');
 require_once('utils.php');
 
 if (!isset($config) || !is_array($config)) {
-	die("broken or missing configuration file?");
+    die("broken or missing configuration file?");
 }
 
-date_default_timezone_set(
-		getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
+date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterdam'));
 
 try {
-	if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
-		if (getProtocol() != "https") {
-			throw new Exception("only available through secure connection");
-		}
-	}
-
-	/* FIXME: use better URLparser with something like htaccess */
-	if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
-		$action = 'pingServer';
-	} else {
-		$action = $_REQUEST['action'];
-	}
-
-	$validActions = array('pingServer', 'serverInfo', 'getDirList',
-			'downloadFile', 'uploadFile', 'getUploadToken', 'getDownloadToken',
-			'deleteDirectory', 'deleteFile', 'setDescription', 'getDescription', 'createDirectory');
-	if (!in_array($action, $validActions, TRUE)) {
-		throw new Exception("unregistered action called");
-	}
-
-        /* prepare config variables for location to files and db */
-        $config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
-        if ($config['fts_data'] === FALSE || !is_dir($config['fts_data'])) {
-  	      throw new Exception("fts_data directory does not exist");
+    if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
+        if (getProtocol() != "https") {
+            throw new Exception("only available through secure connection");
         }
+    }
 
-	/* some actions are allowed without authentication */
-	$noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
-	if (!in_array($action, $noAuthActions, TRUE)) {
-		require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
-		$auth = new MyOAuthProvider($config);
-		$auth->authenticate();
-		$consumerKey = urlencode($auth->getConsumerKey());
+    /* FIXME: use better URLparser with something like htaccess */
+    if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
+        $action = 'pingServer';
+    } else {
+        $action = $_REQUEST['action'];
+    }
 
-	        /* append the OAuth consumer key to the path to keep file storages separate */
-	        $config['fts_data'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerKey;
-	        if(!file_exists($config['fts_data'])) {
-	                if (@mkdir($config['fts_data'], 0775) === FALSE) {
-	                        throw new Exception("unable to create specific fts_data directory for this consumer");
-	                }
-	        }
-	}
+    $validActions = array('pingServer', 'serverInfo', 'getDirList',
+        'downloadFile', 'uploadFile', 'getUploadToken', 'getDownloadToken',
+        'deleteDirectory', 'deleteFile', 'setDescription', 'getDescription', 'createDirectory');
 
-	require_once("lib/Files/Files.class.php");
-	$f = new Files($config);
-	$content = $f->$action();
-	$content["ok"] = TRUE;
-	echo json_encode($content);
+    if (!in_array($action, $validActions, TRUE)) {
+        throw new Exception("unregistered action called");
+    }
+
+    /* prepare config variables for location to files and db */
+    $config['fts_data'] = realpath(getConfig($config, 'fts_data', TRUE));
+    if ($config['fts_data'] === FALSE || !is_dir($config['fts_data'])) {
+        throw new Exception("fts_data directory does not exist");
+    }
+
+    /* some actions are allowed without authentication */
+    $noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
+    if (!in_array($action, $noAuthActions, TRUE)) {
+        require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
+        $auth = new MyOAuthProvider($config);
+        $auth->authenticate();
+        $consumerKey = urlencode($auth->getConsumerKey());
+
+        /* append the OAuth consumer key to the path to keep file storages separate */
+        $config['fts_data'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerKey;
+        if (!file_exists($config['fts_data'])) {
+            if (@mkdir($config['fts_data'], 0775) === FALSE) {
+                throw new Exception("unable to create specific fts_data directory for this consumer");
+            }
+        }
+    }
+
+    require_once("lib/Files/Files.class.php");
+    $f = new Files($config);
+    $content = $f->$action();
+    $content["ok"] = TRUE;
+    echo json_encode($content);
 } catch (OAuthException $e) {
-	echo json_encode(
-			array("ok" => FALSE, "errorMessage" => $e->getMessage(),
-					"errorCode" => $e->getCode()));
+    echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage(), "errorCode" => $e->getCode()));
 } catch (Exception $e) {
-	if ($e->getCode() !== 0) {
-	        /* This is for non OAuthExceptions that get throw in methods not protected
-	           by OAuth, like downloadFile and uploadFile, they set HTTP headers */
-		header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
-		echo $e->getMessage();
-	} else {
-		/* This is for non OAuthExceptions that get thrown in methods protected
-		   by OAuth, so we want to convey the error, and not return different
-		   HTTP header */
-		echo json_encode(
-				array("ok" => FALSE, "errorMessage" => $e->getMessage()));
-	}
+    if ($e->getCode() !== 0) {
+        /* This is for non OAuthExceptions that get throw in methods not protected
+          by OAuth, like downloadFile and uploadFile, they set HTTP headers */
+        header("HTTP/1.1 " . $e->getCode() . " " . $e->getMessage());
+        echo $e->getMessage();
+    } else {
+        /* This is for non OAuthExceptions that get thrown in methods protected
+          by OAuth, so we want to convey the error, and not return different
+          HTTP header */
+        echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage()));
+    }
 }
 ?>
