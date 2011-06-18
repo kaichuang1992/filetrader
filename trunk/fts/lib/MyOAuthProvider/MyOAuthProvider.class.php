@@ -21,12 +21,14 @@
 class MyOAuthProvider {
 
 	private $config;
+	private $consumerKey;
 
 	function __construct($config) {
 		if (!is_array($config)) {
 			throw new Exception("config parameter should be array");
 		}
 		$this->config = $config;
+		$this->consumerKey = NULL;
 	}
 
 	function authenticate() {
@@ -57,6 +59,11 @@ class MyOAuthProvider {
 							return OAUTH_OK;
 						});
 		$provider->checkOAuthRequest();
+		$this->consumerKey = $provider->consumer_key;
+	}
+
+	function getConsumerKey() {
+		return $this->consumerKey;
 	}
 }
 
