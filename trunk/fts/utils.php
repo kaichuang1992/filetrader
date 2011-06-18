@@ -85,7 +85,7 @@ function getConfig($config = array(), $variable = NULL, $required = FALSE,
 
 function getProtocol() {
 	if (!isset($_SERVER['SERVER_NAME'])) {
-		return FALSE;
+		throw new Exception('not called through web server');
 	}
 	return (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS'])
 			&& $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
@@ -93,5 +93,22 @@ function getProtocol() {
 
 function generateToken($length = 16) {
 	return bin2hex(openssl_random_pseudo_bytes($length));
+}
+
+/**
+ * Return the server name and add brackets in case an IPv6 address is used, so
+	::1 becomes [::1] for example
+ */
+function getServerName() {
+        if (!isset($_SERVER['SERVER_NAME'])) {
+                throw new Exception('not called through web server');
+        }
+	$serverName = $_SERVER['SERVER_NAME'];
+
+        if (filter_var($serverName, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
+		return $serverName;
+        } else {
+		return '[' . $serverName . ']';
+	}
 }
 ?>

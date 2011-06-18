@@ -79,12 +79,7 @@ class Files {
 			$stmt->bindParam(':filePath', $absPath);
 			$stmt->execute();
 
-			/* FIXME: pay attention if IPv6 is used! SERVER_NAME needs to
-			   be written in between brackets, e.g.: [2001:610:508:109::] */
-			$downloadLocation = getProtocol() . $_SERVER['SERVER_NAME']
-					. $_SERVER['PHP_SELF']
-					. "?action=downloadFile&token=$token";
-
+			$downloadLocation = getProtocol() . getServerName() . $_SERVER['PHP_SELF'] . "?action=downloadFile&token=$token";
 			return array("downloadLocation" => $downloadLocation,
 					"absPath" => $absPath);
 		} catch (Exception $e) {
@@ -132,8 +127,7 @@ class Files {
 			$stmt->bindParam(':fileSize', $fileSize);
 			$stmt->execute();
 
-			$uploadLocation = getProtocol() . $_SERVER['SERVER_NAME']
-					. $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
+			$uploadLocation = getProtocol() . getServerName() . $_SERVER['PHP_SELF'] . "?action=uploadFile&token=$token";
 			return array("uploadLocation" => $uploadLocation,
 					"absPath" => $absPath);
 		} catch (Exception $e) {
