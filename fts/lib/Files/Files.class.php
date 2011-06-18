@@ -33,9 +33,10 @@ class Files {
 		$this->fsd = getConfig($config, 'fts_data_files', TRUE);
 
 		try {
-			$this->dbh = new PDO(
-					"sqlite:" . getConfig($this->config, 'fts_data_db', TRUE),
-					NULL, NULL, array(PDO::ATTR_PERSISTENT => TRUE));
+			$this->dbh = new PDO(getConfig($this->config, 'fts_db_dsn', TRUE), 
+					     getConfig($this->config, 'fts_db_user', FALSE, NULL),
+				             getConfig($this->config, 'fts_db_pass', FALSE, NULL),
+					     getConfig($this->config, 'fts_db_options', FALSE, array()));
 
 	                /* FIXME: move to SETUP procedure? */
 			$this->dbh->query('CREATE TABLE IF NOT EXISTS downloadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT)');

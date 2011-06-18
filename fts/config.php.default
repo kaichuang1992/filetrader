@@ -1,15 +1,23 @@
 <?php
+/* Time zone
+ * See http://php.net/manual/en/timezones.php */
 $config['time_zone'] = 'Europe/Amsterdam';
 
-// Whether or not to allow only SSL connections
+/* Whether or not to allow only SSL connections */
 $config['ssl_only'] = FALSE;
 
-// Location to directory where to store uploaded files, can be
-// either absolute or relative location. Should be writable by
-// web server!
-$config['fts_data'] = 'data';
+/* Base directory where to store uploaded files
+ * NOTE: directory should be writable by the web server */
+$config['fts_data'] = __DIR__ . DIRECTORY_SEPARATOR . 'data';
 
-// Static list of allowed OAuth consumers (format: key => secret)
+/* Database configuration
+ * See http://www.php.net/manual/en/pdo.construct.php */
+$config['fts_db_dsn'] = 'sqlite:' . __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'fts.sqlite';
+$config['fts_db_user'] = NULL;
+$config['fts_db_pass'] = NULL;
+$config['fts_db_options'] = array(PDO::ATTR_PERSISTENT => TRUE);
+
+/* List of allowed OAuth consumers (format: key => secret) */
 $config['oauth_consumers'] = array (
 	'12345' => '54321',
 	'abcde' => 'edcba',
