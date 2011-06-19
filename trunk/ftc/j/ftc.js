@@ -136,6 +136,10 @@ function redrawPage(actionType) {
             relativePath : curDir
         },
         function(data) {
+	    if(!data.ok) {
+		alert(data.errorMessage);
+		return;
+	    }
             var items = [];
 
             if (actionType === 'getDirList') {
