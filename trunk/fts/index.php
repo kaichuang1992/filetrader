@@ -55,11 +55,18 @@ try {
         throw new Exception("fts_data directory does not exist");
     }
 
+    $dbh = new PDO(getConfig($config, 'fts_db_dsn', TRUE),
+	                   getConfig($config, 'fts_db_user', FALSE, NULL),
+	                   getConfig($config, 'fts_db_pass', FALSE, NULL),
+	                   getConfig($config, 'fts_db_options', FALSE, array()));
+
+//	logHandler(var_export($dbh->errorInfo(), TRUE));
+
     /* some actions are allowed without authentication */
     $noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
     if (!in_array($action, $noAuthActions, TRUE)) {
         require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
-        $auth = new MyOAuthProvider($config);
+        $auth = new MyOAuthProvider($dbh);
         $auth->authenticate();
         $consumerKey = urlencode($auth->getConsumerKey());
 
@@ -73,7 +80,8 @@ try {
     }
 
     require_once("lib/Files/Files.class.php");
-    $f = new Files($config);
+
+    $f = new Files($dbh, $config);
     $content = $f->$action();
     $content["ok"] = TRUE;
     echo json_encode($content);

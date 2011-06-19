@@ -33,27 +33,19 @@ class Files {
       with the consumer key appended to it in case of OAuth
       requests */
 
-    function __construct($config) {
+    function __construct($dbh, $config) {
+        if ($dbh == NULL) {
+            throw new Exception("no database provided");
+        }
+        $this->dbh = $dbh;
+
         $this->config = $config;
         $this->fsd = getConfig($config, 'fts_data', TRUE);
 
-        try {
-            $this->dbh = new PDO(getConfig($this->config, 'fts_db_dsn', TRUE),
-                            getConfig($this->config, 'fts_db_user', FALSE, NULL),
-                            getConfig($this->config, 'fts_db_pass', FALSE, NULL),
-                            getConfig($this->config, 'fts_db_options', FALSE, array()));
-
-            /* FIXME: move to SETUP procedure? */
-            $this->dbh->query('CREATE TABLE IF NOT EXISTS downloadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT)');
-            $this->dbh->query('CREATE TABLE IF NOT EXISTS   uploadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT, fileSize INTEGER)');
-            $this->dbh->query('CREATE TABLE IF NOT EXISTS       metaData (filePath TEXT PRIMARY KEY UNIQUE, fileDescription TEXT)');
-        } catch (Exception $e) {
-            throw new Exception("database connection failed");
-        }
-    }
-
-    function __destruct() {
-        $this->dbh = NULL;
+        /* FIXME: move to SETUP procedure? */
+        $this->dbh->query('CREATE TABLE IF NOT EXISTS downloadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT)');
+        $this->dbh->query('CREATE TABLE IF NOT EXISTS   uploadTokens (token TEXT PRIMARY KEY UNIQUE, filePath TEXT, fileSize INTEGER)');
+        $this->dbh->query('CREATE TABLE IF NOT EXISTS       metaData (filePath TEXT PRIMARY KEY UNIQUE, fileDescription TEXT)');
     }
 
     function getDownloadToken() {

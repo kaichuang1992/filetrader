@@ -1,9 +1,8 @@
 -- REQUIREMENTS --
 * php-pecl-oauth (http://pecl.php.net/package/oauth)
 	==> Fedora Package (php-pecl-oauth)
-		Not yet in Fedora
-		SRPM available at http://fkooman.fedorapeople.org/php-pecl-oauth
-		Package Review: https://bugzilla.redhat.com/show_bug.cgi?id=710751
+		http://admin.fedoraproject.org/updates/php-pecl-oauth
+		(Currently in testing for F14/F15, soon to be pushed to stable)
 
 	==> Debian Package
 		Not in Debian as far as I know (use "pecl install oauth")
@@ -22,7 +21,7 @@
 
 * 64 bit OS and PHP installation (for >2G file support)
 
--- INSTALLATION --
+--- INSTALLATION ---
 
 It is assumed you placed the source files of fts in /var/www/html/fts. This
 is the default directory on Red Hat based systems. On Debian this would
@@ -41,36 +40,45 @@ use a .htaccess file to limit access to directory structure!
         echo "Deny from all" > data/.htaccess
 
 Make sure Apache allows the use of "Limit" as override in your (virtual host)
-directory:
+directory (see below for more Apache configuration hints):
 
         AllowOverride Limit
 
---- SELinux Configuration ---
+--- SELINUX CONFIGURATION ---
+
 Set the correct SELinux labels (only for Fedora/Red Hat systems?)
 
 $ chcon -R -t httpd_sys_rw_content_t data
 
--- CONFIGURATION --
+--- CONFIGURATION ---
 
-Copy config.php.default to config.php and modify it for your situation.
+Copy config.php.default to config.php and modify it for your situation
+(if needed).
 
-In order to configure OAuth consumer/keys it is recommended to use a 
-reasonable length secrets.
+In order to configure storage consumers it is recommended to use a 
+reasonable length secrets. The provided tool in the "tools" directory
+will create them for you!
 
-For example you can use OpenSSL to generate a key/secret:
+$ php tools/manageConsumer.php add [NAME OF CONSUMER]
 
-$ openssl rand -hex 16
+For example:
 
-(This creates a 16 byte, 128 bit key encoded in the hexadecimal system)
+$ php tools/manageConsumers.php add "http://my.university.org"
+consumerKey: [http://my.university.org], consumerSecret: [421398aec34678f1efc506a08f36446d]
 
-As an example below, the consumer key is 28...52 and the secret is 5e...b1:
+You can list the configured consumers using:
 
-$config['oauth_consumers'] = array (
-        '2879d2f782aab6d022b7e2a97f7b9b52' => '5e3ba9d19d55ae4c1361059fe4e409b1',
-);
+$ php tools/manageConsumers.php list
+*** LIST OF STORAGE CONSUMERS ***
+[KEY]    = http://my.university.org
+[SECRET] = 421398aec34678f1efc506a08f36446d
+[PATH]   = /var/www/html/filetrader/fts/data/http%3A%2F%2Fmy.university.org
 
-Note: This is a shared secret that should be configured in the remote service
-accessing this service.
+NOTE: The key and secret should be configured in the remote consumer that is 
+accessing this service. The path is the location on the local file system where
+files belonging to this consumer will be stored.
+
+--- APACHE CONFIGURATION ---
 
 To support the X-Sendfile header Apache needs to be configured to allow for this
 header. Set:
