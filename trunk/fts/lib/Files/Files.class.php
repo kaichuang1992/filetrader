@@ -63,11 +63,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
         $token = generateToken();
 
@@ -96,11 +92,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 
         /* make sure the uploaded file name is unique */
         $absPath = getUniqueName($absPath);
@@ -264,11 +256,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
         /* FIXME: filter_var */
         $description = getRequest('fileDescription', FALSE, '');
@@ -288,11 +276,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
         $stmt = $this->dbh
                 ->prepare(
@@ -311,11 +295,7 @@ class Files {
             throw new Exception("invalid request method, should be GET");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 
         if (chdir($absPath) === FALSE) {
             throw new Exception("directory does not exist");
@@ -335,11 +315,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
         /* delete meta data */
         $stmt = $this->dbh->prepare("DELETE FROM metaData WHERE filePath=:filePath");
@@ -363,11 +339,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 
         if (@rmdir($absPath) === FALSE) {
             throw new Exception("unable to delete directory");
@@ -380,11 +352,7 @@ class Files {
             throw new Exception("invalid request method, should be POST");
         }
 
-        $absPath = $this
-                ->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
-        if ($absPath === FALSE) {
-            throw new Exception("invalid path");
-        }
+        $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 
         /* file or directory with this name should *not* already exist */
         if (file_exists($absPath)) {
@@ -428,48 +396,39 @@ class Files {
 
     /**
      * Validate the relative path specified with the request
-     * @param unknown_type $relativePath the relative path to a file or directory
-     * @param unknown_type $validateOption can be either
-     * FTS_FILE: validate that the absolute file location is inside the global file storage
+     * @param string $relativePath the relative path to a file or directory
+     * @param enum $validateOption can be either
+     * FTS_FILE: validate that the absolute file location is inside the base file storage
      * directory and the file exists
-     * FTS_DIR: validate that the absolute directory location is inside the global file storage
+     * FTS_DIR: validate that the absolute directory location is inside the base file storage
      * directory and that the directory exists
      * FTS_PARENT: validate that the absolute directory location of the parent is inside the
-     * global file storage directory and that this parent directory exists
-     * @return The absoute location of the file or directory when validated, or FALSE when the
-     * validation failed
-     * @throws Exception never?
+     * base file storage directory and that this parent directory exists
+     * @return The absolute location of the file or directory when validated
+     * @throws Exception on path/option failures
      */
     private function validatePath($relativePath, $validateOption) {
-        /* FIXME: should we validate the characters in relativePath? */
-        /* FIXME: why does it throw exceptions sometimes and returns false at other times? */
         $fsd = $this->fsd;
         if ($validateOption == FTS_FILE || $validateOption == FTS_DIR) {
             $absPath = realpath($fsd . DIRECTORY_SEPARATOR . $relativePath);
             $fsdPos = strpos($absPath, $fsd, 0);
             if ($fsdPos === FALSE || $fsdPos != 0) {
-                return FALSE;
+                throw new Exception("invalid path");
             }
             if (!file_exists($absPath)) {
-                return FALSE;
+                throw new Exception("path does not exist");
             }
             if ($validateOption == FTS_FILE && !is_file($absPath)) {
-                return FALSE;
+                throw new Exception("path is not a file");
             }
             if ($validateOption == FTS_DIR && !is_dir($absPath)) {
-                return FALSE;
+                throw new Exception("path is not a directory");
             }
             return $absPath;
         } else if ($validateOption == FTS_PARENT) {
-            $absPath = realpath(
-                    $fsd . DIRECTORY_SEPARATOR . dirname($relativePath));
-            $fsdPos = strpos($absPath, $fsd, 0);
-            if ($fsdPos === FALSE || $fsdPos != 0) {
-                return FALSE;
-            }
-            if (!file_exists($absPath) || !is_dir($absPath)) {
-                return FALSE;
-            }
+            /* first validate the parent directory */
+            $absPath = $this->validatePath(dirname($relativePath), FTS_DIR);
+            /* now validate the file/directory itself */
             $baseName = basename($relativePath);
             if (empty($baseName)) {
                 throw new Exception("no empty path allowed");
@@ -480,8 +439,7 @@ class Files {
             }
             return $absPath . DIRECTORY_SEPARATOR . basename($relativePath);
         } else {
-            /* invalid validateOption */
-            return FALSE;
+            throw new Exception("invalid validation option");
         }
     }
 
