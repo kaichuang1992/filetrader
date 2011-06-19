@@ -252,6 +252,8 @@ class Files {
     }
 
     function setDescription() {
+	/* FIXME: there seems to be a different error for setting description
+	   if file did not exist yet, or after it was removed? */
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             throw new Exception("invalid request method, should be POST");
         }
