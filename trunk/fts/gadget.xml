@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs title="FT">
+    <Require feature="opensocial-0.9"/>
+  </ModulePrefs>
+  <Content type="html">
+<![CDATA[
+<script type="text/javascript">
+    function makeSignedRequest() {
+      var params = {};
+      params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+      var url = "https://frkosp.wind.surfnet.nl/fts/index.php?action=serverInfo";
+      gadgets.io.makeRequest(url, response, params);
+    };
+
+    function response(obj) {
+      //obj.text contains the text of the response
+      alert(obj.text);
+    };
+
+    makeSignedRequest();
+</script>
+]]>
+  </Content>
+</Module>
