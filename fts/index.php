@@ -29,7 +29,7 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 
 try {
     if (getConfig($config, 'ssl_only', FALSE, FALSE)) {
-        if (getProtocol() != "https") {
+        if (getProtocol() != "https://") {
             throw new Exception("only available through secure connection");
         }
     }
