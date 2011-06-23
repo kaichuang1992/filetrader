@@ -85,35 +85,27 @@ and restart the web server. This takes care of protecting the data directory
 and enabling X-SendFile.
 
 --- CUT ---
-<Directory "/var/www/html/fts">
-    Order allow,deny
-    Allow from all
-    XSendFile on
+<Directory "/var/www/html/filetrader/fts">
+    Options None
+    Order Allow,Deny
+    Allow from All
+    XSendFile On
 </Directory>
 
-<Directory "/var/www/html/fts/data">
-    Deny from all
+<Directory "/var/www/html/filetrader/fts/data">
+    Deny from All
 </Directory>
 --- CUT ---
 
 In tests on Debian it was also needed to enable the following directive:
 
 --- CUT ---
-XSendFileAllowAbove on
+    XSendFileAllowAbove on
 --- CUT ---
 
-If you checked out the source from SVN make sure it is not possible to access 
-the .svn directories and the files therein files through the web! See [1] for 
-more information.
-
-One can for example use this and add the following to the fts.conf file as well 
-(inside the fts directory directive):
-
---- CUT ---
-    RewriteEngine On
-    RewriteRule ^(.*/)?\.svn/ - [F,L]
-    ErrorDocument 403 "Access Forbidden"
---- CUT ---
+NOTE: If you checked out the source from SVN make sure it is not possible to 
+access the .svn directories and the files therein files through the web! See 
+[1] for more information.
 
 --- ISSUES ---
 We are using a persistent database connection to the SQlite file, which means 
