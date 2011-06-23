@@ -107,12 +107,12 @@ the .svn directories and the files therein files through the web! See [1] for
 more information.
 
 One can for example use this and add the following to the fts.conf file as well 
-(outside the directory directive):
+(inside the fts directory directive):
 
 --- CUT ---
-RewriteEngine On
-RewriteRule ^(.*/)?\.svn/ - [F,L]
-ErrorDocument 403 "Access Forbidden"
+    RewriteEngine On
+    RewriteRule ^(.*/)?\.svn/ - [F,L]
+    ErrorDocument 403 "Access Forbidden"
 --- CUT ---
 
 --- ISSUES ---
