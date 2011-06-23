@@ -63,7 +63,7 @@ class MyOAuthProvider {
         $this->consumerKey = $provider->consumer_key;
     }
 
-    function getConsumerKey() {
+    function getConsumerIdentifier() {
         return $this->consumerKey;
     }
 

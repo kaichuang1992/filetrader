@@ -94,13 +94,28 @@ For example:
 
 <Directory "/var/www/html">
     Options Indexes FollowSymLinks
-    AllowOverride Limit
+    AllowOverride Limit FileInfo
     XSendFile on
     # on Debian (SendFile module 0.9) you seem to need this option as well:
     ### XSendFileAllowAbove on
     Order allow,deny
     Allow from all
 </Directory>
+
+Also make sure you can't access the .svn directories and files through the 
+web!
+
+(See: http://codex.wordpress.org/Installing/Updating_WordPress_with_Subversion#A_Note_About_.SVN_Folders_on_Public_Servers)
+
+You can for example use this:
+
+	RewriteEngine On
+	RewriteRule ^(.*/)?\.svn/ - [F,L]
+	ErrorDocument 403 "Access Forbidden"
+
+In .htaccess file in the root of the installation. For this to work the 
+Apache rewrite module needs to be installed and FileInfo should be added
+to AllowOverride.
 
 --- ISSUES ---
 

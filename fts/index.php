@@ -68,10 +68,10 @@ try {
         require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
         $auth = new MyOAuthProvider($dbh);
         $auth->authenticate();
-        $consumerKey = urlencode($auth->getConsumerKey());
+        $consumerIdentifier = urlencode($auth->getConsumerIdentifier());
 
         /* append the OAuth consumer key to the path to keep file storages separate */
-        $config['fts_data'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerKey;
+        $config['fts_data'] = $config['fts_data'] . DIRECTORY_SEPARATOR . $consumerIdentifier;
         if (!file_exists($config['fts_data'])) {
             if (@mkdir($config['fts_data'], 0775) === FALSE) {
                 throw new Exception("unable to create specific fts_data directory for this consumer");
