@@ -85,14 +85,14 @@ and restart the web server. This takes care of protecting the data directory
 and enabling X-SendFile.
 
 --- CUT ---
-<Directory "/var/www/html/filetrader/fts">
+<Directory "/var/www/html/fts">
     Options None
     Order Allow,Deny
     Allow from All
     XSendFile On
 </Directory>
 
-<Directory "/var/www/html/filetrader/fts/data">
+<Directory "/var/www/html/fts/data">
     Deny from All
 </Directory>
 --- CUT ---
