@@ -5,44 +5,34 @@
 		(Currently in testing for F14/F15, soon to be pushed to stable)
 
 	==> Debian Package
-		Not in Debian as far as I know (use "pecl install oauth")
+		Not in Debian (use "pecl install oauth")
 		
-* mod_xsendfile (+ web server configuration!)
+* mod_xsendfile (https://tn123.org/mod_xsendfile/)
 	==> Fedora Package (mod_xsendfile)
 
 	==> Debian Package (libapache2-mod-xsendfile)
 
-* php-pdo (+ sqlite)
+* php-pdo (with SQLite driver)
 	==> Fedora Package (php-pdo)
-		In Fedora this package contains the SQlite driver
+		In Fedora this package contains the SQLite driver
 
 	==> Debian Package (php5-sqlite)
-		Also contains SQlite PDO driver
+		Also contains SQLite PDO driver
 
-* 64 bit OS and PHP installation (for >2G file support)
+* 64 bit operating system and PHP installation (for >2G file support)
 
 --- INSTALLATION ---
 
-It is assumed you placed the source files of fts in /var/www/html/fts. This
-is the default directory on Red Hat based systems. On Debian this would
-be /var/www/fts.
+It is assumed you placed the source files (and sub directories) of fts in 
+/var/www/html/fts. This is the default directory on Red Hat based systems. On 
+Debian this would be /var/www/fts. Now perform the following commands in the
+directory /var/www/html/fts: 
  
 # create data directory
 $ mkdir -p data
 
 # set unix permissions
 $ chmod o+w -R data
-
-*** WARNING ***
-Make sure the data directory is not accessible through the web browser,
-use a .htaccess file to limit access to directory structure!
-
-        echo "Deny from all" > data/.htaccess
-
-Make sure Apache allows the use of "Limit" as override in your (virtual host)
-directory (see below for more Apache configuration hints):
-
-        AllowOverride Limit
 
 --- SELINUX CONFIGURATION ---
 
@@ -57,70 +47,79 @@ Copy config.php.default to config.php and modify it for your situation
 
 In order to configure storage consumers it is recommended to use a 
 reasonable length secrets. The provided tool in the "tools" directory
-will create them for you!
+will create them for you.
 
 $ php tools/manageConsumer.php add [NAME OF CONSUMER]
 
 For example:
 
-$ php tools/manageConsumers.php add "http://my.university.org"
-consumerKey: [http://my.university.org], consumerSecret: [421398aec34678f1efc506a08f36446d]
+$ php tools/manageConsumers.php add "my.university.org"
+consumerKey: [my.university.org], 
+consumerSecret: [421398aec34678f1efc506a08f36446d]
 
 You can list the configured consumers using:
 
 $ php tools/manageConsumers.php list
-*** LIST OF STORAGE CONSUMERS ***
-[KEY]    = http://my.university.org
-[SECRET] = 421398aec34678f1efc506a08f36446d
-[PATH]   = /var/www/html/filetrader/fts/data/http%3A%2F%2Fmy.university.org
 
-NOTE: The key and secret should be configured in the remote consumer that is 
-accessing this service. The path is the location on the local file system where
-files belonging to this consumer will be stored.
+*** LIST OF STORAGE CONSUMERS ***
+[KEY]    = my.university.org
+[SECRET] = 421398aec34678f1efc506a08f36446d
+[PATH]   = /var/www/html/filetrader/fts/data/my.university.org
+
+NOTE [1]: The key and secret should be configured in the remote consumer that 
+is accessing this service. The path is the location on the local file system 
+where files belonging to this consumer will be stored.
+
+NOTE [2]: The file data/fts.sqlite should be writable by the web server. If you
+use the tool manageConsumers.php first the file will be created, but not be 
+writable by the web server anymore, so the setting the permissions part of the
+installation section should be repeated!
 
 --- APACHE CONFIGURATION ---
 
-To support the X-Sendfile header Apache needs to be configured to allow for this
-header. Set:
+Included below is an example for configuring the web server, Apache in 
+this case. 
 
-    XSendFile on
+On Fedora/Red Hat one should copy the following to /etc/httpd/conf.d/fts.conf
+and restart the web server. This takes care of protecting the data directory 
+and enabling X-SendFile.
 
-    # on Debian (SendFile module 0.9) you seem to need this option as well:
-    ### XSendFileAllowAbove on
-
-In the (virtual) directory configuration containing the scripts (see https://tn123.org/mod_xsendfile/). 
-
-For example:
-
-<Directory "/var/www/html">
-    Options Indexes FollowSymLinks
-    AllowOverride Limit FileInfo
-    XSendFile on
-    # on Debian (SendFile module 0.9) you seem to need this option as well:
-    ### XSendFileAllowAbove on
+--- CUT ---
+<Directory "/var/www/html/fts">
     Order allow,deny
     Allow from all
+    XSendFile on
 </Directory>
 
-Also make sure you can't access the .svn directories and files through the 
-web!
+<Directory "/var/www/html/fts/data">
+    Deny from all
+</Directory>
+--- CUT ---
 
-(See: http://codex.wordpress.org/Installing/Updating_WordPress_with_Subversion#A_Note_About_.SVN_Folders_on_Public_Servers)
+In tests on Debian it was also needed to enable the following directive:
 
-You can for example use this:
+--- CUT ---
+XSendFileAllowAbove on
+--- CUT ---
 
-	RewriteEngine On
-	RewriteRule ^(.*/)?\.svn/ - [F,L]
-	ErrorDocument 403 "Access Forbidden"
+If you checked out the source from SVN make sure it is not possible to access 
+the .svn directories and the files therein files through the web! See [1] for 
+more information.
 
-In .htaccess file in the root of the installation. For this to work the 
-Apache rewrite module needs to be installed and FileInfo should be added
-to AllowOverride.
+One can for example use this and add the following to the fts.conf file as well 
+(outside the directory directive):
+
+--- CUT ---
+RewriteEngine On
+RewriteRule ^(.*/)?\.svn/ - [F,L]
+ErrorDocument 403 "Access Forbidden"
+--- CUT ---
 
 --- ISSUES ---
+We are using a persistent database connection to the SQlite file, which means 
+that if you remove the file from the file system writing to the database still 
+seems to work, but reading from it fails or something like that... A solution 
+is to restart Apache/PHP when doing this...
 
-We are using a persistent database connection to the SQlite file, which means that 
-if you remove the file from the file system writing to the database still seems 
-to work, but reading from it fails or something like that... A solution is to
-restart Apache/PHP when doing this...
-
+--- REFERENCES ---
+[1] http://codex.wordpress.org/Installing/Updating_WordPress_with_Subversion#A_Note_About_.SVN_Folders_on_Public_Servers
