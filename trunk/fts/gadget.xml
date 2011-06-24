@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
-  <ModulePrefs title="FileTrader"
+  <ModulePrefs title="FT"
                author="François Kooman"
                author_email="fkooman@tuxed.net">
     <Require feature="opensocial-0.9"/>
@@ -9,6 +9,9 @@
   <Content type="html">
 <![CDATA[
 <script type="text/javascript">
+    /* Should get this from gadget data... */
+    var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
+
     /* SURFconext */
     function getMyGroups() {
         osapi.groups.get({userId: '@owner'}).execute(function(response) {
@@ -23,11 +26,43 @@
         });
     };
 
-    function makeSignedRequest() {
+    function pingServer() {
         var params = {};
+        var url = apiEndPoint + "?action=pingServer";
+        gadgets.io.makeRequest(url, function(response) { 
+            alert(response.text);
+        }, params);
+    };
+
+    function serverInfo() {
+        var params = {};
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-        /* make this URL configurable */
-        var url = "https://frkosp.wind.surfnet.nl/fts/index.php?action=serverInfo";
+        var url = apiEndPoint + "?action=serverInfo";
+        gadgets.io.makeRequest(url, function(response) { 
+            alert(response.text);
+        }, params);
+    };
+
+    function getDirList(relativePath) {
+        var postdata = { relativePath : relativePath };
+        var params = {};
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+        var url = apiEndPoint + "?action=getDirList";
+        gadgets.io.makeRequest(url, function(response) { 
+            alert(response.text);
+        }, params);
+    };
+
+    function createDirectory(relativePath) {
+        var postdata = { relativePath : relativePath };
+        var params = {};
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+        var url = apiEndPoint + "?action=createDirectory";
         gadgets.io.makeRequest(url, function(response) { 
             alert(response.text);
         }, params);
@@ -35,7 +70,10 @@
 
     // getMyGroups();
     // getMyFriends();
-    makeSignedRequest();
+    // pingServer();
+    serverInfo();
+    // getFileList("/");
+    // createDirectory("/test");
 </script>
 ]]>
   </Content>
