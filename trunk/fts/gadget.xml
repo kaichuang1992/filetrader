@@ -6,9 +6,16 @@
     <Require feature="opensocial-0.9"/>
     <Require feature="osapi"/>
   </ModulePrefs>
+  <UserPref name="groupContext"/>	<!-- for SURFconext -->
   <Content type="html">
 <![CDATA[
 <script type="text/javascript">
+
+    <!-- for SURFconext -->
+    var prefs = new gadgets.Prefs();
+    var groupContext = escape(prefs.getString('groupContext'));
+    <!-- /for SURFconext -->
+
     /* Should get this from gadget data... */
     var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
 
