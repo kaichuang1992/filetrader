@@ -67,14 +67,16 @@
             alert(response.text);
         }, params);
     };
-
-    // getMyGroups();
-    // getMyFriends();
-    // pingServer();
-    serverInfo();
-    // getFileList("/");
-    // createDirectory("/test");
 </script>
+
+<h3>Actions</h3>
+<a href="javascript:pingServer()">pingServer</a> | 
+<a href="javascript:serverInfo()">serverInfo</a> |
+<a href="javascript:getMyGroups()">getMyGroups</a> (SURFconext) |
+<a href="javascript:getMyFriends()">getMyFriends</a> (Google) |
+<a href="javascript:getFileList('/')">getFileList('/')</a> |
+<a href="javascript:createDirectory('/test')">createDirectory('/test')</a>
+
 ]]>
   </Content>
 </Module>
