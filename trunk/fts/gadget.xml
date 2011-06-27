@@ -15,14 +15,22 @@
     /* SURFconext */
     function getMyGroups() {
         osapi.groups.get({userId: '@owner'}).execute(function(response) {
-            alert(response.list.length);
+            var output = '';
+            for(var f in response.list) {
+                output += response.list[f].title + " (" + response.list[f].description + ")\n";
+            }
+            alert(output);
         });
     };
 
     /* iGoogle */
     function getMyFriends() {
         osapi.people.get({userId: '@owner', groupId: '@friends'}).execute(function(response) {
-            alert(response.list.length);
+	    var output = '';
+            for(var f in response.list) {
+		output += JSON.stringify(response.list[f]) + "\n";
+            }
+            alert(output);
         });
     };
 
@@ -45,12 +53,10 @@
     };
 
     function getDirList(relativePath) {
-        var postdata = { relativePath : relativePath };
         var params = {};
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-        var url = apiEndPoint + "?action=getDirList";
+        var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
         gadgets.io.makeRequest(url, function(response) { 
             alert(response.text);
         }, params);
@@ -74,7 +80,7 @@
 <a href="javascript:pingServer()">pingServer</a> | 
 <a href="javascript:serverInfo()">serverInfo</a> |
 <a href="javascript:getMyGroups()">getMyGroups</a> (SURFconext) |
-<a href="javascript:getMyFriends()">getMyFriends</a> (Google) |
+<a href="javascript:getMyFriends()">getMyFriends</a> (iGoogle) |
 <a href="javascript:getDirList('/')">getDirList('/')</a> |
 <a href="javascript:createDirectory('/test')">createDirectory('/test')</a>
 
