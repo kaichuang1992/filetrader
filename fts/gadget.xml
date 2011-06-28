@@ -12,11 +12,11 @@
   <Content type="html">
 <![CDATA[
 <style type="text/css">
-body {
+div#ft_output {
     font-size: 85%;
     font-family: sans-serif;
-}
-div#ft_output {
+    margin: 0;
+    padding: 0;
     height: 300px;
     overflow: auto;
 }
@@ -30,8 +30,19 @@ table {
 th{
     text-align: left;
 }
-small.path {
-    float: right;
+span#path {
+	float: right;
+}
+span#progress {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+}
+button {
+	font-size: 85%;
+}
+input {
+	font-size: 85%;
 }
 </style>
 <script type="text/javascript">
@@ -61,9 +72,15 @@ small.path {
         gadgets.io.makeRequest(url, function(response) { 
             output = "";
             for(var i in response.data) {
-                output += "<b>" + i + "</b>" + ": " + response.data[i] + "<br>";
+		if(i==='availableSpace') {
+	            output += i + ": " + toHumanSize(response.data[i]) + "\n";
+
+		} else {
+	            output += i + ": " + response.data[i] + "\n";
+	        }
             }
-	    updateOutput(output);
+	//    updateOutput(output);
+	   alert(output);
         }, params);
     };
 
@@ -81,8 +98,10 @@ small.path {
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
         gadgets.io.makeRequest(url, function(response) {
-            var output = '<small class="path">('+ relativePath + ')</small><br>';
-            output += "<button onclick=\"javascript:parentDirectory('" + relativePath + "')\">^</button>";
+            var output = '<span id="progress"></span><span id="path">('+ relativePath + ')</span>';
+            output += "<button onclick=\"javascript:parentDirectory('" + relativePath + "')\">Up...</button>";
+            output += "<input id=\"inputFiles\" type=\"file\" onchange=\"javascript:getUploadToken('" + relativePath + "',this.files[0])\">";
+	    output += "<button onclick=\"javascript:serverInfo()\">About Server</button>";
             output += '<table><tr><th>Name</th><th>Size</th></tr>';
 	    for(var i in response.data) {
                 if(response.data[i] && !response.data[i].fileName) {
@@ -94,6 +113,33 @@ small.path {
             }
             output += "</table>";
             updateOutput(output);
+        }, params);
+    };
+
+    function getUploadToken(relativePath, file) {
+        var postdata = { relativePath : relativePath + '/' + file.name, fileSize : file.size };
+        var params = {};
+        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+        var url = apiEndPoint + "?action=getUploadToken";
+        gadgets.io.makeRequest(url, function(response) {
+            var uploadUrl = response.data.uploadLocation;
+            //alert(uploadUrl);
+            var xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function(evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = Math.round(evt.loaded / evt.total * 100);
+                    document.getElementById('progress').innerHTML = percentComplete + "%";
+                }
+            }, false);
+            xhr.upload.addEventListener("load", function(evt) {
+                document.getElementById('progress').innerHTML = 'Complete!';
+                getDirList(relativePath);
+            }, false);
+            xhr.open("PUT", uploadUrl, true);
+            xhr.send(file);
         }, params);
     };
 
