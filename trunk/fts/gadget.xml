@@ -3,49 +3,53 @@
   <ModulePrefs title="FT"
                author="François Kooman"
                author_email="fkooman@tuxed.net">
+    <Require feature="dynamic-height"/>
     <Require feature="opensocial-0.9"/>
     <Require feature="osapi"/>
+    <Require feature="opensocial-templates"/>
   </ModulePrefs>
   <UserPref name="groupContext"/>	<!-- for SURFconext -->
   <Content type="html">
 <![CDATA[
+<style type="text/css">
+body {
+    font-size: 85%;
+    font-family: sans-serif;
+}
+div#ft_output {
+    height: 300px;
+    overflow: auto;
+}
+a.dir {
+    font-weight: bold;
+}
+table {
+    width: 100%;
+    background-color: #fff;
+}
+th{
+    text-align: left;
+}
+small.path {
+    float: right;
+}
+</style>
 <script type="text/javascript">
 
     <!-- for SURFconext -->
-    var prefs = new gadgets.Prefs();
-    var groupContext = escape(prefs.getString('groupContext'));
+    // var prefs = new gadgets.Prefs();
+    // var groupContext = escape(prefs.getString('groupContext'));
     <!-- /for SURFconext -->
 
     /* Should get this from gadget data... */
     var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
 
-    /* SURFconext */
-    function getMyGroups() {
-        osapi.groups.get({userId: '@owner'}).execute(function(response) {
-            var output = '';
-            for(var f in response.list) {
-                output += response.list[f].title + " (" + response.list[f].description + ")\n";
-            }
-            alert(output);
-        });
-    };
-
-    /* iGoogle */
-    function getMyFriends() {
-        osapi.people.get({userId: '@owner', groupId: '@friends'}).execute(function(response) {
-	    var output = '';
-            for(var f in response.list) {
-		output += JSON.stringify(response.list[f]) + "\n";
-            }
-            alert(output);
-        });
-    };
-
     function pingServer() {
         var params = {};
         var url = apiEndPoint + "?action=pingServer";
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         gadgets.io.makeRequest(url, function(response) { 
-            alert(response.text);
+            return response.data.ok;
         }, params);
     };
 
@@ -55,20 +59,57 @@
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
         var url = apiEndPoint + "?action=serverInfo";
         gadgets.io.makeRequest(url, function(response) { 
-            alert(response.text);
+            output = "";
+            for(var i in response.data) {
+                output += "<b>" + i + "</b>" + ": " + response.data[i] + "<br>";
+            }
+	    updateOutput(output);
         }, params);
     };
+
+    function parentDirectory(relativePath) {
+        var lastSlash = relativePath.lastIndexOf('/');
+        if (lastSlash > 0) {
+            relativePath = relativePath.substring(0, lastSlash);
+        }
+        getDirList(relativePath);
+    }
 
     function getDirList(relativePath) {
         var params = {};
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
-        gadgets.io.makeRequest(url, function(response) { 
-            alert(response.text);
+        gadgets.io.makeRequest(url, function(response) {
+            var output = '<small class="path">('+ relativePath + ')</small><br>';
+            output += "<button onclick=\"javascript:parentDirectory('" + relativePath + "')\">^</button>";
+            output += '<table><tr><th>Name</th><th>Size</th></tr>';
+	    for(var i in response.data) {
+                if(response.data[i] && !response.data[i].fileName) {
+                } else if(response.data[i].isDirectory) {
+                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + response.data[i].fileName + '</a></td><td>&nbsp;</td></tr>';
+                } else { 
+                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + response.data[i].fileName + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td></tr>';
+                }
+            }
+            output += "</table>";
+            updateOutput(output);
         }, params);
     };
 
+    function getDownloadToken(relativePath) {
+	var postdata = { relativePath : relativePath };
+        var params = {};
+        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+        var url = apiEndPoint + "?action=getDownloadToken";
+        gadgets.io.makeRequest(url, function(response) {
+            window.location.href = response.data.downloadLocation;
+        }, params);
+    };
+    
     function createDirectory(relativePath) {
         var postdata = { relativePath : relativePath };
         var params = {};
@@ -78,19 +119,33 @@
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=createDirectory";
         gadgets.io.makeRequest(url, function(response) { 
-            alert(response.text);
+            document.getElementById('ft_output').innerHTML = response.text;
         }, params);
     };
+    
+    function updateOutput(output) {
+        document.getElementById('ft_output').innerHTML = output;
+        gadgets.window.adjustHeight();
+    }
+
+function toHumanSize(bytes) {
+    var kilobyte = 1024;
+    var megabyte = kilobyte * kilobyte;
+    var gigabyte = megabyte * kilobyte;
+
+    if (bytes >= gigabyte)
+        return Math.round((bytes / gigabyte)) + "GB";
+    if (bytes >= megabyte)
+        return Math.round((bytes / megabyte)) + "MB";
+    if (bytes >= kilobyte)
+        return Math.round((bytes / kilobyte)) + "kB";
+    return bytes;
+}
+
+    getDirList('/');
+//    serverInfo();
 </script>
-
-<h3>Actions</h3>
-<a href="javascript:pingServer()">pingServer</a> | 
-<a href="javascript:serverInfo()">serverInfo</a> |
-<a href="javascript:getMyGroups()">getMyGroups</a> (SURFconext) |
-<a href="javascript:getMyFriends()">getMyFriends</a> (iGoogle) |
-<a href="javascript:getDirList('/')">getDirList('/')</a> |
-<a href="javascript:createDirectory('/test')">createDirectory('/test')</a>
-
+<div id="ft_output"></div>
 ]]>
   </Content>
 </Module>
