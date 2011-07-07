@@ -1,58 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Module>
-  <ModulePrefs title="FT"
-               author="François Kooman"
-               author_email="fkooman@tuxed.net">
-    <Require feature="dynamic-height"/>
-    <Require feature="opensocial-0.9"/>
-    <Require feature="osapi"/>
-    <Require feature="opensocial-templates"/>
-  </ModulePrefs>
-  <UserPref name="groupContext"/>	<!-- for SURFconext -->
-  <Content type="html">
-<![CDATA[
-<style type="text/css">
-div#ft_output {
-    font-size: 85%;
-    font-family: sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 300px;
-    overflow: auto;
-}
-a.dir {
-    font-weight: bold;
-}
-table {
-    width: 100%;
-    background-color: #fff;
-}
-th{
-    text-align: left;
-}
-span#path {
-	float: right;
-}
-span#progress {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-}
-button {
-	font-size: 85%;
-}
-input {
-	font-size: 85%;
-}
-</style>
-<script type="text/javascript">
-
-    <!-- for SURFconext -->
-    // var prefs = new gadgets.Prefs();
-    // var groupContext = escape(prefs.getString('groupContext'));
-    <!-- /for SURFconext -->
-
-    /* Should get this from gadget data... */
     var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
 
     function pingServer() {
@@ -64,6 +9,7 @@ input {
         }, params);
     };
 
+    // DEBUG
     function serverInfo() {
         var params = {};
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
@@ -72,15 +18,14 @@ input {
         gadgets.io.makeRequest(url, function(response) { 
             output = "";
             for(var i in response.data) {
-		if(i==='availableSpace') {
-	            output += i + ": " + toHumanSize(response.data[i]) + "\n";
+                if(i==='availableSpace') {
+                    output += i + ": " + toHumanSize(response.data[i]) + "\n";
 
-		} else {
-	            output += i + ": " + response.data[i] + "\n";
-	        }
+                } else {
+                    output += i + ": " + response.data[i] + "\n";
+                }
             }
-	//    updateOutput(output);
-	   alert(output);
+           alert(output);
         }, params);
     };
 
@@ -97,24 +42,36 @@ input {
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
+
         gadgets.io.makeRequest(url, function(response) {
-            var output = '<span id="progress"></span><span id="path">('+ relativePath + ')</span>';
-            output += "<button onclick=\"javascript:parentDirectory('" + relativePath + "')\">Up...</button>";
-            output += "<input id=\"inputFiles\" type=\"file\" onchange=\"javascript:getUploadToken('" + relativePath + "',this.files[0])\">";
-	    output += "<button onclick=\"javascript:serverInfo()\">About Server</button>";
-            output += '<table><tr><th>Name</th><th>Size</th></tr>';
-	    for(var i in response.data) {
+
+        document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
+//        document.getElementById('inputFiles').setAttribute('onchange', 'javascript:getUploadToken("' + relativePath + '",this.files[0])');
+        document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
+        document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
+
+            var output = '<table><tr><th>Name</th><th>Size</th></tr>';
+            for(var i in response.data) {
                 if(response.data[i] && !response.data[i].fileName) {
                 } else if(response.data[i].isDirectory) {
-                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + response.data[i].fileName + '</a></td><td>&nbsp;</td></tr>';
+                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>&nbsp;</td></tr>';
                 } else { 
-                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + response.data[i].fileName + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td></tr>';
+                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td></tr>';
                 }
             }
             output += "</table>";
             updateOutput(output);
         }, params);
     };
+
+    function sliceName(name, len) {
+        if(name.length > len) {
+            return name.slice(0, len/2-2) + "..." + name.slice(0-(len/2-2), name.length);
+	} else {
+	    return name;
+	}
+    }
+
 
     function getUploadToken(relativePath, file) {
         var postdata = { relativePath : relativePath + '/' + file.name, fileSize : file.size };
@@ -131,11 +88,17 @@ input {
             xhr.upload.addEventListener("progress", function(evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = Math.round(evt.loaded / evt.total * 100);
-                    document.getElementById('progress').innerHTML = percentComplete + "%";
+		    var fn;
+		    if(file.name.length > 23) {
+			fn = file.name.slice(0, 10) + "..." + file.name.slice(-10, file.name.length);
+		    }else {
+        	        fn = file.name;
+                    }
+                    document.getElementById('status').innerHTML = "Progress (" + fn + "): " + percentComplete + "%";
                 }
             }, false);
             xhr.upload.addEventListener("load", function(evt) {
-                document.getElementById('progress').innerHTML = 'Complete!';
+                document.getElementById('status').innerHTML = 'Path: ' + relativePath.replace("//", "/");
                 getDirList(relativePath);
             }, false);
             xhr.open("PUT", uploadUrl, true);
@@ -144,7 +107,7 @@ input {
     };
 
     function getDownloadToken(relativePath) {
-	var postdata = { relativePath : relativePath };
+        var postdata = { relativePath : relativePath };
         var params = {};
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
         params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
@@ -156,16 +119,17 @@ input {
         }, params);
     };
     
-    function createDirectory(relativePath) {
-        var postdata = { relativePath : relativePath };
+    function createDirectory(relativePath, dirName) {
+        var postdata = { relativePath : relativePath + '/' + dirName };
         var params = {};
-        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
         params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=createDirectory";
         gadgets.io.makeRequest(url, function(response) { 
-            document.getElementById('ft_output').innerHTML = response.text;
+	    closeButtonWindow();
+            getDirList(relativePath);
         }, params);
     };
     
@@ -188,10 +152,61 @@ function toHumanSize(bytes) {
     return bytes;
 }
 
-    getDirList('/');
-//    serverInfo();
-</script>
-<div id="ft_output"></div>
-]]>
-  </Content>
-</Module>
+function handleCreateDir(relativePath, form) {
+    createDirectory(relativePath, form.dirName.value);
+}
+
+function createButtonWindow() {
+    document.getElementById('overlay').setAttribute('class','visible');
+        gadgets.window.adjustHeight();
+}
+
+function closeButtonWindow() {
+    document.getElementById('overlay').removeAttribute('class','visible');
+}
+
+function createUploadWindow() {
+    document.getElementById('upload_overlay').setAttribute('class','visible');
+
+    var dropbox;
+
+    dropbox = document.getElementById("upload_area");
+    dropbox.addEventListener("dragenter", dragenter, false);
+    dropbox.addEventListener("dragover", dragover, false);
+    dropbox.addEventListener("drop", drop, false);
+
+    gadgets.window.adjustHeight();
+}
+
+function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+  var i;
+
+  closeUploadWindow();
+
+  for(i = 0; i < files.length; i=i+1) {
+      getUploadToken('/',files[i]);
+  }
+
+}
+
+function closeUploadWindow() {
+    document.getElementById('upload_overlay').removeAttribute('class','visible');
+}
+
+getDirList('/');
+
