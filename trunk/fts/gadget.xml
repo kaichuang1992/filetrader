@@ -5,11 +5,19 @@
                author_email="fkooman@tuxed.net">
     <Require feature="dynamic-height"/>
     <Require feature="opensocial-0.9"/>
+
   </ModulePrefs>
+  <UserPref name="storageEngine" 
+            display_name="Storage Engine"
+            datatype="enum"
+            default_value="https://frkosp.wind.surfnet.nl/fts/index.php">
+              <EnumValue value="https://frkosp.wind.surfnet.nl/fts/index.php" display_value="Demo [frkosp.wind.surfnet.nl]"/>
+              <EnumValue value="https://franet.tuxed.net/fts/index.php" display_value="University of Monnickendam"/>
+  </UserPref>
   <Content type="html">
 <![CDATA[
-<link rel="stylesheet" type="text/css" href="gadget.css" />
-<script type="text/javascript" src="gadget.js"></script>
+<link rel="stylesheet" type="text/css" href="gadget/gadget.css" />
+<script type="text/javascript" src="gadget/gadget.js"></script>
 <div id="header">
   <button id="upButton">Parent Directory</button>
   <button id="uploadButton" onclick="createUploadWindow()">Upload Files</button>
@@ -33,11 +41,7 @@
    <div id="upload_area">
    Drag Files Here...
    </div>
-
-<!--
-    <input id="inputFiles" type="file" size="5">
- -->
-  <a href="#" onclick="closeUploadWindow()">Close Window</a>
+   <a href="#" onclick="closeUploadWindow()">Close Window</a>
 </div>
 
 ]]>

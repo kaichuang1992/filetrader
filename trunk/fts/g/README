@@ -1,5 +1,0 @@
-This is the OpenSocial gadget code that can be used in an OpenSocial Portal.
-
-NOTE: only HMAC_SHA1 signatures from the container are supported due to 
-php-pecl-oauth not supporting RSA_SHA1 signatures (yet).
-
