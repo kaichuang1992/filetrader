@@ -1,4 +1,5 @@
-    var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
+    var prefs = new _IG_Prefs();
+    var apiEndPoint = prefs.getString("storageEngine");
 
     function pingServer() {
         var params = {};
@@ -45,22 +46,26 @@
 
         gadgets.io.makeRequest(url, function(response) {
 
+                    if(!response.data.ok) {
+                        alert(response.data.errorMessage);
+                    } else {
         document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
 //        document.getElementById('inputFiles').setAttribute('onchange', 'javascript:getUploadToken("' + relativePath + '",this.files[0])');
         document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
         document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
 
-            var output = '<table><tr><th>Name</th><th>Size</th></tr>';
+            var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
             for(var i in response.data) {
                 if(response.data[i] && !response.data[i].fileName) {
                 } else if(response.data[i].isDirectory) {
-                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>&nbsp;</td></tr>';
+                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>&nbsp;</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>"  +  '</td></tr>';
                 } else { 
-                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td></tr>';
+                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName,50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
                 }
             }
             output += "</table>";
             updateOutput(output);
+		}
         }, params);
     };
 
@@ -82,6 +87,11 @@
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=getUploadToken";
         gadgets.io.makeRequest(url, function(response) {
+    
+                    if(!response.data.ok) {
+                        alert(response.data.errorMessage);
+                    } else {
+
             var uploadUrl = response.data.uploadLocation;
             //alert(uploadUrl);
             var xhr = new XMLHttpRequest();
@@ -103,7 +113,9 @@
             }, false);
             xhr.open("PUT", uploadUrl, true);
             xhr.send(file);
+   	    }
         }, params);
+
     };
 
     function getDownloadToken(relativePath) {
@@ -115,10 +127,54 @@
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=getDownloadToken";
         gadgets.io.makeRequest(url, function(response) {
+
+                    if(!response.data.ok) {
+                        alert(response.data.errorMessage);
+                    } else { 
+
             window.location.href = response.data.downloadLocation;
+
+		}
         }, params);
     };
     
+
+    function deleteDirectory(relativePath, fileName) {
+        if(confirm("Are you sure you want to delete " + fileName + "?")) {
+                var postdata = { relativePath : relativePath + '/' + fileName };
+                var params = {};
+                params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+                params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+                params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+                params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+                var url = apiEndPoint + "?action=deleteDirectory";
+                gadgets.io.makeRequest(url, function(response) {
+		    if(!response.data.ok) {
+			alert(response.data.errorMessage);
+		    }
+                    getDirList(relativePath);
+                }, params);
+        }
+    };
+
+    function deleteFile(relativePath, fileName) {
+        if(confirm("Are you sure you want to delete " + fileName + "?")) {
+	        var postdata = { relativePath : relativePath + '/' + fileName };
+	        var params = {};
+	        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+	        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+	        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+	        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
+	        var url = apiEndPoint + "?action=deleteFile";
+	        gadgets.io.makeRequest(url, function(response) {
+                    if(!response.data.ok) {
+                        alert(response.data.errorMessage);
+                    }
+	            getDirList(relativePath);
+	        }, params);
+	}
+    };
+
     function createDirectory(relativePath, dirName) {
         var postdata = { relativePath : relativePath + '/' + dirName };
         var params = {};
@@ -128,6 +184,10 @@
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=createDirectory";
         gadgets.io.makeRequest(url, function(response) { 
+                    if(!response.data.ok) {
+                        alert(response.data.errorMessage);
+                    }
+
 	    closeButtonWindow();
             getDirList(relativePath);
         }, params);
