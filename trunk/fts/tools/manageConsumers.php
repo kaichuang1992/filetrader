@@ -35,13 +35,19 @@
 		break;
 
 	case "add":
-		if($argc != 3) {
+		if($argc < 3) {
 			echo "specify a (unique) consumerKey value, for example the name of the consumer\n";
 			exit(1);
 		}
                 $stmt = $dbh->prepare('INSERT INTO storageConsumers (consumerKey, consumerSecret) VALUES(:key, :secret)');
 		$stmt->bindValue(':key', $argv[2]);
-		$secret = generateToken();
+		if($argc > 3) {
+			/* secret specified */
+                	$secret = $argv[3];
+		} else {
+			/* generate us a new secret */
+			$secret = generateToken();
+		}
 		$stmt->bindValue(':secret', $secret);
 		$stmt->execute();
 		echo "consumerKey: [" . $argv[2] . "], consumerSecret: [" . $secret . "]\n";

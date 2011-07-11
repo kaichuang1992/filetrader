@@ -11,8 +11,8 @@
             display_name="Storage Engine"
             datatype="enum"
             default_value="https://frkosp.wind.surfnet.nl/fts/index.php">
-              <EnumValue value="https://frkosp.wind.surfnet.nl/fts/index.php" display_value="Demo [frkosp.wind.surfnet.nl]"/>
-              <EnumValue value="https://franet.tuxed.net/fts/index.php" display_value="University of Monnickendam"/>
+              <EnumValue value="https://frkosp.wind.surfnet.nl/fts/index.php" display_value="FrKo Test Server [frkosp.wind.surfnet.nl]"/>
+              <EnumValue value="http://192.87.19.123/fts/index.php" display_value="PaDe Test VM [http://192.87.19.123]"/>
   </UserPref>
   <Content type="html">
 <![CDATA[
