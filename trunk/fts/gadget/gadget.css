@@ -49,6 +49,10 @@ div#overlay.visible, div#upload_overlay.visible {
 	display: block !important;
 }
 
+input#fileElem {
+	display: none;
+}
+
 div#upload_area {
 	margin: 0 auto;
 	width: 90%;
