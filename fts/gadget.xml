@@ -12,7 +12,7 @@
             datatype="enum"
             default_value="https://frkosp.wind.surfnet.nl/fts/index.php">
               <EnumValue value="https://frkosp.wind.surfnet.nl/fts/index.php" display_value="FrKo Test Server [frkosp.wind.surfnet.nl]"/>
-              <EnumValue value="http://192.87.19.123/fts/index.php" display_value="PaDe Test VM [http://192.87.19.123]"/>
+              <EnumValue value="http://192.87.19.123/fts/index.php" display_value="PaDe Test VM [192.87.19.123]"/>
   </UserPref>
   <Content type="html">
 <![CDATA[
@@ -36,11 +36,13 @@
 </div>
 
 <div id="upload_overlay">
-   <p>Please drag the files you want to upload to the drop area below:</p>
+   <p>Please drag the files you want to upload to the drop area below or press the button to get the traditional file selector:</p>
 
    <div id="upload_area">
    Drag Files Here...
    </div>
+     <input type="file" id="fileElem" multiple="true">
+     <button id="fileSelect">Select Files...</button>
    <a href="#" onclick="closeUploadWindow()">Close Window</a>
 </div>
 

@@ -5,20 +5,17 @@ function pingServer() {
     var params = {};
     var url = apiEndPoint + "?action=pingServer";
     params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         return response.data.ok;
     }, params);
 };
-
-// DEBUG
-
 
 function serverInfo() {
     var params = {};
     params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
     params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
     var url = apiEndPoint + "?action=serverInfo";
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         output = "";
         for (var i in response.data) {
             if (i === 'availableSpace') {
@@ -45,12 +42,13 @@ function getDirList(relativePath) {
     params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
     var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
 
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         if (!response.data.ok) {
             alert(response.data.errorMessage);
         } else {
             document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
-            //        document.getElementById('inputFiles').setAttribute('onchange', 'javascript:getUploadToken("' + relativePath + '",this.files[0])');
+            document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
+
             document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
             document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
 
@@ -88,14 +86,14 @@ function getUploadToken(relativePath, file) {
     params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
     params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
     var url = apiEndPoint + "?action=getUploadToken";
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         if (!response.data.ok) {
             alert(response.data.errorMessage);
         } else {
             var uploadUrl = response.data.uploadLocation;
             //alert(uploadUrl);
             var xhr = new XMLHttpRequest();
-            xhr.upload.addEventListener("progress", function (evt) {
+            xhr.upload.addEventListener("progress", function(evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = Math.round(evt.loaded / evt.total * 100);
                     var fn;
@@ -107,7 +105,7 @@ function getUploadToken(relativePath, file) {
                     document.getElementById('status').innerHTML = "Progress (" + fn + "): " + percentComplete + "%";
                 }
             }, false);
-            xhr.upload.addEventListener("load", function (evt) {
+            xhr.upload.addEventListener("load", function(evt) {
                 document.getElementById('status').innerHTML = 'Path: ' + relativePath.replace("//", "/");
                 getDirList(relativePath);
             }, false);
@@ -128,7 +126,7 @@ function getDownloadToken(relativePath) {
     params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
     params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
     var url = apiEndPoint + "?action=getDownloadToken";
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         if (!response.data.ok) {
             alert(response.data.errorMessage);
         } else {
@@ -148,7 +146,7 @@ function deleteDirectory(relativePath, fileName) {
         params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=deleteDirectory";
-        gadgets.io.makeRequest(url, function (response) {
+        gadgets.io.makeRequest(url, function(response) {
             if (!response.data.ok) {
                 alert(response.data.errorMessage);
             }
@@ -168,7 +166,7 @@ function deleteFile(relativePath, fileName) {
         params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
         params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
         var url = apiEndPoint + "?action=deleteFile";
-        gadgets.io.makeRequest(url, function (response) {
+        gadgets.io.makeRequest(url, function(response) {
             if (!response.data.ok) {
                 alert(response.data.errorMessage);
             }
@@ -187,7 +185,7 @@ function createDirectory(relativePath, dirName) {
     params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
     params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
     var url = apiEndPoint + "?action=createDirectory";
-    gadgets.io.makeRequest(url, function (response) {
+    gadgets.io.makeRequest(url, function(response) {
         if (!response.data.ok) {
             alert(response.data.errorMessage);
         }
@@ -233,6 +231,15 @@ function createUploadWindow() {
     dropbox.addEventListener("dragover", dragover, false);
     dropbox.addEventListener("drop", drop, false);
     gadgets.window.adjustHeight();
+
+    var fileSelect = document.getElementById("fileSelect"),
+        fileElem = document.getElementById("fileElem");
+    fileSelect.addEventListener("click", function(e) {
+        if (fileElem) {
+            fileElem.click();
+        }
+        e.preventDefault(); // prevent navigation to "#"
+    }, false);
 }
 
 function dragenter(e) {
@@ -254,6 +261,13 @@ function drop(e) {
     closeUploadWindow();
     for (i = 0; i < files.length; i = i + 1) {
         getUploadToken('/', files[i]);
+    }
+}
+
+function handleFiles(relativePath, files) {
+    closeUploadWindow();
+    for (var i = 0; i < files.length; i++) {
+        getUploadToken(relativePath, files[i]);
     }
 }
 
