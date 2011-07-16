@@ -13,7 +13,7 @@ $config['fts_data'] = __DIR__ . DIRECTORY_SEPARATOR . 'data';
 
 /* Database configuration
  * See http://www.php.net/manual/en/pdo.construct.php */
-$config['fts_db_dsn'] = 'sqlite:' . __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'fts.sqlite';
+$config['fts_db_dsn'] = 'sqlite:' . $config['fts_data'] . DIRECTORY_SEPARATOR . 'fts.sqlite';
 $config['fts_db_user'] = NULL;
 $config['fts_db_pass'] = NULL;
 $config['fts_db_options'] = array(PDO::ATTR_PERSISTENT => FALSE);
