@@ -20,7 +20,7 @@ function serverCall(action, params, method, callback) {
         if (!response.data.ok) {
             alert(response.data.errorMessage);
         } else {
-            callback(response)
+            callback(response);
         }
     }, params);
 }
