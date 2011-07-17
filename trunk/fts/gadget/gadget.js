@@ -1,21 +1,38 @@
+/* OpenSocial Gadget Source. If designed well, only "serverCall" should be
+   reimplemented to make it work elsewhere, currently that is not the 
+   case unfortunately... */
+
+// var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
 var prefs = new _IG_Prefs();
 var apiEndPoint = prefs.getString("storageEngine");
 
-function pingServer() {
-    var params = {};
-    var url = apiEndPoint + "?action=pingServer";
+function serverCall(action, params, method, callback) {
+    var url = apiEndPoint + "?action=" + action;
     params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    gadgets.io.makeRequest(url, function(response) {
-        return response.data.ok;
+    if (action !== "pingServer") {
+        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+    }
+    if (method === "POST") {
+        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(params);
+    }
+    gadgets.io.makeRequest(url, function (response) {
+        if (!response.data.ok) {
+            alert(response.data.errorMessage);
+        } else {
+            callback(response)
+        }
     }, params);
-};
+}
+
+function pingServer() {
+    serverCall("pingServer", {}, "GET", function (response) {
+        return response.data.ok;
+    });
+}
 
 function serverInfo() {
-    var params = {};
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    var url = apiEndPoint + "?action=serverInfo";
-    gadgets.io.makeRequest(url, function(response) {
+    serverCall("serverInfo", {}, "GET", function (response) {
         output = "";
         for (var i in response.data) {
             if (i === 'availableSpace') {
@@ -25,174 +42,101 @@ function serverInfo() {
             }
         }
         alert(output);
-    }, params);
-};
-
-function parentDirectory(relativePath) {
-    var lastSlash = relativePath.lastIndexOf('/');
-    if (lastSlash > 0) {
-        relativePath = relativePath.substring(0, lastSlash);
-    }
-    getDirList(relativePath);
+    });
 }
 
-function getDirList(relativePath) {
-    var params = {};
-    params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    var url = apiEndPoint + "?action=getDirList&relativePath=" + relativePath;
+function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativePath' : relativePath}, "GET", function() { */
+    serverCall("getDirList&relativePath=" + relativePath, {}, "GET", function (response) {
+        document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
+        document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
 
-    gadgets.io.makeRequest(url, function(response) {
-        if (!response.data.ok) {
-            alert(response.data.errorMessage);
-        } else {
-            document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
-            document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
+        document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
+        document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
 
-            document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
-            document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
-
-            var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
-            for (var i in response.data) {
-                if (response.data[i] && !response.data[i].fileName) {} else if (response.data[i].isDirectory) {
-                    output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
-                } else {
-                    output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
-                }
+        var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
+        for (var i in response.data) {
+            if (response.data[i] && !response.data[i].fileName) {} else if (response.data[i].isDirectory) {
+                output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
+            } else {
+                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
             }
-            output += "</table>";
-            updateOutput(output);
         }
-    }, params);
-};
-
-function sliceName(name, len) {
-    if (name.length > len) {
-        return name.slice(0, len / 2 - 2) + "..." + name.slice(0 - (len / 2 - 2), name.length);
-    } else {
-        return name;
-    }
+        output += "</table>";
+        updateOutput(output);
+    });
 }
-
 
 function getUploadToken(relativePath, file) {
-    var postdata = {
+    var params = {
         relativePath: relativePath + '/' + file.name,
         fileSize: file.size
     };
-    var params = {};
-    params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-    params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-    var url = apiEndPoint + "?action=getUploadToken";
-    gadgets.io.makeRequest(url, function(response) {
-        if (!response.data.ok) {
-            alert(response.data.errorMessage);
-        } else {
-            var uploadUrl = response.data.uploadLocation;
-            //alert(uploadUrl);
-            var xhr = new XMLHttpRequest();
-            xhr.upload.addEventListener("progress", function(evt) {
-                if (evt.lengthComputable) {
-                    var percentComplete = Math.round(evt.loaded / evt.total * 100);
-                    var fn;
-                    if (file.name.length > 23) {
-                        fn = file.name.slice(0, 10) + "..." + file.name.slice(-10, file.name.length);
-                    } else {
-                        fn = file.name;
-                    }
-                    document.getElementById('status').innerHTML = "Progress (" + fn + "): " + percentComplete + "%";
+    serverCall("getUploadToken", params, "POST", function (response) {
+        var uploadUrl = response.data.uploadLocation;
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function (evt) {
+            if (evt.lengthComputable) {
+                var percentComplete = Math.round(evt.loaded / evt.total * 100);
+                var fn;
+                if (file.name.length > 23) {
+                    fn = file.name.slice(0, 10) + "..." + file.name.slice(-10, file.name.length);
+                } else {
+                    fn = file.name;
                 }
-            }, false);
-            xhr.upload.addEventListener("load", function(evt) {
-                document.getElementById('status').innerHTML = 'Path: ' + relativePath.replace("//", "/");
-                getDirList(relativePath);
-            }, false);
-            xhr.open("PUT", uploadUrl, true);
-            xhr.send(file);
-        }
-    }, params);
-
-};
+                document.getElementById('status').innerHTML = "Progress (" + fn + "): " + percentComplete + "%";
+            }
+        }, false);
+        xhr.upload.addEventListener("load", function (evt) {
+            document.getElementById('status').innerHTML = 'Path: ' + relativePath.replace("//", "/");
+            getDirList(relativePath);
+        }, false);
+        xhr.open("PUT", uploadUrl, true);
+        xhr.send(file);
+    });
+}
 
 function getDownloadToken(relativePath) {
-    var postdata = {
+    var params = {
         relativePath: relativePath
     };
-    var params = {};
-    params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-    params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-    var url = apiEndPoint + "?action=getDownloadToken";
-    gadgets.io.makeRequest(url, function(response) {
-        if (!response.data.ok) {
-            alert(response.data.errorMessage);
-        } else {
-            window.location.href = response.data.downloadLocation;
-        }
-    }, params);
-};
+    serverCall("getDownloadToken", params, "POST", function (response) {
+        window.location.href = response.data.downloadLocation;
+    });
+}
 
 function deleteDirectory(relativePath, fileName) {
     if (confirm("Are you sure you want to delete " + fileName + "?")) {
-        var postdata = {
+        var params = {
             relativePath: relativePath + '/' + fileName
         };
-        var params = {};
-        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-        var url = apiEndPoint + "?action=deleteDirectory";
-        gadgets.io.makeRequest(url, function(response) {
-            if (!response.data.ok) {
-                alert(response.data.errorMessage);
-            }
+        serverCall("deleteDirectory", params, "POST", function (response) {
             getDirList(relativePath);
-        }, params);
+        });
     }
-};
+}
 
 function deleteFile(relativePath, fileName) {
     if (confirm("Are you sure you want to delete " + fileName + "?")) {
-        var postdata = {
+        var params = {
             relativePath: relativePath + '/' + fileName
         };
-        var params = {};
-        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-        var url = apiEndPoint + "?action=deleteFile";
-        gadgets.io.makeRequest(url, function(response) {
-            if (!response.data.ok) {
-                alert(response.data.errorMessage);
-            }
+        serverCall("deleteFile", params, "POST", function (response) {
             getDirList(relativePath);
-        }, params);
+        });
     }
-};
+}
 
 function createDirectory(relativePath, dirName) {
-    var postdata = {
+    var params = {
         relativePath: relativePath + '/' + dirName
     };
-    var params = {};
-    params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-    params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(postdata);
-    var url = apiEndPoint + "?action=createDirectory";
-    gadgets.io.makeRequest(url, function(response) {
-        if (!response.data.ok) {
-            alert(response.data.errorMessage);
-        }
+    serverCall("createDirectory", params, "POST", function (response) {
         closeButtonWindow();
         getDirList(relativePath);
-    }, params);
-};
+    });
+}
+
+/* Below are the helper functions, much can be optimized, it is one big mess */
 
 function updateOutput(output) {
     document.getElementById('ft_output').innerHTML = output;
@@ -234,7 +178,7 @@ function createUploadWindow() {
 
     var fileSelect = document.getElementById("fileSelect"),
         fileElem = document.getElementById("fileElem");
-    fileSelect.addEventListener("click", function(e) {
+    fileSelect.addEventListener("click", function (e) {
         if (fileElem) {
             fileElem.click();
         }
@@ -251,6 +195,8 @@ function dragover(e) {
     e.stopPropagation();
     e.preventDefault();
 }
+
+/* FIXME: need to work with relativePath! */
 
 function drop(e) {
     e.stopPropagation();
@@ -274,5 +220,27 @@ function handleFiles(relativePath, files) {
 function closeUploadWindow() {
     document.getElementById('upload_overlay').removeAttribute('class', 'visible');
 }
+
+/* FIXME */
+
+function parentDirectory(relativePath) {
+    var lastSlash = relativePath.lastIndexOf('/');
+    if (lastSlash > 0) {
+        relativePath = relativePath.substring(0, lastSlash);
+    }
+    getDirList(relativePath);
+}
+
+/* FIXME */
+
+function sliceName(name, len) {
+    if (name.length > len) {
+        return name.slice(0, len / 2 - 2) + "..." + name.slice(0 - (len / 2 - 2), name.length);
+    } else {
+        return name;
+    }
+}
+
+
 
 getDirList('/');
