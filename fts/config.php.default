@@ -18,4 +18,7 @@ $config['fts_db_user'] = NULL;
 $config['fts_db_pass'] = NULL;
 $config['fts_db_options'] = array(PDO::ATTR_PERSISTENT => FALSE);
 
+// $config['oauth_lib_dir'] = '/usr/share/php/oauth';
+$config['oauth_lib_dir'] = 'ext/oauth';
+
 ?>

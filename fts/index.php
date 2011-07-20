@@ -38,6 +38,8 @@ try {
         }
     }
 
+    set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($config, "oauth_lib_dir", TRUE));
+	
     /* FIXME: use better URLparser with something like htaccess */
     if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
         $action = 'pingServer';
@@ -67,14 +69,8 @@ try {
     /* some actions are allowed without authentication */
     $noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
     if (!in_array($action, $noAuthActions, TRUE)) {
-
-	/* PHP PECL OAuth (HMAC only) */
-	require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
-	$auth = new MyOAuthProvider($dbh);
-
-	/* PHP OAuth (RSA, HMAC) */
-	// require_once("lib/OAuthProv/OAuthProv.class.php");
-	// $auth = new OAuthProv($dbh);
+	require_once("lib/OAuthProv/OAuthProv.class.php");
+	$auth = new OAuthProv($dbh);
 
         $auth->authenticate();
         $consumerIdentifier = urlencode($auth->getConsumerIdentifier());

@@ -1,6 +1,14 @@
-div#ft_output {
-    font-size: 85%;
+tbody {
+	font-size: 85%;
     font-family: sans-serif;
+}
+
+a { 
+	text-decoration: none;
+	color: #222;
+}
+
+div#ft_output {
     margin: 0;
     padding: 0;
     height: 300px;
