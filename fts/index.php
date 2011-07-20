@@ -64,13 +64,18 @@ try {
 	                   getConfig($config, 'fts_db_pass', FALSE, NULL),
 	                   getConfig($config, 'fts_db_options', FALSE, array()));
 
-//	logHandler(var_export($dbh->errorInfo(), TRUE));
-
     /* some actions are allowed without authentication */
     $noAuthActions = array('pingServer', 'downloadFile', 'uploadFile');
     if (!in_array($action, $noAuthActions, TRUE)) {
-        require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
-        $auth = new MyOAuthProvider($dbh);
+
+	/* PHP PECL OAuth (HMAC only) */
+	require_once("lib/MyOAuthProvider/MyOAuthProvider.class.php");
+	$auth = new MyOAuthProvider($dbh);
+
+	/* PHP OAuth (RSA, HMAC) */
+	// require_once("lib/OAuthProv/OAuthProv.class.php");
+	// $auth = new OAuthProv($dbh);
+
         $auth->authenticate();
         $consumerIdentifier = urlencode($auth->getConsumerIdentifier());
 
