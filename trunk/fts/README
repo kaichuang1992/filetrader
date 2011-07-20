@@ -1,12 +1,4 @@
 -- REQUIREMENTS --
-* php-pecl-oauth (http://pecl.php.net/package/oauth)
-	==> Fedora Package (php-pecl-oauth)
-		http://admin.fedoraproject.org/updates/php-pecl-oauth
-		(Currently in testing for F14/F15, soon to be pushed to stable)
-
-	==> Debian Package
-		Not in Debian (use "pecl install oauth")
-		
 * mod_xsendfile (https://tn123.org/mod_xsendfile/)
 	==> Fedora Package (mod_xsendfile)
 
@@ -111,9 +103,6 @@ access the .svn directories and the files therein files through the web! See
 Included is an OpenSocial gadget (gadget.xml) that can be loaded in an 
 OpenSocial container. 
 
-NOTE: only HMAC-SHA1 signatures from the container are supported due to 
-php-pecl-oauth not supporting RSA-SHA1 signatures (yet) [2].
-
 --- ISSUES ---
 We are using a persistent database connection to the SQlite file, which means 
 that if you remove the file from the file system writing to the database still 
@@ -122,4 +111,3 @@ is to restart Apache/PHP when doing this...
 
 --- REFERENCES ---
 [1] http://codex.wordpress.org/Installing/Updating_WordPress_with_Subversion#A_Note_About_.SVN_Folders_on_Public_Servers
-[2] http://pecl.php.net/bugs/bug.php?id=22779

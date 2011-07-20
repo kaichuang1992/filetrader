@@ -1,0 +1,19 @@
+-- DEPENDENCIES --
+* php-oauth (http://code.google.com/p/oauth/)
+
+        ==> Fedora Package (php-oauth)
+                http://admin.fedoraproject.org/updates/php-oauth
+
+        ==> Debian Package (liboauth-php)
+
+        NOTE JUST FOR PACKAGE MAINTAINERS:
+        When using the SVN version the php-oauth library is included
+        as an external dependency and automatically fetched and used.
+        Modify the configuration file to use the system-wide version.
+
+        # Fedora
+        $config['oauth_lib_dir'] = '/usr/share/php/oauth'
+
+        # Debian
+        $config['oauth_lib_dir'] = '/usr/share/php'
+
