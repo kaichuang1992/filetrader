@@ -6,6 +6,10 @@
 var prefs = new _IG_Prefs();
 var apiEndPoint = prefs.getString("storageEngine");
 
+/*
+var relativePath = "/";
+*/
+
 function serverCall(action, params, method, callback) {
     var url = apiEndPoint + "?action=" + action;
     params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
@@ -44,6 +48,20 @@ function serverInfo() {
         alert(output);
     });
 }
+
+/*
+function getDirList() {
+	serverCall("getDirList", {'relativePath' : relativePath}, "GET", function() {
+		var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
+		for (var i in response.data) {
+			if (response.data[i].isDirectory) {
+			output += '<tr><td><a class="listDir" href="' + relativePath + "/" + response.data[i].fileName + '">' + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td><a class="deleteDir" href="' + relativePath + '/' + response.data[i].fileName + '">del</a></td></tr>';
+			} else {
+
+			}
+	});
+}
+*/
 
 function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativePath' : relativePath}, "GET", function() { */
     serverCall("getDirList&relativePath=" + relativePath, {}, "GET", function (response) {
