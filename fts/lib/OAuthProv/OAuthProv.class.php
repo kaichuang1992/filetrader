@@ -60,7 +60,18 @@ class OAuthProv {
 	if(!$valid) {
 		throw new Exception("invalid signature");
 	} else {
-	        $this->consumerKey = $consumer_key;
+		/* SURFconext */
+		$instance_id = $request->get_parameter('opensocial_instance_id');
+		/* iGoogle */
+                $owner_id = $request->get_parameter('opensocial_owner_id');
+
+		if($instance_id !== NULL) {
+			$this->consumerKey = $consumer_key . '_' . $instance_id;
+		} else if($owner_id !== NULL) {
+                        $this->consumerKey = $consumer_key . '_' . $owner_id;
+		} else {
+                        $this->consumerKey = $consumer_key;
+		}
 	}
     }
 
