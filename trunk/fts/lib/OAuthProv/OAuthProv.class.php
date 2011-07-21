@@ -62,8 +62,8 @@ class OAuthProv {
 	} else {
 		/* SURFconext (contains groupContext) */
 		$instance_id = $request->get_parameter('opensocial_instance_id');
-    /* iGoogle and other OpenSocial/Shindig portals/containers */
-    $owner_id = $request->get_parameter('opensocial_owner_id');
+		/* iGoogle and other OpenSocial/Shindig portals/containers */
+		$owner_id = $request->get_parameter('opensocial_owner_id');
 
 		if($instance_id !== NULL) {
 			$this->consumerKey = $consumer_key . '_' . $instance_id;
