@@ -1,9 +1,8 @@
 -- REQUIREMENTS --
 * The Apache module mod_xsendfile:
-	https://tn123.org/mod_xsendfile/
-
+	(https://tn123.org/mod_xsendfile/)
+* PHP 5.3.x
 * The PHP PDO module for SQlite
-
 * A 64 bit operating system and PHP installation (for >2G file support)
 
 --- On Fedora ---

@@ -31,7 +31,7 @@
 
 		echo "*** LIST OF STORAGE CONSUMERS ***\n\n";
 		foreach($sc as $i) {
-			echo "[KEY]    = " . $i['consumerKey'] . "\n[SECRET] = " . $i['consumerSecret'] . "\n[PATH]   = " . getConfig($config, 'fts_data', TRUE) . DIRECTORY_SEPARATOR . urlencode($i['consumerKey']) . "\n\n";
+			echo "[KEY]    = " . $i['consumerKey'] . "\n[SECRET] = " . $i['consumerSecret'] . "\n\n";
 		}
 		break;
 
@@ -44,8 +44,8 @@
 		$stmt->bindValue(':key', $argv[2]);
 		if($argc > 3) {
 			/* secret specified */
-			if(file_exists($argv[3]) && is_file($argv[3])) {
-				/* certificate instead of secret specified */
+			if(file_exists($argv[3]) && is_file($argv[3]) && is_readable($argv[3])) {
+				/* assume certificate instead of secret specified */
 				$secret = file_get_contents($argv[3]);
 			} else {
 	                	$secret = $argv[3];
