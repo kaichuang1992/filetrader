@@ -1,19 +1,20 @@
 -- REQUIREMENTS --
-* mod_xsendfile (https://tn123.org/mod_xsendfile/)
-	==> Fedora Package (mod_xsendfile)
+* The Apache module mod_xsendfile:
+	https://tn123.org/mod_xsendfile/
 
-	==> Debian Package (libapache2-mod-xsendfile)
+* The PHP PDO module for SQlite
 
-* php-pdo (with SQLite driver)
-	==> Fedora Package (php-pdo)
-		In Fedora this package contains the SQLite driver
+* A 64 bit operating system and PHP installation (for >2G file support)
 
-	==> Debian Package (php5-sqlite)
-		Also contains SQLite PDO driver
+--- On Fedora ---
 
-* 64 bit operating system and PHP installation (for >2G file support)
+$ sudo yum install mod_xsendfile php-pdo
 
---- INSTALLATION ---
+--- On Debian/Ubuntu ---
+
+$ sudo apt-get install libapache2-mod-xsendfile php5-sqlite
+
+-- INSTALLATION --
 
 It is assumed you placed the source files (and sub directories) of fts in 
 /var/www/html/fts. This is the default directory on Red Hat based systems. On 
@@ -26,46 +27,34 @@ $ mkdir -p data
 # set unix permissions
 $ chmod o+w -R data
 
---- SELINUX CONFIGURATION ---
+-- SELINUX CONFIGURATION --
 
 Set the correct SELinux labels (only for Fedora/Red Hat systems?)
 
 $ chcon -R -t httpd_sys_rw_content_t data
 
---- CONFIGURATION ---
+-- CONFIGURATION --
 
 Copy config.php.default to config.php and modify it for your situation
 (if needed).
 
 In order to configure storage consumers it is recommended to use a 
-reasonable length secrets. The provided tool in the "tools" directory
-will create them for you.
+reasonable length OAuth secrets (HMAC-SHA1) or RSA certificates (RSA-SHA1). 
+The provided tool in the "tools" directory will let you configure them, 
+see for more information and examples:
 
-$ php tools/manageConsumer.php add [NAME OF CONSUMER]
+$ php tools/manageConsumers.php --help
 
-For example:
-
-$ php tools/manageConsumers.php add "my.university.org"
-consumerKey: [my.university.org], 
-consumerSecret: [421398aec34678f1efc506a08f36446d]
-
-You can list the configured consumers using:
-
-$ php tools/manageConsumers.php list
-
-*** LIST OF STORAGE CONSUMERS ***
-[KEY]    = my.university.org
-[SECRET] = 421398aec34678f1efc506a08f36446d
-[PATH]   = /var/www/html/filetrader/fts/data/my.university.org
-
-NOTE [1]: The key and secret should be configured in the remote consumer that 
-is accessing this service. The path is the location on the local file system 
-where files belonging to this consumer will be stored.
+NOTE [1]: In case HMAC-SHA1 (key/secret) is used the key and secret should be 
+configured in the remote consumer that is accessing this service. In case 
+RSA-SHA1 (certificate) is used the public key should be configured using this
+tool.
 
 NOTE [2]: The file data/fts.sqlite should be writable by the web server. If you
-use the tool manageConsumers.php first the file will be created, but not be 
-writable by the web server anymore, so the setting the permissions part of the
-installation section should be repeated!
+use the tool first the file will be created, but not be writable by the web 
+server, so the web server should have write access again:
+
+$ chmod o+w data/fts.sqlite
 
 --- APACHE CONFIGURATION ---
 
@@ -89,7 +78,8 @@ and enabling X-SendFile.
 </Directory>
 --- CUT ---
 
-In tests on Debian it was also needed to enable the following directive:
+In tests on Debian it was also needed to enable the following directive in
+the section containing XSendFile:
 
 --- CUT ---
     XSendFileAllowAbove on
@@ -99,15 +89,15 @@ NOTE: If you checked out the source from SVN make sure it is not possible to
 access the .svn directories and the files therein files through the web! See 
 [1] for more information.
 
---- OPENSOCIAL ---
+-- OPENSOCIAL --
 Included is an OpenSocial gadget (gadget.xml) that can be loaded in an 
 OpenSocial container. 
 
---- ISSUES ---
-We are using a persistent database connection to the SQlite file, which means 
-that if you remove the file from the file system writing to the database still 
-seems to work, but reading from it fails or something like that... A solution 
-is to restart Apache/PHP when doing this...
+-- ISSUES --
+If you are using the persistent database connection to the SQlite file be aware 
+that remove the SQlite file from the file system writing to the database still 
+seems to work, but reading from it fails. A fix is to restart Apache/PHP after 
+doing this...
 
---- REFERENCES ---
+-- REFERENCES --
 [1] http://codex.wordpress.org/Installing/Updating_WordPress_with_Subversion#A_Note_About_.SVN_Folders_on_Public_Servers
