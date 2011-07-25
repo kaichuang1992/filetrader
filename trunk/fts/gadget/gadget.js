@@ -69,7 +69,7 @@ function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativeP
         document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
 
         document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
-        document.getElementById('status').innerHTML = 'Path: ' + sliceName(relativePath.replace("//", "/"), 25);
+        document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + apiEndPoint;
 
         var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
         for (var i in response.data) {
