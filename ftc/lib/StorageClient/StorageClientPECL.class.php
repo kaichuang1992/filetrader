@@ -18,15 +18,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once("../fts/ext/oauth/OAuth.php");
-
 class StorageClient {
-    private $consumer;
+
+    private $endpoint;
+    private $oauth;
+    private $decode;
 
     function __construct($storageProvider) {
         $this->decode = FALSE;
-	$this->endpoint = $storageProvider['apiUrl'];
- 	$this->consumer = new OAuthConsumer($storageProvider['consumerKey'], $storageProvider['consumerSecret']);
+
+        $this->endpoint = $storageProvider['apiUrl'];
+        $this->oauth = new OAuth($storageProvider['consumerKey'],
+                        $storageProvider['consumerSecret'], OAUTH_SIG_METHOD_HMACSHA1,
+                        OAUTH_AUTH_TYPE_AUTHORIZATION);
     }
 
     /**
@@ -46,32 +50,16 @@ class StorageClient {
      * @param string $method (POST, GET)
      */
     function call($action = "pingServer", $parameters = array(), $method = "GET") {
-        $endpoint = "$this->endpoint/?action=$action";
-        $request = OAuthRequest::from_consumer_and_token($this->consumer, NULL, $method, $endpoint, $parameters);
-	$sig_method = new OAuthSignatureMethod_HMAC_SHA1();
-	$request->sign_request($sig_method, $this->consumer, NULL);
-
-	switch($method) {
-	case "GET": 
-		$response = file_get_contents($request->to_url());
-		break;
-
-	case "POST": 
-		$opts = array('http' =>
-		    array(
-		        'method'  => 'POST',
-		        'header'  => 'Content-type: application/x-www-form-urlencoded',
-		        'content' => $request->to_postdata(),
-		    )           
-		);
-		$context = stream_context_create($opts);
-		$response = file_get_contents($endpoint, false, $context);
-		break;
-
-	default: 
+        if ($method == "GET") {
+            $method = OAUTH_HTTP_METHOD_GET;
+        } elseif ($method == "POST") {
+            $method = OAUTH_HTTP_METHOD_POST;
+        } else {
             throw new Exception("invalid method, should be either GET or POST");
-	}
-
+        }
+        $endpoint = "$this->endpoint/?action=$action";
+        $this->oauth->fetch($endpoint, $parameters, $method);
+        $response = $this->oauth->getLastResponse();
         return ($this->decode) ? json_decode($response) : $response;
     }
 
