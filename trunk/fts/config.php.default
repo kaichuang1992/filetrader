@@ -1,5 +1,8 @@
 <?php
 
+/* The display name of server */
+$config['display_name'] = 'Snake Oil Storage';
+
 /* Time zone
  * See http://php.net/manual/en/timezones.php */
 $config['time_zone'] = 'Europe/Amsterdam';
