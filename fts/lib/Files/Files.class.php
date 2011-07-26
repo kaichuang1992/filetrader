@@ -385,7 +385,7 @@ class Files {
         if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             throw new Exception("invalid request method, should be GET");
         }
-        return array('message' => 'FTS reporting for duty', 'apiVersion' => API_VERSION);
+        return array('message' => 'FTS reporting for duty', 'apiVersion' => API_VERSION, 'displayName' => getConfig($this->config, 'display_name', FALSE, $_SERVER['SERVER_NAME']));
     }
 
     /**

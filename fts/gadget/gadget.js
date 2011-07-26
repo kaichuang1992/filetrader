@@ -5,6 +5,7 @@
 // var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
 var prefs = new _IG_Prefs();
 var apiEndPoint = prefs.getString("storageEngine");
+var displayName;
 
 /*
 var relativePath = "/";
@@ -31,6 +32,7 @@ function serverCall(action, params, method, callback) {
 
 function pingServer() {
     serverCall("pingServer", {}, "GET", function (response) {
+	displayName = response.data.displayName;
         return response.data.ok;
     });
 }
@@ -69,7 +71,7 @@ function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativeP
         document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
 
         document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
-        document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + apiEndPoint;
+        document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + displayName;
 
         var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
         for (var i in response.data) {
@@ -260,5 +262,5 @@ function sliceName(name, len) {
 }
 
 
-
+pingServer();
 getDirList('/');
