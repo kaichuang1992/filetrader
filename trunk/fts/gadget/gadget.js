@@ -268,7 +268,9 @@ function fancyDate(ts) {
 
 	if(ts*1000 > (currentTs - 60*60*24*1000)) {
 		/* last 24h, show just time */
-		humanDate = date.getHours() + ":" + date.getMinutes();
+		var hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+		var minutes = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+		humanDate = hours + ":" + minutes;
 	} else if ( ts*1000 > (currentTs - 60*60*24*7*1000) ) {
 		/* last week, show just day */
 		humanDate = dayToText(date.getDay());
