@@ -73,12 +73,12 @@ function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativeP
         document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
         document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + displayName;
 
-        var output = '<table><tr><th>Name</th><th>Size</th><th>Action</th></tr>';
+        var output = '<table><tr><th>Name</th><th>Size</th><th>Created</th><th>Action</th></tr>';
         for (var i in response.data) {
             if (response.data[i] && !response.data[i].fileName) {} else if (response.data[i].isDirectory) {
-                output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
+                output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
             } else {
-                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
+                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
             }
         }
         output += "</table>";
@@ -261,6 +261,31 @@ function sliceName(name, len) {
     }
 }
 
+function fancyDate(ts) {
+	var currentTs = new Date().getTime();
+	var date = new Date(ts*1000);
+	var humanDate;
+
+	if(ts*1000 > (currentTs - 60*60*24*1000)) {
+		/* last 24h, show just time */
+		humanDate = date.getHours() + ":" + date.getMinutes();
+	} else if ( ts*1000 > (currentTs - 60*60*24*7*1000) ) {
+		/* last week, show just day */
+		humanDate = dayToText(date.getDay());
+	} else if (ts*1000 > (currentTs - 60*60*24*365*1000 )) {
+		/* longer ago, show just month+day */
+		humanDate = date.getMonth() + " " + date.getDate();
+	} else { 
+		/* show year */
+		humanDate = date.getFullYear();
+	}
+	return humanDate;
+}
+
+function dayToText(day) {
+	var days = { 0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat" };
+	return days[day];
+}
 
 pingServer();
 getDirList('/');

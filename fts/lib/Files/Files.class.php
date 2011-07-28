@@ -299,6 +299,7 @@ class Files {
         foreach (glob("*") as $fileName) {
             array_push($dirList, array("fileName" => $fileName,
                 "fileSize" => filesize($fileName),
+		"fileDate" => filectime($fileName), 
                 "isDirectory" => is_dir($fileName)));
         }
         return $dirList;
