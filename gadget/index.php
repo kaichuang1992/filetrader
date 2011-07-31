@@ -18,7 +18,7 @@
  */
 
 require_once ('config.php');
-require_once ('../filetrader/fts/utils.php');
+require_once ('utils.php');
 
 if (!isset($config) || !is_array($config)) {
     die("broken or missing configuration file?");
@@ -35,8 +35,8 @@ require_once ("Smarty.class.php");
 $smarty = new Smarty();
 $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
-$smarty->assign('css_url', getProtocol() . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']) . '/s/style.css');
-$smarty->assign('js_url', getProtocol() . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']) . '/j/opensocial.js');
+$smarty->assign('css_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/s/style.css');
+$smarty->assign('js_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/opensocial.js');
 $content = $smarty->fetch('body.tpl');
 $smarty->assign('content', $content);
 
