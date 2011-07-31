@@ -1,0 +1,5 @@
+<?php
+
+$config['smarty_lib_dir'] = 'ext/smarty/libs';
+
+?>
