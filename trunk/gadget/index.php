@@ -30,25 +30,19 @@ set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($config, "smart
 
 $view = getRequest('view', FALSE, 'web');
 
+if(!in_array($view, array('web','opensocial'))) {
+	die ("invalid view");
+}
+
 require_once ("Smarty.class.php");
 
 $smarty = new Smarty();
 $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
 $smarty->assign('css_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/s/style.css');
-$smarty->assign('js_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/opensocial.js');
+$smarty->assign('js_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/' . $view . '.js');
 $content = $smarty->fetch('body.tpl');
 $smarty->assign('content', $content);
-
-switch($view) {
-case "opensocial":
-	$smarty->display('opensocial.tpl');
-	break;
-case "web":
-	$smarty->display('web.tpl');
-	break;
-default:
-	die("invalid view");
-}
+$smarty->display($view . '.tpl');
 
 ?>
