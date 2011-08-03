@@ -1,0 +1,3 @@
+# svn propset svn:externals . -F svn_externals.txt
+oauth http://oauth.googlecode.com/svn/code/php/
+smarty http://smarty-php.googlecode.com/svn/trunk/distribution/
