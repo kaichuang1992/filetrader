@@ -1,19 +1,17 @@
-  <link rel="stylesheet" type="text/css" href=
-  "{$css_url}">
-  <script type="text/javascript" src=
-  "{$js_url}">
-  </script>
+  <link rel="stylesheet" type="text/css" href="{$css_url}">
+  <script type="text/javascript" src="{$js_url}"></script>
+  <script type="text/javascript" src="{$js_common_url}"></script>
 
-  <div id="header">
+<!--  <div id="header">
     <button id="upButton">Parent Directory</button> <button id=
     "uploadButton" onclick="createUploadWindow()">Upload
     Files</button> <button id="createDir" onclick=
     "createButtonWindow()">Create Directory</button>
-  </div>
+  </div> -->
 
   <div id="ft_output"></div>
 
-  <div id="status"></div>
+<!--  <div id="status"></div>
 
   <div id="overlay">
     <p>Please enter the name of the directory you want to
@@ -36,4 +34,4 @@
     </div><input type="file" id="fileElem" multiple="true">
     <button id="fileSelect">Select Files...</button> <a href="#"
     onclick="closeUploadWindow()">Close Window</a>
-  </div>
+  </div> -->

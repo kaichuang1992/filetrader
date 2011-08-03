@@ -28,9 +28,9 @@ date_default_timezone_set(getConfig($config, 'time_zone', FALSE, 'Europe/Amsterd
 
 set_include_path(get_include_path() . PATH_SEPARATOR . getConfig($config, "smarty_lib_dir", TRUE));
 
-$view = getRequest('view', FALSE, 'web');
+$view = getRequest('fmt', FALSE, 'html');
 
-if(!in_array($view, array('web','opensocial'))) {
+if(!in_array($view, array('html','os'))) {
 	die ("invalid view");
 }
 
@@ -41,8 +41,16 @@ $smarty->template_dir = 'tpl';
 $smarty->compile_dir = 'tpl_c';
 $smarty->assign('css_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/s/style.css');
 $smarty->assign('js_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/' . $view . '.js');
-$content = $smarty->fetch('body.tpl');
+$smarty->assign('js_common_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/common.js');
+$content = $smarty->fetch('content.tpl');
 $smarty->assign('content', $content);
+
+if($view === "os") {
+	/* Disable Caching */
+	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+	header("Content-Type: text/xml");
+}
 $smarty->display($view . '.tpl');
 
 ?>

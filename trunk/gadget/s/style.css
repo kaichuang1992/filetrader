@@ -1,70 +1,79 @@
-tbody {
-	font-size: 85%;
-    font-family: sans-serif;
-}
-
-a { 
-	text-decoration: none;
-	color: #222;
-}
-
-div#ft_output {
-    margin: 0;
-    padding: 0;
-    height: 300px;
-    overflow: auto;
-}
-a.dir {
-    font-weight: bold;
-}
-table {
-    width: 100%;
-    background-color: #fff;
-}
-th{
-    text-align: left;
-}
-div#header {
-        width: 100%;
-        background-color: #aaa;
-}
-
-div#status {
-        width: 100%;
-        background-color: #ccc;
-}
-
-button {
-        font-size: 85%;
-}
-input {
-        font-size: 85%;
-}
-div#overlay, div#upload_overlay {
-	display: none;
-	left: 5%;
-	top: 10px;
-	width: 80%;
+#gadget {
+	border: 1px solid #000;
+	width: 400px;
 	height: 300px;
-	position: absolute;
-	background-color: #ddd;
-	border: 1px solid #000;
-	border-radius: 10px;
-	padding: 10px;
+	margin: 50px auto;
 }
 
-div#overlay.visible, div#upload_overlay.visible {
-	display: block !important;
+#header {
+	height: 40px;
 }
 
-input#fileElem {
-	display: none;
-}
-
-div#upload_area {
+#content {
+	border: 1px solid #333333;
+	height: 240px;
 	margin: 0 auto;
-	width: 90%;
-	height: 100px;
-	border: 1px solid #000;
-	background-color: #fff;
+	overflow: auto;
+	width: 380px;
 }
+
+body, tbody {
+	font-family: "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+	font-size: 80%;
+}
+
+a {
+	color: #000;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #999;
+}
+
+td.file {
+	font-style: italic;
+	text-align: left;
+}
+
+td.dir {
+	font-weight: bold;
+	text-align: left;
+}
+
+span.breadcrumb {
+	padding-left: 10px;
+	padding-top: 10px;
+	float: left;
+}
+
+span.icons {
+	padding: 5px;
+	float: right;
+}
+
+table {
+	border: medium none;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th {
+	background-color: #000;
+	color: #fff;
+}
+
+tr.even {
+	background-color: #ccc;
+}
+
+tr.odd {
+	background-color: #fff#
+}
+
+th, td {
+	border-left: medium none;
+	border-right: medium none;
+	padding: 5px;
+}
+

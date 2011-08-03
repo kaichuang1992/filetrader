@@ -4,7 +4,8 @@
     <Require feature="dynamic-height"/>
     <Require feature="opensocial-0.9"/>
   </ModulePrefs>
-  <UserPref name="storageEngine" display_name="Storage Engine URI"/>
+  <UserPref name="storageEngine" display_name="Storage Engine URI">
+	</UserPref>
   <Content type="html"><![CDATA[
     {$content}
   ]]></Content>

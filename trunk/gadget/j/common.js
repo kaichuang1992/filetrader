@@ -1,34 +1,4 @@
-/* OpenSocial Gadget Source. If designed well, only "serverCall" should be
-   reimplemented to make it work elsewhere, currently that is not the 
-   case unfortunately... */
-
-// var apiEndPoint = "https://frkosp.wind.surfnet.nl/fts/index.php";
-var prefs = new _IG_Prefs();
-var apiEndPoint = prefs.getString("storageEngine");
 var displayName;
-
-/*
-var relativePath = "/";
-*/
-
-function serverCall(action, params, method, callback) {
-    var url = apiEndPoint + "?action=" + action;
-    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
-    if (action !== "pingServer") {
-        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
-    }
-    if (method === "POST") {
-        params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
-        params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(params);
-    }
-    gadgets.io.makeRequest(url, function (response) {
-        if (!response.data.ok) {
-            alert(response.data.errorMessage);
-        } else {
-            callback(response);
-        }
-    }, params);
-}
 
 function pingServer() {
     serverCall("pingServer", {}, "GET", function (response) {
@@ -67,19 +37,37 @@ function getDirList() {
 
 function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativePath' : relativePath}, "GET", function() { */
     serverCall("getDirList&relativePath=" + relativePath, {}, "GET", function (response) {
-        document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
-        document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
+//        document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
+//        document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
 
-        document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
-        document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + displayName;
+//        document.getElementById('createDirButton').setAttribute('onclick', 'javascript:handleCreateDir("' + relativePath + '",this.form)');
+//        document.getElementById('status').innerHTML = 'Path: <strong>' + sliceName(relativePath.replace("//", "/"), 25) + '</strong> @ ' + displayName;
+	var output = '';
 
-        var output = '<table><tr><th>Name</th><th>Size</th><th>Created</th><th>Action</th></tr>';
+	output += '<div id="header"><span class="breadcrumb"><a href="#">Home</a>';
+	var parts = relativePath.replace("//", "/").split("/");
+	for(var i in parts) {
+	   if(parts[i] !== '') {
+	       output += ' &raquo; <a href="#">' + parts[i] + '</a>';
+	   }
+	}
+	output += '<span class="icons"><a href="#"><img src="i/add_bl.png" width="32" height="32"></a> <a href="#"><img src="i/setting_bl.png" width="32" height="32"></a></span></div>';
+
+    output += '<div id="content"><table class="filelist"><tr><th>Action</th><th>Name</th><th>Size</th><th>Created</th><th>Delete</th></tr>';
+	var counter=0;
         for (var i in response.data) {
+	    if(counter%2===0) {
+		output += '<tr class="even">';
+	    } else {
+		output += '<tr class="odd">';
+	    }
             if (response.data[i] && !response.data[i].fileName) {} else if (response.data[i].isDirectory) {
-                output += "<tr><td><a class=\"dir\" href=\"javascript:getDirList('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>&nbsp;</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteDirectory('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
+                output += '<td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/dir_bl.png" width="20" height="20"></a></td><td class="dir">' + sliceName(response.data[i].fileName, 50) + '</td><td>-</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
             } else {
-                output += "<tr><td><a class=\"file\" href=\"javascript:getDownloadToken('" + relativePath + '/' + response.data[i].fileName + "')\">" + sliceName(response.data[i].fileName, 50) + '</a></td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td>' + "<a class=\"dir\" href=\"javascript:deleteFile('" + relativePath + "','" + response.data[i].fileName + "')\">del</a>" + '</td></tr>';
-            }
+		output += '<td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/download_bl.png" width="20" height="20"></a></td><td class="file">' + sliceName(response.data[i].fileName, 50) + '</td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
+           }
+		output += "</tr>";
+		counter+=1;
         }
         output += "</table>";
         updateOutput(output);
