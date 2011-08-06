@@ -1,0 +1,13 @@
+<?php
+
+/* Time zone
+ * See http://php.net/manual/en/timezones.php */
+$config['time_zone'] = 'Europe/Amsterdam';
+
+/* Whether or not to allow only SSL connections */
+$config['ssl_only'] = FALSE;
+
+// $config['oauth_lib_dir'] = '/usr/share/php/oauth';
+$config['oauth_lib_dir'] = 'ext/oauth';
+
+?>
