@@ -88,8 +88,8 @@ try {
 
     $f = new Files($dbh, $config);
     $content = $f->$action();
-    $content["ok"] = TRUE;
-    echo json_encode($content);
+    $output = array( "ok" => TRUE, "data" => $content );
+    echo json_encode($output);
 } catch (OAuthException $e) {
     echo json_encode(array("ok" => FALSE, "errorMessage" => $e->getMessage(), "errorCode" => $e->getCode()));
 } catch (Exception $e) {

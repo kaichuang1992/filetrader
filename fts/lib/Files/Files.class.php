@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('API_VERSION', '0.1');
+define('API_VERSION', '0.2');
 
 /* Validation constants */
 define('FTS_DIR', 0);
@@ -299,7 +299,7 @@ class Files {
         foreach (glob("*") as $fileName) {
             array_push($dirList, array("fileName" => $fileName,
                 "fileSize" => filesize($fileName),
-		"fileDate" => filectime($fileName), 
+		"fileDate" => filemtime($fileName), 
                 "isDirectory" => is_dir($fileName)));
         }
         return $dirList;
