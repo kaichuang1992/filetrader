@@ -1,0 +1,9 @@
+$ mkdir -p tpl_c
+$ chmod o+w -R tpl_c
+
+-- SELINUX CONFIGURATION --
+
+Set the correct SELinux labels (only for Fedora/Red Hat systems?)
+
+$ chcon -R -t httpd_sys_rw_content_t tpl_c
+

@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>FileTrader</title>
+  <link rel="stylesheet" type="text/css" href="s/style.css">
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+  <script type="text/javascript" src="j/ftc.js"></script>
+
+  <script id="directoryEntryHeader" type="text/x-jquery-tmpl">
+        <tr>
+          <th>Action</th>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Created</th>
+          <th>Delete</th>
+        </tr>
+  </script>
+
+  <script id="directoryEntry" type="text/x-jquery-tmpl">
+        <tr class="dirEntry">
+	  {{if isDirectory}}
+	          <td><a class="open" href="#"><img src="i/dir_bl.png" height="20" width="20"></a></td>
+	  	  <td class="dir">${fileName}</td><td>-</td><td>${fileDate}</td>
+		  <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
+	  {{else}}
+                  <td><a class="download" href="#"><img src="i/download_bl.png" height="20" width="20"></a></td>
+		  <td class="file">${fileName}</td><td>${fileSize}</td><td>${fileDate}</td>
+                  <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
+	  {{/if}}
+        </tr> 
+  </script>
+
+</head>
+<body>
+  <div id="header">
+    <span class="breadcrumb">
+	<a href="#">Home</a>
+    </span>
+    <span class="icons">
+	<a href="#">
+		<img src="i/add_bl.png" height="32" width="32">
+	</a>
+	<a href="#">
+		<img src="i/setting_bl.png" height="32" width="32">
+	</a>
+    </span>
+  </div>
+
+  <div id="content">
+    <table class="filelist">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
+

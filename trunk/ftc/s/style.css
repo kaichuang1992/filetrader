@@ -1,0 +1,80 @@
+#gadget {
+	border: 1px solid #000;
+	margin: 50px auto;
+}
+
+#header {
+	height: 50px;
+	width: 100%;
+}
+
+#content {
+	border: 1px solid #333333;
+	margin: 0 auto;
+	overflow: auto;
+}
+
+li:odd {
+	background-color: #ccc;
+}
+
+body, tbody {
+	font-family: "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+	font-size: 80%;
+}
+
+a {
+	color: #000;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #999;
+}
+
+td.file {
+	font-style: italic;
+	text-align: left;
+}
+
+td.dir {
+	font-weight: bold;
+	text-align: left;
+}
+
+span.breadcrumb {
+	float: left;
+	padding: 5px;
+}
+
+span.icons {
+	padding: 5px;
+	float: right;
+}
+
+table {
+	border: medium none;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th {
+	background-color: #000;
+	color: #fff;
+}
+
+tr.even {
+	background-color: #ccc;
+}
+
+tr.odd {
+	background-color: #fff#
+}
+
+th, td {
+	border-left: medium none;
+	border-right: medium none;
+	text-align: center;
+	padding: 5px;
+}
+
