@@ -1,0 +1,8 @@
+- fix upload
+- do not hard code the storage server, but get it from proxy or something
+- handle errors
+- make ftc.js generic so it can be used for opensocial gadget as well
+  (wrapper for $.get and $.post)
+- fix breadcrumb
+- fix FTS API so there is a "path" and "filename" (if operation is on file)
+
