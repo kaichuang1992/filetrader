@@ -21,7 +21,6 @@
 require_once('config.php');
 require_once('utils.php');
 
-require_once('lib/StorageClient/StorageClient.class.php');
 
 /* Disable Caching */
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
@@ -51,6 +50,8 @@ try {
 	unset($params['proxy_consumer_key']);
 	unset($params['proxy_consumer_secret']);
 	unset($params['action']);
+
+	require_once('lib/StorageClient/StorageClient.class.php');
 
         $sc = new StorageClient(array('apiUrl' => $endpoint, 'consumerKey' => $key, 'consumerSecret' => $secret ));
         echo $sc->call($action, $params, $_SERVER['REQUEST_METHOD']);
