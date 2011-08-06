@@ -17,6 +17,10 @@
 	width: 380px;
 }
 
+li:odd {
+	background-color: #ccc;
+}
+
 body, tbody {
 	font-family: "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
 	font-size: 80%;

@@ -1,6 +1,7 @@
   <link rel="stylesheet" type="text/css" href="{$css_url}">
-  <script type="text/javascript" src="{$js_url}"></script>
-  <script type="text/javascript" src="{$js_common_url}"></script>
+  <script type="text/javascript" src="{$protocol}ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script type="text/javascript" src="j/jq.js"></script>
+<!--  <script type="text/javascript" src="{$js_common_url}"></script> -->
 
 <!--  <div id="header">
     <button id="upButton">Parent Directory</button> <button id=
