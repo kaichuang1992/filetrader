@@ -14,7 +14,6 @@ $(document).ready(function () {
                 v.fileDate = fancyDate(v.fileDate);
                 v.fileSize = toHumanSize(v.fileSize);
             });
-
             // this is ugly do not want!
             $("tbody").html($("#directoryEntryHeader").tmpl());
             $("#directoryEntry").tmpl(response.data).appendTo("tbody");
