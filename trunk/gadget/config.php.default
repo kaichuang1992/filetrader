@@ -1,5 +1,29 @@
 <?php
 
-$config['smarty_lib_dir'] = 'ext/smarty/libs';
+/* The display name of server */
+$config['display_name'] = 'Snake Oil Storage';
 
+/* Time zone
+ * See http://php.net/manual/en/timezones.php */
+$config['time_zone'] = 'Europe/Amsterdam';
+
+/* Whether or not to allow only SSL connections */
+$config['ssl_only'] = FALSE;
+
+/* Base directory
+ * NOTE: directory should be writable by the web server */
+$config['ftc_data'] = __DIR__ . DIRECTORY_SEPARATOR . 'data';
+
+/* Database configuration
+ * See http://www.php.net/manual/en/pdo.construct.php */
+$config['ftc_db_dsn'] = 'sqlite:' . $config['ftc_data'] . DIRECTORY_SEPARATOR . 'ftc.sqlite';
+$config['ftc_db_user'] = NULL;
+$config['ftc_db_pass'] = NULL;
+$config['ftc_db_options'] = array(PDO::ATTR_PERSISTENT => FALSE);
+
+// $config['oauth_lib_dir'] = '/usr/share/php/oauth';
+$config['oauth_lib_dir'] = 'ext/oauth';
+
+// $config['smarty_lib_dir'] = '/usr/share/php/Smarty';
+$config['smarty_lib_dir'] = 'ext/smarty/libs';
 ?>

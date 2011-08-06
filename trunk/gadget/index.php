@@ -42,6 +42,8 @@ $smarty->compile_dir = 'tpl_c';
 $smarty->assign('css_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/s/style.css');
 $smarty->assign('js_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/' . $view . '.js');
 $smarty->assign('js_common_url', getProtocol() . getServerName() . dirname($_SERVER['PHP_SELF']) . '/j/common.js');
+$smarty->assign('protocol', getProtocol());
+
 $content = $smarty->fetch('content.tpl');
 $smarty->assign('content', $content);
 

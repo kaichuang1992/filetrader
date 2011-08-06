@@ -36,7 +36,7 @@ function getDirList() {
 */
 
 function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativePath' : relativePath}, "GET", function() { */
-    serverCall("getDirList&relativePath=" + relativePath, {}, "GET", function (response) {
+    serverCall("getDirList", { 'relativePath' : relativePath }, "GET", function (response) {
 //        document.getElementById('upButton').setAttribute('onclick', 'javascript:parentDirectory("' + relativePath + '")');
 //        document.getElementById('fileElem').setAttribute('onchange', 'handleFiles("' + relativePath + '",this.files)');
 
@@ -55,6 +55,7 @@ function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativeP
 
     output += '<div id="content"><table class="filelist"><tr><th>Action</th><th>Name</th><th>Size</th><th>Created</th><th>Delete</th></tr>';
 	var counter=0;
+	
         for (var i in response.data) {
 	    if(counter%2===0) {
 		output += '<tr class="even">';
@@ -62,9 +63,9 @@ function getDirList(relativePath) { /* FIXME serverCall("getDirList, {'relativeP
 		output += '<tr class="odd">';
 	    }
             if (response.data[i] && !response.data[i].fileName) {} else if (response.data[i].isDirectory) {
-                output += '<td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/dir_bl.png" width="20" height="20"></a></td><td class="dir">' + sliceName(response.data[i].fileName, 50) + '</td><td>-</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
+                output += '<td><a id="open_' + i + '" href="#"><img src="i/dir_bl.png" width="20" height="20"></a></td><td class="dir">' + sliceName(response.data[i].fileName, 50) + '</td><td>-</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a id="rmdir_' + i + '" href="#"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
             } else {
-		output += '<td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/download_bl.png" width="20" height="20"></a></td><td class="file">' + sliceName(response.data[i].fileName, 50) + '</td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a href="' + relativePath + '/' + response.data[i].fileName + '"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
+		output += '<td><a id="dl_' + i + '" href="#"><img src="i/download_bl.png" width="20" height="20"></a></td><td class="file">' + sliceName(response.data[i].fileName, 50) + '</td><td>' + toHumanSize(response.data[i].fileSize) + '</td><td>' + fancyDate(response.data[i].fileDate) + '</td><td><a id="rm_' + i + '" href="#"><img src="i/bin_bl.png" width="20" height="20"></a></td>';
            }
 		output += "</tr>";
 		counter+=1;
