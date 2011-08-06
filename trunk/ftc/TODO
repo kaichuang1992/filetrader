@@ -5,4 +5,6 @@
   (wrapper for $.get and $.post)
 - fix breadcrumb
 - fix FTS API so there is a "path" and "filename" (if operation is on file)
-
+- don't use CDN versions of jquery and jquery-tmpl
+- fix template stuff a bit so header of table can be printed in same 
+  template
