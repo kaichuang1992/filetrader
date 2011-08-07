@@ -24,11 +24,11 @@
 
 	  {{if isDirectory}}
 	          <td><a class="open" href="#"><img src="i/dir_bl.png" height="20" width="20"></a></td>
-	  	  <td class="dir">${entry.fileName}</td><td>-</td><td>${entry.fileDate}</td>
+	  	  <td class="dir">${entry.fileName}</td><td>-</td><td>${$item.fDate(entry.fileDate)}</td>
 		  <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
 	  {{else}}
                   <td><a class="download" href="#"><img src="i/download_bl.png" height="20" width="20"></a></td>
-		  <td class="file">${entry.fileName}</td><td>${entry.fileSize}</td><td>${entry.fileDate}</td>
+		  <td class="file">${entry.fileName}</td><td>${$item.fSize(entry.fileSize)}</td><td>${$item.fDate(entry.fileDate)}</td>
                   <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
 	  {{/if}}
        {{/each}}
