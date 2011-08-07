@@ -18,15 +18,18 @@ $(document).ready(function () {
                     return fancyBytes(bytes);
                 }
             }));
-            // FIXME: turn this into a proper template...
-            $("#breadcrumb").html($.tmpl("<li>${$data}</li>", generateBreadcrumb()));
+            $("#breadcrumb").html($("#directoryPathViewer").tmpl(splitPath()));
             $("#breadcrumb li").click(function (event) {
-                var relPath = $(this).text() + "/";
-                $.each($(this).prevUntil("ul"), function (i, val) {
-                    relPath = $(this).text() + "/" + relPath;
-                });
-                // FIXME: cannot have a dir named "Home" like this! Ugly!!
-                params.relativePath = relPath.replace("Home", "/");
+                var relPath;
+                if ($(this).hasClass("root")) {
+                    relPath = "/";
+                } else {
+                    relPath = $(this).text();
+                    $.each($(this).prevUntil("li.root"), function (i, val) {
+                        relPath = $(this).text() + "/" + relPath;
+                    });
+                }
+                params.relativePath = relPath;
                 getDirList();
             });
             $('a.download').click(function (event) {
@@ -129,17 +132,17 @@ $(document).ready(function () {
         return bytes;
     }
 
-    function generateBreadcrumb() {
-        var breadcrumb = ["Home"];
-        path = params.relativePath;
-        parts = path.split("/");
+    function splitPath() {
+        var e = {
+            pathEntries: []
+        };
+        parts = params.relativePath.split("/");
         $.each(parts, function (i, v) {
-            if (v === '') { /* ignore */
-            } else {
-                breadcrumb.push(v);
+            if (v !== '') {
+                e.pathEntries.push(v);
             }
         });
-        return breadcrumb;
+        return e;
     }
     getDirList();
 });
