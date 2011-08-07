@@ -7,7 +7,7 @@
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
   <script type="text/javascript" src="j/ftc.js"></script>
 
-  <script id="directoryEntryHeader" type="text/x-jquery-tmpl">
+  <script id="directoryList" type="text/x-jquery-tmpl">
         <tr>
           <th>Action</th>
           <th>Name</th>
@@ -15,19 +15,23 @@
           <th>Created</th>
           <th>Delete</th>
         </tr>
-  </script>
+	{{each(i, entry) data}}
+          {{if (i % 2 === 0)}}
+	        <tr class="dirEntry even">
+          {{else}}
+ 		<tr class="dirEntry odd">
+          {{/if}}
 
-  <script id="directoryEntry" type="text/x-jquery-tmpl">
-        <tr class="dirEntry">
 	  {{if isDirectory}}
 	          <td><a class="open" href="#"><img src="i/dir_bl.png" height="20" width="20"></a></td>
-	  	  <td class="dir">${fileName}</td><td>-</td><td>${fileDate}</td>
+	  	  <td class="dir">${entry.fileName}</td><td>-</td><td>${entry.fileDate}</td>
 		  <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
 	  {{else}}
                   <td><a class="download" href="#"><img src="i/download_bl.png" height="20" width="20"></a></td>
-		  <td class="file">${fileName}</td><td>${fileSize}</td><td>${fileDate}</td>
+		  <td class="file">${entry.fileName}</td><td>${entry.fileSize}</td><td>${entry.fileDate}</td>
                   <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20"></a></td>
 	  {{/if}}
+       {{/each}}
         </tr> 
   </script>
 
