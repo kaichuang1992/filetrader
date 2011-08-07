@@ -1,0 +1,108 @@
+var FTCUpload = {
+    var files; // keep track of the files to upload
+    var xhrs; // keep track of all xhrs to be able to stop them
+    var rdrs; // keep track of all readers to be able to stop them
+    var done; // keep track of the number of files done uploading
+    var blockSize = 512 * 1024;
+    // add the files to the upload list
+
+    function listFiles(f) {
+        files = f;
+        document.getElementById('uploadStatus').textContent = '';
+        var fileList = document.getElementById('fileList');
+        fileList.innerHTML = '';
+        for (var i = 0; i < files.length; i++) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + files[i].name + '</td><td>' + files[i].size + '</td><td><span id="file_progress_' + i + '"></span></td>';
+            fileList.appendChild(tr);
+        }
+        if (files.length != 0) {
+            document.getElementById('startButton').removeAttribute('disabled');
+        }
+    }
+
+    function startUpload() {
+        xhrs = new Array();
+        rdrs = new Array();
+        done = 0;
+        if (files != null) {
+            document.getElementById('startButton').setAttribute('disabled', 'disabled');
+            document.getElementById('cancelButton').removeAttribute('disabled');
+            for (var i = 0; i < files.length; i++) {
+                uploadFile(i, files[i]);
+            }
+        }
+    }
+
+    function cancelUpload() {
+        for (var i = 0; i < xhrs.length; i++) {
+            xhrs[i].abort();
+        }
+        for (var i = 0; i < rdrs.length; i++) {
+            rdrs[i].abort();
+        }
+        document.getElementById('cancelButton').setAttribute('disabled', 'disabled');
+        document.getElementById('uploadStatus').textContent = "Canceled";
+        document.getElementById('uploadStatus').setAttribute('class', 'canceled');
+    }
+
+    function uploadFile(index, file) {
+        var bytesLeft = file.size;
+        var currentChunk = 0;
+        var transferLength;
+        var blob;
+        var xhr;
+        if (bytesLeft > 0) {
+            transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
+            var reader = new FileReader();
+            rdrs.push(reader);
+            reader.onload = function (evt) {
+                xhr = new XMLHttpRequest();
+                xhrs.push(xhr);
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        document.getElementById('file_progress_' + index).textContent = Math.round(((blockSize * currentChunk + evt.loaded) * 100) / file.size) + "%";
+                    }
+                }, false);
+                // when upload of a chunk is complete
+                xhr.upload.addEventListener("load", function (evt) {
+                    bytesLeft -= transferLength;
+                    if (bytesLeft > 0) {
+                        transferLength = (blockSize > bytesLeft) ? bytesLeft : blockSize;
+                        currentChunk++;
+                        if (file.slice) blob = file.slice(currentChunk * blockSize, transferLength);
+                        if (file.mozSlice) blob = file.mozSlice(currentChunk * blockSize, currentChunk * blockSize + transferLength);
+                        if (file.webkitSlice) blob = file.webkitSlice(currentChunk * blockSize, currentChunk * blockSize + transferLength);
+                        // read the next blob
+                        reader.readAsBinaryString(blob);
+                    } else {
+                        // all done
+                        document.getElementById('file_progress_' + index).textContent = "Done";
+                        document.getElementById('file_progress_' + index).setAttribute('class', 'done'); /* if this was the last file, disable cancel button */
+                        if (++done == files.length && bytesLeft == 0) {
+                            document.getElementById('cancelButton').setAttribute('disabled', 'disabled');
+                            document.getElementById('uploadStatus').textContent = "Done";
+                            document.getElementById('uploadStatus').setAttribute('class', 'done');
+                        }
+                    }
+                }, false);
+                xhr.open("POST", 'proxy.php?action=handleUpload', true);
+                xhr.setRequestHeader("X-File-Name", file.name);
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                xhr.setRequestHeader("X-File-Size", file.size);
+                xhr.setRequestHeader("X-File-Chunk", currentChunk);
+                xhr.send(blob);
+            }
+            if (file.slice) {
+                blob = file.slice(0, transferLength);
+            }
+            if (file.mozSlice) {
+                blob = file.mozSlice(0, currentChunk * blockSize + transferLength);
+            }
+            if (file.webkitSlice) {
+                blob = file.webkitSlice(0, currentChunk * blockSize + transferLength);
+            }
+            reader.readAsBinaryString(blob);
+        }
+    }
+}
