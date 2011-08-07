@@ -302,6 +302,10 @@ class Files {
 		"fileDate" => filemtime($fileName), 
                 "isDirectory" => is_dir($fileName)));
         }
+	/* sort the list by fileDate, newest first */
+        usort($dirList, function($a, $b) { 
+        	return $b['fileDate'] - $a['fileDate'];
+	});
         return $dirList;
     }
 
