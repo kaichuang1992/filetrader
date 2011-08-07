@@ -1,87 +1,106 @@
-#gadget {
-	border: 1px solid #000;
-	margin: 50px auto;
+#page
+{
+  width:80%;
+  border:1px solid #ccc;
+  margin:0 auto;
+  padding:10px;
 }
 
-#header {
-	height: 50px;
-	width: 100%;
+#header
+{
+  height:35px;
 }
 
-#content {
-	border: 1px solid #333333;
-	margin: 0 auto;
-	overflow: auto;
+#content
+{
+  border:1px solid #000;
+  margin:0 auto;
 }
 
-body, tbody {
-	font-family: "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
-	font-size: 80%;
+body,tbody
+{
+  font-family:"Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+  font-size:80%;
 }
 
-a {
-	color: #000;
-	text-decoration: none;
+a
+{
+  color:#000;
+  text-decoration:none;
 }
 
-a:hover {
-	color: #999;
+a:hover
+{
+  color:#999;
 }
 
-td.file {
-	font-style: italic;
-	text-align: left;
+td.file
+{
+  font-style:italic;
+  text-align:left;
 }
 
-td.dir {
-	font-weight: bold;
-	text-align: left;
+td.dir
+{
+  font-weight:700;
+  text-align:left;
 }
 
-span.icons {
-	padding: 5px;
-	float: right;
+span.icons
+{
+  float:right;
 }
 
-table {
-	border: medium none;
-	border-collapse: collapse;
-	width: 100%;
+table
+{
+  border:medium none;
+  border-collapse:collapse;
+  width:100%;
 }
 
-th {
-	background-color: #000;
-	color: #fff;
+th
+{
+  background-color:#000;
+  color:#fff;
 }
 
-tr.even {
-	background-color: #ccc;
+tr.even
+{
+  background-color:#ccc;
 }
 
-tr.odd {
-	background-color: #fff;
+tr.odd
+{
+  background-color:#fff;
 }
 
-th, td {
-	border-left: medium none;
-	border-right: medium none;
-	text-align: center;
-	padding: 5px;
+th,td
+{
+  border-left:medium none;
+  border-right:medium none;
+  text-align:center;
+  padding:5px;
 }
 
-ul#breadcrumb {
-	list-style: none;
+ul#breadcrumb
+{
+  display:inline;
+  list-style:none;
+  margin:0;
+  padding:0;
 }
 
-ul#breadcrumb li {
-	display: inline;
+ul#breadcrumb li
+{
+  display:inline;
 }
 
-ul#breadcrumb li:after {
-	content: ' » ';
+ul#breadcrumb li:after
+{
+  content:' » ';
 }
 
-ul#breadcrumb li:last-child:after {
-	content : ""
+ul#breadcrumb li:last-child:after
+{
+  content:"";
 }
-
