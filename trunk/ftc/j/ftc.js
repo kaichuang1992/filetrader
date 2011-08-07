@@ -18,7 +18,7 @@ $(document).ready(function () {
                     return fancyBytes(bytes);
                 }
             }));
-            $("#breadcrumb").html($("#directoryPathViewer").tmpl(splitPath()));
+            $("#breadcrumb").html($("#directoryPathViewer").tmpl(splitPath(params.relativePath)));
             $("#breadcrumb li").click(function (event) {
                 var relPath;
                 if ($(this).hasClass("root")) {
@@ -132,11 +132,11 @@ $(document).ready(function () {
         return bytes;
     }
 
-    function splitPath() {
+    function splitPath(fullPath) {
         var e = {
             pathEntries: []
         };
-        parts = params.relativePath.split("/");
+        parts = fullPath.split("/");
         $.each(parts, function (i, v) {
             if (v !== '') {
                 e.pathEntries.push(v);
