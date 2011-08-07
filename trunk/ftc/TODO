@@ -6,3 +6,4 @@
 - fix breadcrumb
 - fix FTS API so there is a "path" and "filename" (if operation is on file)
 - don't use CDN versions of jquery and jquery-tmpl
+- fix FTS API to use json content type instead of text/html
