@@ -10,7 +10,14 @@ $(document).ready(function () {
     function getDirList() {
         params.action = 'getDirList';
         $.get(proxy_endpoint, params, function (response) {
-            $("tbody").html($("#directoryList").tmpl(response));
+            $("tbody").html($("#directoryList").tmpl(response, {
+                fDate: function (timestamp) {
+                    return fancyDate(timestamp);
+                },
+                fSize: function (bytes) {
+                    return fancyBytes(bytes);
+                }
+            }));
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
@@ -95,7 +102,7 @@ $(document).ready(function () {
         return months[month];
     }
 
-    function toHumanSize(bytes) {
+    function fancyBytes(bytes) {
         var kilobyte = 1024;
         var megabyte = kilobyte * kilobyte;
         var gigabyte = megabyte * kilobyte;
