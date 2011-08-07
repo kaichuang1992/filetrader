@@ -127,15 +127,19 @@ $(document).ready(function () {
         var kilobyte = 1024;
         var megabyte = kilobyte * kilobyte;
         var gigabyte = megabyte * kilobyte;
+        var terabyte = gigabyte * kilobyte;
+        if (bytes >= terabyte) {
+            return Math.round((bytes / terabyte)) + "TB"
+        }
         if (bytes >= gigabyte) {
             return Math.round((bytes / gigabyte)) + "GB"
-        };
+        }
         if (bytes >= megabyte) {
             return Math.round((bytes / megabyte)) + "MB"
-        };
+        }
         if (bytes >= kilobyte) {
             return Math.round((bytes / kilobyte)) + "kB"
-        };
+        }
         return bytes;
     }
 
