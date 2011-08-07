@@ -18,9 +18,17 @@ $(document).ready(function () {
                     return fancyBytes(bytes);
                 }
             }));
-
-	    $("#breadcrumb").html($.tmpl( "<li>${$data}</li>", params.relativePath.split("/")));
-
+            // FIXME: turn this into a proper template...
+            $("#breadcrumb").html($.tmpl("<li>${$data}</li>", generateBreadcrumb()));
+            $("#breadcrumb li").click(function (event) {
+                var relPath = $(this).text() + "/";
+                $.each($(this).prevUntil("ul"), function (i, val) {
+                    relPath = $(this).text() + "/" + relPath;
+                });
+                // FIXME: cannot have a dir named "Home" like this! Ugly!!
+                params.relativePath = relPath.replace("Home", "/");
+                getDirList();
+            });
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
@@ -119,6 +127,19 @@ $(document).ready(function () {
             return Math.round((bytes / kilobyte)) + "kB"
         };
         return bytes;
+    }
+
+    function generateBreadcrumb() {
+        var breadcrumb = ["Home"];
+        path = params.relativePath;
+        parts = path.split("/");
+        $.each(parts, function (i, v) {
+            if (v === '') { /* ignore */
+            } else {
+                breadcrumb.push(v);
+            }
+        });
+        return breadcrumb;
     }
     getDirList();
 });
