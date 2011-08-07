@@ -4,6 +4,8 @@
   border:1px solid #ccc;
   margin:0 auto;
   padding:10px;
+    box-shadow: 0 3px 3px 0;
+    -webkit-box-shadow: 0 3px 3px 0;
 }
 
 #header
@@ -93,6 +95,7 @@ ul#breadcrumb
 ul#breadcrumb li
 {
   display:inline;
+  cursor:pointer;
 }
 
 ul#breadcrumb li:after
@@ -103,4 +106,39 @@ ul#breadcrumb li:after
 ul#breadcrumb li:last-child:after
 {
   content:"";
+}
+
+#dropbox {
+	background-color: #fff;
+	border: 2px solid #000;
+	border-radius: 8px;
+	display: none;
+	width: 50%;
+	left: 25%;
+	right: 25%;
+	top: 100px;
+	padding: 10px;
+	position: absolute; 
+	text-align: center;
+}
+#ftc_cancel_upload {
+	float: right;
+	height: 40px;
+}
+#dropbox p {
+	display: inline;
+	margin: 0 auto;
+}
+#dropbox .dropzone {
+	clear: both;
+	background-color: #fff;
+	background-repeat: repeat;
+	border: 2px dashed #000;
+	border-radius: 8px;
+	height: 155px;
+	padding: 0;
+	text-align: center;
+	vertical-align: bottom;
+	background-image: url(../i/back_down.png);
+	background-position: -30px;
 }
