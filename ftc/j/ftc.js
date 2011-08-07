@@ -32,6 +32,12 @@ $(document).ready(function () {
                 params.relativePath = relPath;
                 getDirList();
             });
+	    $('a#ftc_add').click(function(event) {
+		$('#dropbox').show();
+	    });
+	    $('a#ftc_cancel_upload').click(function(event) {
+		$('#dropbox').hide();
+	    });
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
