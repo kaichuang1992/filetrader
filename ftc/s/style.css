@@ -38,11 +38,6 @@ td.dir {
 	text-align: left;
 }
 
-span.breadcrumb {
-	float: left;
-	padding: 5px;
-}
-
 span.icons {
 	padding: 5px;
 	float: right;
@@ -72,5 +67,21 @@ th, td {
 	border-right: medium none;
 	text-align: center;
 	padding: 5px;
+}
+
+ul#breadcrumb {
+	list-style: none;
+}
+
+ul#breadcrumb li {
+	display: inline;
+}
+
+ul#breadcrumb li:after {
+	content: ' » ';
+}
+
+ul#breadcrumb li:last-child:after {
+	content : ""
 }
 

@@ -18,6 +18,9 @@ $(document).ready(function () {
                     return fancyBytes(bytes);
                 }
             }));
+
+	    $("#breadcrumb").html($.tmpl( "<li>${$data}</li>", params.relativePath.split("/")));
+
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
