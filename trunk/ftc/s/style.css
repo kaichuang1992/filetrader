@@ -66,6 +66,10 @@ th
   color:#fff;
 }
 
+th.action {
+  width: 30px;
+}
+
 tr.even
 {
   background-color:#ccc;
@@ -88,7 +92,6 @@ ul#breadcrumb
 {
   display:inline;
   list-style:none;
-  margin:0;
   padding:0;
 }
 
@@ -96,6 +99,10 @@ ul#breadcrumb li
 {
   display:inline;
   cursor:pointer;
+}
+
+ul#breadcrumb li.root {
+  font-weight:bold;
 }
 
 ul#breadcrumb li:after

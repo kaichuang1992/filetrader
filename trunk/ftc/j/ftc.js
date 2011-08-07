@@ -12,7 +12,7 @@ $(document).ready(function () {
         $.get(proxy_endpoint, params, function (response) {
             $("tbody").html($("#directoryList").tmpl(response, {
                 fDate: function (timestamp) {
-                    return fancyDate(timestamp);
+                    return fancyDateTime(timestamp);
                 },
                 fSize: function (bytes) {
                     return fancyBytes(bytes);
@@ -32,12 +32,12 @@ $(document).ready(function () {
                 params.relativePath = relPath;
                 getDirList();
             });
-	    $('a#ftc_add').click(function(event) {
-		$('#dropbox').show();
-	    });
-	    $('a#ftc_cancel_upload').click(function(event) {
-		$('#dropbox').hide();
-	    });
+            $('a#ftc_add').click(function (event) {
+                $('#dropbox').show();
+            });
+            $('a#ftc_cancel_upload').click(function (event) {
+                $('#dropbox').hide();
+            });
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
@@ -67,26 +67,27 @@ $(document).ready(function () {
         }, 'json');
     }
 
-    function fancyDate(ts) {
-        var currentTs = new Date().getTime();
-        var date = new Date(ts * 1000);
+    function fancyDateTime(ts) {
+        var now = new Date();
+        var dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var fileDateTime = new Date(ts * 1000);
+        var now_ts = Math.round(now.getTime() / 1000);
+        var dayStart_ts = Math.round(dayStart.getTime() / 1000);
+        var hours = (fileDateTime.getHours() < 10) ? "0" + fileDateTime.getHours() : fileDateTime.getHours();
+        var minutes = (fileDateTime.getMinutes() < 10) ? "0" + fileDateTime.getMinutes() : fileDateTime.getMinutes();
         var humanDate;
-        if (ts * 1000 > (currentTs - 60 * 60 * 24 * 1000)) {
-            // last 24h, show just time
-            var hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
-            var minutes = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+        if (ts > dayStart_ts) {
+            // today, show just time
             humanDate = hours + ":" + minutes;
-        } else if (ts * 1000 > (currentTs - 60 * 60 * 24 * 7 * 1000)) {
+        } else if (ts > (now_ts - 60 * 60 * 24 * 7)) {
             // last week, show just day and time
-            var hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
-            var minutes = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
-            humanDate = dayToText(date.getDay()) + " " + hours + ":" + minutes;
-        } else if (ts * 1000 > (currentTs - 60 * 60 * 24 * 365 * 1000)) {
-            // longer ago, show just month+day
-            humanDate = monthToText(date.getMonth()) + " " + date.getDate();
+            humanDate = dayToText(fileDateTime.getDay()) + " " + hours + ":" + minutes;
+        } else if ((ts > now_ts - 60 * 60 * 24 * 365)) {
+            // longer than a week ago, show just month+day
+            humanDate = monthToText(fileDateTime.getMonth()) + " " + fileDateTime.getDate();
         } else {
-            // show year 
-            humanDate = date.getFullYear();
+            // longer than a year ago, show just year 
+            humanDate = fileDateTime.getFullYear();
         }
         return humanDate;
     }
