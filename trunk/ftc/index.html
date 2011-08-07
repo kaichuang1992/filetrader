@@ -7,6 +7,13 @@
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
   <script type="text/javascript" src="j/ftc.js"></script>
 
+  <script id="directoryPathViewer" type="text/x-jquery-tmpl">
+    <li class="root">Home</li>
+    {{each(i, entry) pathEntries}}
+	<li>${entry}</li>
+    {{/each}}
+  </script>
+
   <script id="directoryList" type="text/x-jquery-tmpl">
         <tr>
           <th>Action</th>
