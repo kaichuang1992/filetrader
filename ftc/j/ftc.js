@@ -10,17 +10,7 @@ $(document).ready(function () {
     function getDirList() {
         params.action = 'getDirList';
         $.get(proxy_endpoint, params, function (response) {
-            $.each(response.data, function (i, v) {
-                v.fileDate = fancyDate(v.fileDate);
-                v.fileSize = toHumanSize(v.fileSize);
-            });
-            // this is ugly do not want!
-            $("tbody").html($("#directoryEntryHeader").tmpl());
-            $("#directoryEntry").tmpl(response.data).appendTo("tbody");
-            $('tr:odd').each(function () {
-                // TODO: set style class instead of CSS right here
-                $(this).css('background-color', '#ccc');
-            });
+            $("tbody").html($("#directoryList").tmpl(response));
             $('a.download').click(function (event) {
                 var tmp_rp = params.relativePath;
                 params.action = 'getDownloadToken';
