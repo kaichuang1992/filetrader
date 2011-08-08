@@ -10,11 +10,11 @@
 
 #header
 {
-  height:35px;
 }
 
 #content
 {
+  clear: both;
   border:1px solid #000;
   margin:0 auto;
 }
@@ -126,23 +126,22 @@ ul#breadcrumb li:last-child:after
 	top: 100px;
 	padding: 10px;
 	position: absolute; 
-	text-align: center;
 }
+
+#dropbox button {
+	float: right;
+}
+
 #ftc_cancel_upload {
 	float: right;
-	height: 40px;
 }
-#dropbox p {
-	display: inline;
-	margin: 0 auto;
-}
-#dropbox .dropzone {
+#dropzone {
 	clear: both;
 	background-color: #fff;
 	background-repeat: repeat;
 	border: 2px dashed #000;
 	border-radius: 8px;
-	height: 155px;
+	height: 100px;
 	padding: 0;
 	text-align: center;
 	vertical-align: bottom;
