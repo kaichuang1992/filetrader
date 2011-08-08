@@ -64,6 +64,18 @@ $(document).ready(function () {
                     }, 'json');
                 }
             });
+            $('#inputFiles').bind('change', function () {
+                handleFiles(this.files);
+            });
+            $('#dropzone').bind('dragenter dragover', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            });
+            $('#dropzone').bind('drop', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                handleFiles(e.originalEvent.dataTransfer.files);
+            });
         }, 'json');
     }
 
@@ -154,6 +166,10 @@ $(document).ready(function () {
             }
         });
         return e;
+    }
+
+    function handleFiles(files) {
+        alert(files.length);
     }
     getDirList();
 });
