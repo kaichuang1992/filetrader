@@ -67,9 +67,13 @@
   </div>
 
   <div id="dropbox">
-	<p>Drop the file(s) you want to add</p>
+	<span>Drag &amp; Drop the files you want to upload in the area below...</span>
 	<a id="ftc_cancel_upload" href="#"><img src="i/cancel_bl.png" alt="Cancel" title="Cancel Upload" width="32" height="32"/></a>
-	<div class="dropzone"></div>
+	<div id="dropzone">Drop files here...</div>
+	<p>Or, alternatively, select them with the file chooser below...</p>
+	<input id="inputFiles" type="file" multiple="multiple">
+	<button id="startButton" disabled="disabled">Start Upload</button>
+	<button id="cancelButton" disabled="disabled">Cancel Upload</button>        
   </div>
   </div>
 </body>
