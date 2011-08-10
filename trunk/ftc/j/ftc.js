@@ -202,9 +202,6 @@ $(document).ready(function () {
         uploader_xhrs = new Array();
         uploader_rdrs = new Array();
         uploader_done = 0;
-        $.ajaxSetup({
-            async: false
-        });
         if (uploader_files !== null && uploader_files.length !== 0) {
             $('#startUpload').attr('disabled', 'disabled');
             $('#cancelUpload').removeAttr('disabled');
@@ -302,5 +299,11 @@ $(document).ready(function () {
             reader.readAsBinaryString(blob);
         }
     }
+
+        $.ajaxSetup({
+            async: false
+        });
+
+
     getDirList();
 });
