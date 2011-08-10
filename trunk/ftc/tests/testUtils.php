@@ -59,6 +59,24 @@ function handleNegativeResponse($testName = "test", $debug = FALSE, $response) {
 }
 
 function handleResponse($testName = "test", $debug = FALSE, $response, $negative = FALSE) {
+    if(file_exists("response_cache.txt")) {
+	    $responses = json_decode(file_get_contents("response_cache.txt"));
+    } else {
+	    $responses = json_decode('{}');
+    }
+    if(isset($responses->$testName)) {
+	/* compare */
+        if(json_encode($responses->$testName) !== json_encode($response)) {
+		echo "**** MISMATCH $testName ****\n";
+	        echo json_encode($responses->$testName) . "\n";
+	        echo json_encode($response) . "\n";
+		echo "**** END OF MISMATCH $testName ****\n";
+	}
+    } else {
+	$responses->$testName = $response;
+    }
+    file_put_contents("response_cache.txt", json_encode($responses));
+
     if ((!$negative && !$response->ok) || ($negative && $response->ok)) {
         echo "[FAILED] $testName";
         if (!$negative) {
@@ -72,6 +90,7 @@ function handleResponse($testName = "test", $debug = FALSE, $response, $negative
         }
         echo "\n";
     }
+    
     if ($debug) {
         echo "----     OUTPUT [$testName]    -----\n";
         var_dump($response);

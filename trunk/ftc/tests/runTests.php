@@ -49,7 +49,7 @@ $sc->performDecode(TRUE);
 handleResponse("ping " . $storageProvider['apiUrl'], $dbg, $sc->call("pingServer"));
 handleNegativeResponse("mkdir $dirName/$otherDirName", $dbg, $sc->call("createDirectory", array('relativePath' => "$dirName/$otherDirName"), "POST"));
 handleResponse("mkdir $dirName", $dbg, $sc->call("createDirectory", array('relativePath' => $dirName), "POST"));
-handleResponse("mkdir $dirName/$otherDirName", $dbg, $sc->call("createDirectory", array('relativePath' => "$dirName/$otherDirName"), "POST"));
+handleResponse("mkdir2 $dirName/$otherDirName", $dbg, $sc->call("createDirectory", array('relativePath' => "$dirName/$otherDirName"), "POST"));
 
 handleNegativeResponse("mkdir $dirName/$otherDirName/.test", $dbg, $sc->call("createDirectory", array('relativePath' => "$dirName/$otherDirName/.test"), "POST"));
 
@@ -64,9 +64,9 @@ $r = handleResponse("utoken $fileName", $dbg, $sc->call("getUploadToken", array(
 
 handleResponse("ufile $fileName", $dbg, uploadFile($r->data->uploadLocation, "COPYING", 1024));
 
-handleResponse("setdesc $fileName", $dbg, $sc->call('setDescription', array('relativePath' => $fileName, 'fileDescription' => "'Hello World'"), "POST"));
+handleResponse("setdesc2 $fileName", $dbg, $sc->call('setDescription', array('relativePath' => $fileName, 'fileDescription' => "'Hello World'"), "POST"));
 
-$d = handleResponse("getdesc $fileName", $dbg, $sc->call('getDescription', array('relativePath' => $fileName), "POST"));
+$d = handleResponse("getdesc2 $fileName", $dbg, $sc->call('getDescription', array('relativePath' => $fileName), "POST"));
 if ($d->data->fileDescription !== "'Hello World'") {
     die("FAIL");
 }
@@ -80,9 +80,9 @@ handleResponse("ls $dirName", $dbg, $sc->call("getDirList", array('relativePath'
 
 handleNegativeResponse("rmdir $dirName", $dbg, $sc->call("deleteDirectory", array('relativePath' => $dirName), "POST"));
 handleResponse("rmdir $dirName/$otherDirName", $dbg, $sc->call("deleteDirectory", array('relativePath' => "$dirName/$otherDirName"), "POST"));
-handleResponse("rmdir $dirName", $dbg, $sc->call("deleteDirectory", array('relativePath' => $dirName), "POST"));
+handleResponse("rmdir2 $dirName", $dbg, $sc->call("deleteDirectory", array('relativePath' => $dirName), "POST"));
 handleResponse("rm $fileName", $dbg, $sc->call("deleteFile", array('relativePath' => $fileName), "POST"));
 
-handleNegativeResponse("setdesc $fileName", $dbg, $sc->call('setDescription', array('relativePath' => $fileName, 'fileDescription' => 'Hello World'), "POST"));
+handleNegativeResponse("setdesc3 $fileName", $dbg, $sc->call('setDescription', array('relativePath' => $fileName, 'fileDescription' => 'Hello World'), "POST"));
 
 ?>

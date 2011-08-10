@@ -10,7 +10,7 @@ $(document).ready(function () {
     function getDirList() {
         params.action = 'getDirList';
         $.get(proxy_endpoint, params, function (response) {
-            $("tbody").html($("#directoryList").tmpl(response, {
+            $("#filelist").html($("#directoryList").tmpl(response, {
                 fDate: function (timestamp) {
                     return fancyDateTime(timestamp);
                 },
@@ -75,6 +75,9 @@ $(document).ready(function () {
                 e.stopPropagation();
                 e.preventDefault();
                 handleFiles(e.originalEvent.dataTransfer.files);
+            });
+            $('#startUpload').click(function (event) {
+                startUpload();
             });
         }, 'json');
     }
@@ -152,7 +155,7 @@ $(document).ready(function () {
         if (bytes >= kilobyte) {
             return Math.round((bytes / kilobyte)) + "kB"
         }
-        return bytes;
+        return bytes + " bytes";
     }
 
     function splitPath(fullPath) {
@@ -167,9 +170,128 @@ $(document).ready(function () {
         });
         return e;
     }
+    var uploader_total_size;
+    var uploader_uploaded;
+    var uploader_files;
+    var uploader_xhrs;
+    var uploader_rdrs;
+    var uploader_done;
+    var uploader_block_size = 512 * 1024;
 
     function handleFiles(files) {
-        alert(files.length);
+        uploader_files = files;
+        uploader_total_size = 0;
+        uploader_uploaded = 0;
+        if (uploader_files.length !== 0) {
+            $('#startUpload').removeAttr('disabled');
+            for (var i = 0; i < uploader_files.length; i++) {
+                uploader_total_size += uploader_files[i].size;
+            }
+            $('#statusBar').html("Selected " + uploader_files.length + " file(s) for upload, a total of " + fancyBytes(uploader_total_size) + ".");
+            $('#progressBar').progressbar({
+                value: 0
+            });
+        }
+    }
+
+    function startUpload() {
+        uploader_xhrs = new Array();
+        uploader_rdrs = new Array();
+        uploader_done = 0;
+        $.ajaxSetup({
+            async: false
+        });
+        if (uploader_files !== null && uploader_files.length !== 0) {
+            $('#startUpload').attr('disabled', 'disabled');
+            $('#cancelUpload').removeAttr('disabled');
+            for (var i = 0; i < uploader_files.length; i++) {
+                // get token
+                var tmp_rp = params.relativePath;
+                params.action = 'getUploadToken';
+                params.relativePath += "/" + uploader_files[i].name;
+                params.fileSize = uploader_files[i].size;
+                $.post(proxy_endpoint, params, function (response) {
+                    var upload_url = response.data.uploadLocation;
+                    uploadFile(i, uploader_files[i], upload_url);
+                }, 'json');
+                params.relativePath = tmp_rp;
+            }
+        }
+    }
+
+    function cancelUpload() {
+        for (var i = 0; i < uploader_xhrs.length; i++) {
+            uploader_xhrs[i].abort();
+        }
+        for (var i = 0; i < uploader_rdrs.length; i++) {
+            uploader_rdrs[i].abort();
+        }
+        $('#cancelUpload').attr('disabled', 'disabled');
+    }
+
+    function uploadFile(index, file, upload_url) {
+        var bytesLeft = file.size;
+        var currentChunk = 0;
+        var transferLength;
+        var blob;
+        var xhr;
+        if (bytesLeft > 0) {
+            transferLength = (uploader_block_size > bytesLeft) ? bytesLeft : uploader_block_size;
+            var reader = new FileReader();
+            uploader_rdrs.push(reader);
+            reader.onload = function (evt) {
+                xhr = new XMLHttpRequest();
+                uploader_xhrs.push(xhr);
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        uploader_uploaded += evt.loaded;
+                        $('#debug').text(uploader_uploaded + '/' + uploader_total_size);
+                        $('#progressBar').progressbar({
+                            value: Math.round(uploader_uploaded * 100 / uploader_total_size)
+                        });
+                    }
+                }, false);
+                // when upload of a chunk is complete
+                xhr.upload.addEventListener("load", function (evt) {
+                    bytesLeft -= transferLength;
+                    if (bytesLeft > 0) {
+                        transferLength = (uploader_block_size > bytesLeft) ? bytesLeft : uploader_block_size;
+                        currentChunk++;
+                        if (file.slice) {
+                            blob = file.slice(currentChunk * uploader_block_size, transferLength);
+                        }
+                        if (file.mozSlice) {
+                            blob = file.mozSlice(currentChunk * uploader_block_size, currentChunk * uploader_block_size + transferLength);
+                        }
+                        if (file.webkitSlice) {
+                            blob = file.webkitSlice(currentChunk * uploader_block_size, currentChunk * uploader_block_size + transferLength);
+                        }
+                        // read the next blob
+                        reader.readAsBinaryString(blob);
+                    } else {
+                        // file done
+                        alert('file done');
+                        if (++done == uploader_files.length && bytesLeft == 0) {
+                            // also last file done
+                            $('#cancelUpload').attr('disabled', 'disabled');
+                        }
+                    }
+                }, false);
+                xhr.open("PUT", upload_url, true);
+                xhr.setRequestHeader("X-File-Chunk", currentChunk);
+                xhr.send(blob);
+            }
+            if (file.slice) {
+                blob = file.slice(0, transferLength);
+            }
+            if (file.mozSlice) {
+                blob = file.mozSlice(0, currentChunk * uploader_block_size + transferLength);
+            }
+            if (file.webkitSlice) {
+                blob = file.webkitSlice(0, currentChunk * uploader_block_size + transferLength);
+            }
+            reader.readAsBinaryString(blob);
+        }
     }
     getDirList();
 });

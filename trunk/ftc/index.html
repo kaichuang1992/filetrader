@@ -2,11 +2,13 @@
 <head>
 <title>FileTrader</title>
   <link rel="stylesheet" type="text/css" href="s/style.css">
-
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.8.15/themes/base/jquery-ui.css">
   <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.8.15/jquery-ui.min.js"></script>
+<!-- <script type="text/javascript" src="http://www.datatables.net/download/build/jquery.dataTables.min.js"></script> -->
+
   <script type="text/javascript" src="j/ftc.js"></script>
-<!--  <script type="text/javascript" src="j/uploader.js"></script> -->
 
   <script id="directoryPathViewer" type="text/x-jquery-tmpl">
     <li class="root">home</li>
@@ -16,6 +18,7 @@
   </script>
 
   <script id="directoryList" type="text/x-jquery-tmpl">
+        <thead>
         <tr>
           <th class="action">Action</th>
           <th>Name</th>
@@ -23,6 +26,8 @@
           <th>Created</th>
           <th>Delete</th>
         </tr>
+        </thead>
+        <tbody>
 	{{each(i, entry) data}}
           {{if (i % 2 === 0)}}
 	        <tr class="dirEntry even">
@@ -32,15 +37,16 @@
 
 	  {{if isDirectory}}
 	          <td><a class="open" href="#"><img src="i/dir_bl.png" height="20" width="20" alt="Open" title="Open Directory"></a></td>
-	  	  <td class="dir">${entry.fileName}</td><td>-</td><td>${$item.fDate(entry.fileDate)}</td>
+	  	  <td class="name dir">${entry.fileName}</td><td>-</td><td>${$item.fDate(entry.fileDate)}</td>
 		  <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20" alt="Delete" title="Delete Directory"></a></td>
 	  {{else}}
                   <td><a class="download" href="#"><img src="i/download_bl.png" height="20" width="20" alt="Download" title="Download File"></a></td>
-		  <td class="file">${entry.fileName}</td><td>${$item.fSize(entry.fileSize)}</td><td>${$item.fDate(entry.fileDate)}</td>
+		  <td class="name file">${entry.fileName}</td><td>${$item.fSize(entry.fileSize)}</td><td>${$item.fDate(entry.fileDate)}</td>
                   <td><a class="delete" href="#"><img src="i/bin_bl.png" height="20" width="20" alt="Delete" title="Delete File"></a></td>
 	  {{/if}}
        {{/each}}
-        </tr> 
+        </tr>
+        </tbody>
   </script>
 
 </head>
@@ -60,20 +66,21 @@
   </div>
 
   <div id="content">
-    <table class="filelist">
-      <tbody>
-      </tbody>
+    <table id="filelist">
     </table>
   </div>
 
   <div id="dropbox">
-	<span>Drag &amp; Drop the files you want to upload in the area below...</span>
+	<h3>Upload</h3>
 	<a id="ftc_cancel_upload" href="#"><img src="i/cancel_bl.png" alt="Cancel" title="Cancel Upload" width="32" height="32"/></a>
-	<div id="dropzone">Drop files here...</div>
-	<p>Or, alternatively, select them with the file chooser below...</p>
+	<div id="dropzone"><p>Drop here!</p></div>
+	<p>Or, select some files...</p>
 	<input id="inputFiles" type="file" multiple="multiple">
-	<button id="startButton" disabled="disabled">Start Upload</button>
-	<button id="cancelButton" disabled="disabled">Cancel Upload</button>        
+	<div id="statusBar"></div>
+	<div id="progressBar"></div>
+        <button id="startUpload" disabled="disabled">Start Upload</button>
+        <button id="cancelUpload" disabled="disabled">Cancel Upload</button>
+	<p id="debug"></p>
   </div>
   </div>
 </body>
