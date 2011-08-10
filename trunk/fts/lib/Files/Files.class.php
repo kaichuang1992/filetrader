@@ -49,8 +49,9 @@ class Files {
     }
 
     function getDownloadToken() {
-        /* FIXME: token should expire, based on server request? */
+        requireRequestMethod("POST");
 
+        /* FIXME: token should expire, based on server request? */
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             throw new Exception("invalid request method, should be POST");
         }
@@ -76,18 +77,14 @@ class Files {
     }
 
     function getUploadToken() {
+        requireRequestMethod("POST");
+
         /* FIXME: token should expire, based on server request? */
         /* FIXME: what if upload size is not known in time? transcode web service for example... */
-        /* FIXME: maybe transparently fix the file name on duplicate upload */
-
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception("invalid request method, should be POST");
-        }
-
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 
         /* make sure the uploaded file name is unique */
-        $absPath = getUniqueName($absPath);
+        $absPath = $this->getUniqueName($absPath);
 
         /* verify fileSize
          *
@@ -119,13 +116,10 @@ class Files {
     }
 
     function downloadFile() {
+        requireRequestMethod("GET", 405);
+
         /* FIXME: delete token after download, but still support range requests, pickle?! */
         /* FIXME: delete token immediately on first request? */
-
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-            throw new Exception("invalid request method, should be GET", 405);
-        }
-
         if (!isset($_GET['token']) || empty($_GET['token']) || !ctype_xdigit($_GET['token'])) {
             throw new Exception("invalid token", 400);
         }
@@ -156,14 +150,11 @@ class Files {
     }
 
     function uploadFile() {
+        requireRequestMethod(array("PUT","OPTIONS"), 405);
+
         /* FIXME: limit content-length to something reasonable, max file upload size from PHP? */
-
-        if ($_SERVER['REQUEST_METHOD'] != 'PUT'
-                && $_SERVER['REQUEST_METHOD'] != 'OPTIONS') {
-            throw new Exception("invalid request method, should be PUT", 405);
-        }
-
-        /* This is to allow "preflight" XMLHttpRequests,
+        
+	/* This is to allow "preflight" XMLHttpRequests,
          * see https://developer.mozilla.org/En/HTTP_access_control */
         /* FIXME: maybe move this to after the token verification? */
         /* FIXME: maybe be more restrictive in where to allow requests from? */
@@ -266,9 +257,7 @@ class Files {
     }
 
     function getDescription() {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception("invalid request method, should be POST");
-        }
+	requireRequestMethod("POST");
 
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
@@ -285,9 +274,7 @@ class Files {
     }
 
     function getDirList() {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-            throw new Exception("invalid request method, should be GET");
-        }
+        requireRequestMethod("GET");
 
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 
@@ -310,9 +297,7 @@ class Files {
     }
 
     function deleteFile() {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception("invalid request method, should be POST");
-        }
+        requireRequestMethod("POST");
 
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_FILE);
 
@@ -334,9 +319,7 @@ class Files {
     }
 
     function deleteDirectory() {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception("invalid request method, should be POST");
-        }
+        requireRequestMethod("POST");
 
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_DIR);
 
@@ -347,9 +330,7 @@ class Files {
     }
 
     function createDirectory() {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            throw new Exception("invalid request method, should be POST");
-        }
+        requireRequestMethod("POST");
 
         $absPath = $this->validatePath(getRequest('relativePath', TRUE), FTS_PARENT);
 
@@ -367,9 +348,7 @@ class Files {
     }
 
     function serverInfo() {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-            throw new Exception("invalid request method, should be GET");
-        }
+        requireRequestMethod("GET");
 
         /* determine available disk space on server */
         $df = disk_free_space($this->fsd);
@@ -387,9 +366,8 @@ class Files {
     }
 
     function pingServer() {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-            throw new Exception("invalid request method, should be GET");
-        }
+        requireRequestMethod("GET");
+
         return array('message' => 'FTS reporting for duty', 'apiVersion' => API_VERSION, 'displayName' => getConfig($this->config, 'display_name', FALSE, $_SERVER['SERVER_NAME']));
     }
 
@@ -442,6 +420,36 @@ class Files {
         }
     }
 
+	/**
+	 * Get a unique name when uploading a file if requested file name already
+	 * exists.
+	 *
+	 * Suppose "text.txt" exists already, the suggestion becomes "test (1).txt"
+	 * If "test (1).txt" already exists, make it "test (2).txt"
+	 *
+	 * NOTE: If you want to upload "test (1).txt" and it already exists, it will
+	 * become "test (1) (1).txt" though!
+	 */
+	private function getUniqueName($absPath) {
+	    $count = 1;
+	    $uploadName = $absPath;
+	    while (file_exists($uploadName)) {
+	        $dirName = dirname($absPath);
+	        $fileName = basename($absPath);
+	        $lastDotPos = strrpos($fileName, ".");
+	        if ($lastDotPos === FALSE) {
+	            $fileBase = $fileName . " (" . $count . ")";
+	            $fileExt = '';
+	        } else {
+	            $fileExt = substr($fileName, $lastDotPos);
+	            $fileBase = substr($fileName, 0, $lastDotPos);
+	            $fileBase = $fileBase . " (" . $count . ")";
+	        }
+	        $uploadName = $dirName . DIRECTORY_SEPARATOR . $fileBase . $fileExt;
+	        $count++;
+	    }
+	    return $uploadName;
+	}
 }
 
 ?>
