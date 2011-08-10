@@ -79,6 +79,9 @@ $(document).ready(function () {
             $('#startUpload').click(function (event) {
                 startUpload();
             });
+            $('#cancelUpload').click(function (event) {
+                cancelUpload();
+            });
         }, 'json');
     }
 
