@@ -119,35 +119,18 @@ function getServerName() {
     }
 }
 
-/**
- * Get a unique name when uploading a file if requested file name already
- * exists.
- *
- * Suppose "text.txt" exists already, the suggestion becomes "test (1).txt"
- * If "test (1).txt" already exists, make it "test (2).txt"
- *
- * NOTE: If you want to upload "test (1).txt" and it already exists, it will
- * become "test (1) (1).txt" though!
- */
-function getUniqueName($absPath) {
-    $count = 1;
-    $uploadName = $absPath;
-    while (file_exists($uploadName)) {
-        $dirName = dirname($absPath);
-        $fileName = basename($absPath);
-        $lastDotPos = strrpos($fileName, ".");
-        if ($lastDotPos === FALSE) {
-            $fileBase = $fileName . " (" . $count . ")";
-            $fileExt = '';
-        } else {
-            $fileExt = substr($fileName, $lastDotPos);
-            $fileBase = substr($fileName, 0, $lastDotPos);
-            $fileBase = $fileBase . " (" . $count . ")";
-        }
-        $uploadName = $dirName . DIRECTORY_SEPARATOR . $fileBase . $fileExt;
-        $count++;
-    }
-    return $uploadName;
+function requireRequestMethod($method = "GET", $errorCode = 0) {
+	if(!is_array($method)) {
+		$method = array($method);
+	}
+
+	$validMethods = array_intersect($method, array("GET","POST","PUT","DELETE","OPTIONS"));
+	if(empty($validMethods)) {
+ 		throw new Exception("invalid request method(s) specified", $errorCode);
+	}
+	if(!in_array($_SERVER['REQUEST_METHOD'], $validMethods)) {
+		throw new Exception("invalid request method used, require [" . implode(" or ", $validMethods) . "]");
+	}
 }
 
 ?>
