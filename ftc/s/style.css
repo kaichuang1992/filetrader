@@ -19,7 +19,7 @@
   margin:0 auto;
 }
 
-body,tbody
+body,tbody,thead
 {
   font-family:"Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
   font-size:80%;
@@ -132,6 +132,12 @@ ul#breadcrumb li:last-child:after
 	float: right;
 }
 
+#dropbox h3 {
+	margin: 0;
+	padding: 0;
+	display: inline;
+}
+
 #ftc_cancel_upload {
 	float: right;
 }
@@ -139,12 +145,22 @@ ul#breadcrumb li:last-child:after
 	clear: both;
 	background-color: #fff;
 	background-repeat: repeat;
+	width: 200px;
 	border: 2px dashed #000;
 	border-radius: 8px;
+        display: table-cell;
+        vertical-align: middle;
 	height: 100px;
 	padding: 0;
 	text-align: center;
-	vertical-align: bottom;
 	background-image: url(../i/back_down.png);
-	background-position: -30px;
 }
+
+#statusBar {
+	margin: 10px 0;
+}
+
+#progressBar {
+	margin: 10px 0;
+}
+
