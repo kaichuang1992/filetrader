@@ -184,11 +184,12 @@ $(document).ready(function () {
     function handleFiles(files) {
         uploader_files = files;
         uploader_total_size = 0;
-        uploader_uploaded = 0;
+        uploader_uploaded = [];
         if (uploader_files.length !== 0) {
             $('#startUpload').removeAttr('disabled');
             for (var i = 0; i < uploader_files.length; i++) {
                 uploader_total_size += uploader_files[i].size;
+                uploader_uploaded[i] = 0;
             }
             $('#statusBar').html("Selected " + uploader_files.length + " file(s) for upload, a total of " + fancyBytes(uploader_total_size) + ".");
             $('#progressBar').progressbar({
@@ -247,10 +248,13 @@ $(document).ready(function () {
                 uploader_xhrs.push(xhr);
                 xhr.upload.addEventListener("progress", function (evt) {
                     if (evt.lengthComputable) {
-                        uploader_uploaded += evt.loaded;
-                        $('#debug').text(uploader_uploaded + '/' + uploader_total_size);
+                        uploader_uploaded[index] = Math.round(uploader_block_size * currentChunk + evt.loaded);
+                        var total_uploaded = 0;
+                        for (var i = 0; i < uploader_files.length; i++) {
+                            total_uploaded += uploader_uploaded[i];
+                        }
                         $('#progressBar').progressbar({
-                            value: Math.round(uploader_uploaded * 100 / uploader_total_size)
+                            value: Math.round(total_uploaded * 100 / uploader_total_size)
                         });
                     }
                 }, false);
@@ -273,8 +277,10 @@ $(document).ready(function () {
                         reader.readAsBinaryString(blob);
                     } else {
                         // file done
-                        alert('file done');
-                        if (++done == uploader_files.length && bytesLeft == 0) {
+                        if (++uploader_done == uploader_files.length && bytesLeft == 0) {
+                            $('#progressBar').progressbar({
+                                value: 100
+                            });
                             // also last file done
                             $('#cancelUpload').attr('disabled', 'disabled');
                         }
