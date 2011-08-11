@@ -206,6 +206,7 @@ $(document).ready(function () {
     }
 
     function startUpload() {
+        uploader_start_time = Date.now();
         uploader_xhrs = new Array();
         uploader_rdrs = new Array();
         uploader_done = 0;
@@ -287,6 +288,9 @@ $(document).ready(function () {
                                 value: 100
                             });
                             $('#cancelUpload').attr('disabled', 'disabled');
+                            var elapsed_time = Math.round((Date.now() - uploader_start_time) / 1000);
+                            getDirList();
+                            alert("Average speed of upload: " + fancyBytes(Math.round(uploader_total_size / elapsed_time)) + "/s");
                         }
                     }
                 }, false);
