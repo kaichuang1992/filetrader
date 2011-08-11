@@ -18,78 +18,79 @@ $(document).ready(function () {
                     return fancyBytes(bytes);
                 }
             }));
-            $("#breadcrumb").html($("#directoryPathViewer").tmpl(splitPath(params.relativePath)));
-            $("#breadcrumb li").click(function (event) {
-                var relPath;
-                if ($(this).hasClass("root")) {
-                    relPath = "/";
-                } else {
-                    relPath = $(this).text();
-                    $.each($(this).prevUntil("li.root"), function (i, val) {
-                        relPath = $(this).text() + "/" + relPath;
-                    });
-                }
-                params.relativePath = relPath;
-                getDirList();
-            });
-            $('a#ftc_add').click(function (event) {
-                $('#dropbox').show();
-            });
-            $('a#ftc_cancel_upload').click(function (event) {
-                $('#dropbox').hide();
-            });
-            $('a.download').click(function (event) {
-                var tmp_rp = params.relativePath;
-                params.action = 'getDownloadToken';
-                params.relativePath += "/" + $(this).parent().next().text();
-                $.post(proxy_endpoint, params, function (response) {
-                    window.location.href = response.data.downloadLocation;
-                }, 'json');
+        }, 'json');
+        // FIXME: optimize this
+        $("#breadcrumb").html($("#directoryPathViewer").tmpl(splitPath(params.relativePath)));
+        $("#breadcrumb li").click(function (event) {
+            var relPath;
+            if ($(this).hasClass("root")) {
+                relPath = "/";
+            } else {
+                relPath = $(this).text();
+                $.each($(this).prevUntil("li.root"), function (i, val) {
+                    relPath = $(this).text() + "/" + relPath;
+                });
+            }
+            params.relativePath = relPath;
+            getDirList();
+        });
+    }
+    $('a#ftc_add').click(function (event) {
+        $('#dropbox').show();
+    });
+    $('a#ftc_cancel_upload').click(function (event) {
+        $('#dropbox').hide();
+    });
+    $('a.download').live('click', function (event) {
+        var tmp_rp = params.relativePath;
+        params.action = 'getDownloadToken';
+        params.relativePath += "/" + $(this).parent().next().text();
+        $.post(proxy_endpoint, params, function (response) {
+            window.location.href = response.data.downloadLocation;
+        }, 'json');
+        params.relativePath = tmp_rp;
+        getDirList();
+    });
+    $('a.open').live('click', function (event) {
+        params.relativePath += "/" + $(this).parent().next().text();
+        getDirList();
+    });
+    $('a.delete').live('click', function (event) {
+        var fileName = $(this).parent().prev().prev().prev().text();
+        if (confirm("Are you sure you want to delete '" + fileName + "'?")) {
+            var tmp_rp = params.relativePath;
+            params.action = 'deleteFile';
+            params.relativePath += "/" + fileName;
+            $.post(proxy_endpoint, params, function (response) {
                 params.relativePath = tmp_rp;
                 getDirList();
-            });
-            $('a.open').click(function (event) {
-                params.relativePath += "/" + $(this).parent().next().text();
-                getDirList();
-            });
-            $('a.delete').click(function (event) {
-                var fileName = $(this).parent().prev().prev().prev().text();
-                if (confirm("Are you sure you want to delete '" + fileName + "'?")) {
-                    var tmp_rp = params.relativePath;
-                    params.action = 'deleteFile';
-                    params.relativePath += "/" + fileName;
-                    $.post(proxy_endpoint, params, function (response) {
-                        params.relativePath = tmp_rp;
-                        getDirList();
-                    }, 'json');
-                }
-            });
-            $('#inputFiles').bind('change', function (e) {
-                handleFiles(this.files);
-                e.stopPropagation();
-                e.preventDefault();
-            });
-            $('#dropzone').bind('dragenter dragover', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-            });
-            $('#dropzone').bind('drop', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                handleFiles(e.originalEvent.dataTransfer.files);
-            });
-            $('#startUpload').click(function (e) {
-                startUpload();
-                e.stopPropagation();
-                e.preventDefault();
-            });
-            $('#cancelUpload').click(function (e) {
-                cancelUpload();
-                e.stopPropagation();
-                e.preventDefault();
-            });
-        }, 'json');
-    }
+            }, 'json');
+        }
+    });
+    $('#inputFiles').bind('change', function (e) {
+        handleFiles(this.files);
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $('#dropzone').bind('dragenter dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $('#dropzone').bind('drop', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        handleFiles(e.originalEvent.dataTransfer.files);
+    });
+    $('#startUpload').click(function (e) {
+        startUpload();
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $('#cancelUpload').click(function (e) {
+        cancelUpload();
+        e.stopPropagation();
+        e.preventDefault();
+    });
 
     function fancyDateTime(ts) {
         var now = new Date();
