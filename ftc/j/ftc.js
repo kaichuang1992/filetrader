@@ -64,8 +64,10 @@ $(document).ready(function () {
                     }, 'json');
                 }
             });
-            $('#inputFiles').bind('change', function () {
+            $('#inputFiles').bind('change', function (e) {
                 handleFiles(this.files);
+                e.stopPropagation();
+                e.preventDefault();
             });
             $('#dropzone').bind('dragenter dragover', function (e) {
                 e.stopPropagation();
@@ -76,11 +78,15 @@ $(document).ready(function () {
                 e.preventDefault();
                 handleFiles(e.originalEvent.dataTransfer.files);
             });
-            $('#startUpload').click(function (event) {
+            $('#startUpload').click(function (e) {
                 startUpload();
+                e.stopPropagation();
+                e.preventDefault();
             });
-            $('#cancelUpload').click(function (event) {
+            $('#cancelUpload').click(function (e) {
                 cancelUpload();
+                e.stopPropagation();
+                e.preventDefault();
             });
         }, 'json');
     }
@@ -275,10 +281,10 @@ $(document).ready(function () {
                     } else {
                         // file done
                         if (++uploader_done == uploader_files.length && bytesLeft == 0) {
+                            // also last file done
                             $('#progressBar').progressbar({
                                 value: 100
                             });
-                            // also last file done
                             $('#cancelUpload').attr('disabled', 'disabled');
                         }
                     }
@@ -299,11 +305,8 @@ $(document).ready(function () {
             reader.readAsBinaryString(blob);
         }
     }
-
-        $.ajaxSetup({
-            async: false
-        });
-
-
+    $.ajaxSetup({
+        async: false
+    });
     getDirList();
 });
