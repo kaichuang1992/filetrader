@@ -49,7 +49,6 @@ $(document).ready(function () {
             window.location.href = response.data.downloadLocation;
         }, 'json');
         params.relativePath = tmp_rp;
-        getDirList();
     });
     $('a.open').live('click', function (event) {
         params.relativePath += "/" + $(this).parent().next().text();
@@ -261,6 +260,10 @@ $(document).ready(function () {
                         $('#progressBar').progressbar({
                             value: Math.round(total_uploaded * 100 / uploader_total_size)
                         });
+                        var elapsed_time = Math.round((Date.now() - uploader_start_time) / 1000);
+                        if (!isNaN(total_uploaded) && !isNaN(elapsed_time) && elapsed_time > 0) {
+                            $('#progressInfo').text(fancyBytes(Math.round(total_uploaded / elapsed_time)) + "/s");
+                        }
                     }
                 }, false);
                 // when upload of a chunk is complete
@@ -288,9 +291,8 @@ $(document).ready(function () {
                                 value: 100
                             });
                             $('#cancelUpload').attr('disabled', 'disabled');
-                            var elapsed_time = Math.round((Date.now() - uploader_start_time) / 1000);
+                            $('#progressInfo').prepend('Average: ');
                             getDirList();
-                            alert("Average speed of upload: " + fancyBytes(Math.round(uploader_total_size / elapsed_time)) + "/s");
                         }
                     }
                 }, false);
