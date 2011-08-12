@@ -4,8 +4,8 @@
   border:1px solid #ccc;
   margin:0 auto;
   padding:10px;
-    box-shadow: 0 3px 3px 0;
-    -webkit-box-shadow: 0 3px 3px 0;
+  box-shadow: 0 3px 3px 0;
+  -webkit-box-shadow: 0 3px 3px 0;
 }
 
 #header
@@ -22,7 +22,7 @@
 body,tbody,thead
 {
   font-family:"Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
-  font-size:80%;
+  font-size:85%;
 }
 
 a
@@ -162,5 +162,9 @@ ul#breadcrumb li:last-child:after
 
 #progressBar {
 	margin: 10px 0;
+}
+
+#progressInfo {
+	float: left;
 }
 
