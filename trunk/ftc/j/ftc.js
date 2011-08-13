@@ -198,9 +198,7 @@ $(document).ready(function () {
                 uploader_uploaded[i] = 0;
             }
             $('#statusBar').html("Selected " + uploader_files.length + " file(s) for upload, a total of " + fancyBytes(uploader_total_size) + ".");
-            $('#progressBar').progressbar({
-                value: 0
-            });
+            $('#progressBar').text("0%");
         }
     }
 
@@ -257,9 +255,8 @@ $(document).ready(function () {
                         for (var i = 0; i < uploader_files.length; i++) {
                             total_uploaded += uploader_uploaded[i];
                         }
-                        $('#progressBar').progressbar({
-                            value: Math.round(total_uploaded * 100 / uploader_total_size)
-                        });
+                        var val = Math.round(total_uploaded * 100 / uploader_total_size);
+                        $('#progressBar').val(val).text(val + "%");
                         var elapsed_time = Math.round((Date.now() - uploader_start_time) / 1000);
                         if (!isNaN(total_uploaded) && !isNaN(elapsed_time) && elapsed_time > 0) {
                             $('#progressInfo').text(fancyBytes(Math.round(total_uploaded / elapsed_time)) + "/s");
@@ -287,9 +284,7 @@ $(document).ready(function () {
                         // file done
                         if (++uploader_done == uploader_files.length && bytesLeft == 0) {
                             // also last file done
-                            $('#progressBar').progressbar({
-                                value: 100
-                            });
+                            $('#progressBar').val(100).text(100 + "%");
                             $('#cancelUpload').attr('disabled', 'disabled');
                             $('#progressInfo').prepend('Average: ');
                             getDirList();

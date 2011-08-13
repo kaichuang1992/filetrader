@@ -4,12 +4,8 @@
 <meta charset="UTF-8"> 
 <title>FileTrader</title>
   <link rel="stylesheet" type="text/css" href="s/style.css">
-  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.8.15/themes/base/jquery-ui.css">
   <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-  <script type="text/javascript" src="http://code.jquery.com/ui/1.8.15/jquery-ui.min.js"></script>
-<!-- <script type="text/javascript" src="http://www.datatables.net/download/build/jquery.dataTables.min.js"></script> -->
-
   <script type="text/javascript" src="j/ftc.js"></script>
 
   <script id="directoryPathViewer" type="text/x-jquery-tmpl">
@@ -79,7 +75,7 @@
 	<p>Or, select some files...</p>
 	<input id="inputFiles" type="file" multiple="multiple">
 	<div id="statusBar"></div>
-	<div id="progressBar"></div>
+	<progress id="progressBar" value="0" max="100"></progress>
 	<div id="progressInfo"></div>
         <button id="startUpload" disabled="disabled">Start Upload</button>
         <button id="cancelUpload" disabled="disabled">Cancel Upload</button>
