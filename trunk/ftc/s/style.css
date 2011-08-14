@@ -163,6 +163,7 @@ ul#breadcrumb li:last-child:after
 #progressBar {
 	margin: 10px auto;
 	display: block;
+	width: 100%;
 }
 
 #progressInfo {
