@@ -185,7 +185,7 @@ $(document).ready(function () {
     var uploader_xhrs;
     var uploader_rdrs;
     var uploader_done;
-    var uploader_block_size = 512 * 1024;
+    var uploader_block_size = 1024 * 1024;
 
     function handleFiles(files) {
         uploader_files = files;
