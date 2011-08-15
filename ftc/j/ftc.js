@@ -235,11 +235,27 @@ $(document).ready(function () {
         $('#cancelUpload').attr('disabled', 'disabled');
     }
 
+    function sliceWrapper(file, start, end) {
+        var blob = false;
+        if (file.slice) {
+            alert("WARNING: using Blob.slice()");
+            blob = file.slice(start, end - start);
+        } else if (file.mozSlice) {
+            blob = file.mozSlice(start, end);
+        } else if (file.webkitSlice) {
+            blob = file.webkitSlice(start, end);
+        } else {
+            alert('ERROR: FileAPI Blob.slice() not supported by browser');
+        }
+        return blob;
+    }
+
     function uploadFile(index, file, upload_url) {
         var bytesLeft = file.size;
         var currentChunk = 0;
         var transferLength;
         var blob;
+        var slice_function;
         var xhr;
         if (bytesLeft > 0) {
             transferLength = (uploader_block_size > bytesLeft) ? bytesLeft : uploader_block_size;
@@ -269,15 +285,7 @@ $(document).ready(function () {
                     if (bytesLeft > 0) {
                         transferLength = (uploader_block_size > bytesLeft) ? bytesLeft : uploader_block_size;
                         currentChunk++;
-                        if (file.slice) {
-                            blob = file.slice(currentChunk * uploader_block_size, transferLength);
-                        }
-                        if (file.mozSlice) {
-                            blob = file.mozSlice(currentChunk * uploader_block_size, currentChunk * uploader_block_size + transferLength);
-                        }
-                        if (file.webkitSlice) {
-                            blob = file.webkitSlice(currentChunk * uploader_block_size, currentChunk * uploader_block_size + transferLength);
-                        }
+                        blob = sliceWrapper(file, currentChunk * uploader_block_size, currentChunk * uploader_block_size + transferLength);
                         // read the next blob
                         reader.readAsBinaryString(blob);
                     } else {
@@ -295,15 +303,7 @@ $(document).ready(function () {
                 xhr.setRequestHeader("X-File-Chunk", currentChunk);
                 xhr.send(blob);
             }
-            if (file.slice) {
-                blob = file.slice(0, transferLength);
-            }
-            if (file.mozSlice) {
-                blob = file.mozSlice(0, currentChunk * uploader_block_size + transferLength);
-            }
-            if (file.webkitSlice) {
-                blob = file.webkitSlice(0, currentChunk * uploader_block_size + transferLength);
-            }
+            blob = sliceWrapper(file, 0, currentChunk * uploader_block_size + transferLength);
             reader.readAsBinaryString(blob);
         }
     }
