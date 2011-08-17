@@ -146,25 +146,17 @@ $(document).ready(function () {
         };
         return months[month];
     }
+    // Thanks to http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-%28javascript%29
 
     function fancyBytes(bytes) {
-        var kilobyte = 1024;
-        var megabyte = kilobyte * kilobyte;
-        var gigabyte = megabyte * kilobyte;
-        var terabyte = gigabyte * kilobyte;
-        if (bytes >= terabyte) {
-            return Math.round((bytes / terabyte)) + "TB"
+        var i, sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        if (bytes !== 0) {
+            i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+            return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+        } else {
+            i = 0;
+            return bytes + ' ' + sizes[i];
         }
-        if (bytes >= gigabyte) {
-            return Math.round((bytes / gigabyte)) + "GB"
-        }
-        if (bytes >= megabyte) {
-            return Math.round((bytes / megabyte)) + "MB"
-        }
-        if (bytes >= kilobyte) {
-            return Math.round((bytes / kilobyte)) + "kB"
-        }
-        return bytes + " bytes";
     }
 
     function splitPath(fullPath) {
