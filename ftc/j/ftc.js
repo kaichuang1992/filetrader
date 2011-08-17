@@ -146,9 +146,9 @@ $(document).ready(function () {
         };
         return months[month];
     }
-    // Thanks to http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-%28javascript%29
 
     function fancyBytes(bytes) {
+        // Thanks to http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-%28javascript%29
         var i, sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
         if (bytes !== 0) {
             i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
